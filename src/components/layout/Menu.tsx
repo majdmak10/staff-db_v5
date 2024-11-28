@@ -1,0 +1,220 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { jwtDecode } from "jwt-decode";
+
+interface DecodedToken {
+  id: string;
+  username: string;
+  role: string;
+}
+
+const Menu = () => {
+  const [hoveredItem, setHoveredItem] = useState<string | null>(null);
+  const [userRole, setUserRole] = useState<string>(""); // Store user role
+  const pathname = usePathname();
+  const router = useRouter(); // Initialize useRouter for navigation
+
+  useEffect(() => {
+    const fetchRole = () => {
+      const cookie = document.cookie
+        .split("; ")
+        .find((row) => row.startsWith("authToken="))
+        ?.split("=")[1];
+
+      if (cookie) {
+        try {
+          const decoded = jwtDecode<DecodedToken>(cookie);
+          setUserRole(decoded.role);
+        } catch (err) {
+          console.error("Failed to decode token:", err);
+        }
+      }
+    };
+
+    fetchRole();
+  }, []);
+
+  const handleLogout = () => {
+    document.cookie =
+      "authToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
+    alert("Logged out successfully"); // Feedback
+    router.push("/login");
+  };
+
+  const menuItems = [
+    {
+      title: "MENU",
+      items: [
+        {
+          icon: "/menu_icons/home.png?v=1.0",
+          hoverIcon: "/menu_icons/home_h.png?v=1.0",
+          label: "Home",
+          href: "/dashboard",
+        },
+        // Conditional rendering for Super-Admin
+        ...(userRole === "Super-Admin"
+          ? [
+              {
+                icon: "/menu_icons/admin.png?v=1.0",
+                hoverIcon: "/menu_icons/admin_h.png?v=1.0",
+                label: "Admins",
+                href: "/dashboard/admins",
+              },
+            ]
+          : []),
+        {
+          icon: "/menu_icons/staff.png?v=1.0",
+          hoverIcon: "/menu_icons/staff_h.png?v=1.0",
+          label: "Staff",
+          href: "/dashboard/staff",
+        },
+        {
+          icon: "/menu_icons/critical_staff.png?v=1.0",
+          hoverIcon: "/menu_icons/critical_staff_h.png?v=1.0",
+          label: "Critical Staff",
+          href: "/dashboard/critical-staff",
+        },
+        {
+          icon: "/menu_icons/warden.png?v=1.0",
+          hoverIcon: "/menu_icons/warden_h.png?v=1.0",
+          label: "Wardens",
+          href: "/dashboard/wardens",
+        },
+        {
+          icon: "/menu_icons/floor_marshal.png?v=1.0",
+          hoverIcon: "/menu_icons/floor_marshal_h.png?v=1.0",
+          label: "Floor Marshals",
+          href: "/dashboard/floor-marshals",
+        },
+        {
+          icon: "/menu_icons/etb.png?v=1.0",
+          hoverIcon: "/menu_icons/etb_h.png?v=1.0",
+          label: "ETB",
+          href: "/dashboard/etb",
+        },
+        {
+          icon: "/menu_icons/ifak.png?v=1.0",
+          hoverIcon: "/menu_icons/ifak_h.png?v=1.0",
+          label: "IFAK",
+          href: "/dashboard/ifak",
+        },
+        {
+          icon: "/menu_icons/advanced_driving.png?v=1.0",
+          hoverIcon: "/menu_icons/advanced_driving_h.png?v=1.0",
+          label: "Advanced Driving",
+          href: "/dashboard/advanced-driving",
+        },
+        {
+          icon: "/menu_icons/inside_ds.png?v=1.0",
+          hoverIcon: "/menu_icons/inside_ds_h.png?v=1.0",
+          label: "Inside DS",
+          href: "/dashboard/inside-ds",
+        },
+        {
+          icon: "/menu_icons/outside_ds.png?v=1.0",
+          hoverIcon: "/menu_icons/outside_ds_h.png?v=1.0",
+          label: "Outside DS",
+          href: "/dashboard/outside-ds",
+        },
+        {
+          icon: "/menu_icons/conops.png?v=1.0",
+          hoverIcon: "/menu_icons/conops_h.png?v=1.0",
+          label: "ConOps",
+          href: "/dashboard/conops",
+        },
+      ],
+    },
+    {
+      title: "PROFILE",
+      items: [
+        {
+          icon: "/menu_icons/profile.png?v=1.0",
+          hoverIcon: "/menu_icons/profile_h.png?v=1.0",
+          label: "Profile",
+          href: "/profile",
+        },
+        {
+          icon: "/menu_icons/settings.png?v=1.0",
+          hoverIcon: "/menu_icons/settings_h.png?v=1.0",
+          label: "Settings",
+          href: "/settings",
+        },
+        {
+          icon: "/menu_icons/help.png?v=1.0",
+          hoverIcon: "/menu_icons/help_h.png?v=1.0",
+          label: "Help",
+          href: "/help",
+        },
+        {
+          icon: "/menu_icons/logout.png?v=1.0",
+          hoverIcon: "/menu_icons/logout_h.png?v=1.0",
+          label: "Logout",
+          href: "#",
+          onClick: () => handleLogout(),
+        },
+      ],
+    },
+  ];
+
+  return (
+    <div className="text-sm min-h-screen">
+      {menuItems.map((i, sectionIndex) => (
+        <div className="flex flex-col gap-2" key={i.title}>
+          <span className="hidden lg:block text-gray-400 font-light mt-4">
+            {i.title}
+          </span>
+          {i.items.map((item, itemIndex) => {
+            const uniqueKey = `${sectionIndex}-${itemIndex}`;
+            const isActive = pathname === item.href;
+
+            return (
+              <Link
+                href={item.href}
+                key={item.label}
+                className={`flex items-center justify-center lg:justify-start gap-4 p-2 md:px-2 hover:text-mBlue rounded-lg hover:bg-mHover ${
+                  isActive
+                    ? "text-mBlue rounded-lg bg-mHover"
+                    : "mText hover:text-mBlue hover:rounded-lg hover:bg-mHover"
+                }`}
+                onMouseEnter={() => !isActive && setHoveredItem(uniqueKey)}
+                onMouseLeave={() => setHoveredItem(null)}
+                onClick={
+                  item.label === "Logout"
+                    ? (e) => {
+                        e.preventDefault(); // Prevent default link navigation
+                        handleLogout();
+                      }
+                    : undefined
+                }
+              >
+                <Image
+                  src={
+                    hoveredItem === uniqueKey || isActive
+                      ? item.hoverIcon
+                      : item.icon
+                  }
+                  alt=""
+                  width={20}
+                  height={20}
+                  className="w-5 h-5"
+                />
+                <span className="hidden lg:block">{item.label}</span>
+              </Link>
+            );
+          })}
+
+          {sectionIndex === 0 && (
+            <div className="divider my-4 h-[1px] bg-gray-300"></div>
+          )}
+        </div>
+      ))}
+    </div>
+  );
+};
+
+export default Menu;

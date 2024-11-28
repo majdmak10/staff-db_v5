@@ -1,0 +1,396 @@
+import Breadcrumbs from "@/components/layout/Breadcrumbs";
+import InputField from "@/components/shared/table/InputField";
+import FormSectionTitle from "@/components/shared/table/FormSectionTitle";
+import SelectField from "@/components/shared/table/SelectField";
+import UploadPicture from "@/components/shared/table/UploadPicture";
+import GoogleMapComponent from "@/components/shared/table/GoogleMapComponent";
+
+const AddStaffPage: React.FC = () => {
+  const center = {
+    lat: 37.7749, // Example: Latitude of San Francisco
+    lng: -122.4194, // Example: Longitude of San Francisco
+  };
+
+  const markers = [
+    { lat: 37.7749, lng: -122.4194 },
+    { lat: 37.7849, lng: -122.4094 },
+  ];
+
+  return (
+    <main className="flex flex-col gap-3">
+      <div className="flex items-center justify-between bg-white rounded-lg p-4">
+        <Breadcrumbs
+          items={[
+            { label: "Dashboard", href: "/dashboard" },
+            { label: "All Staff", href: "/dashboard/staff" },
+            { label: "Add New Staff", href: "/dashboard/staff/add" },
+          ]}
+        />
+      </div>
+
+      <div className="flex items-center bg-white rounded-lg p-4">
+        <form className="flex flex-col gap-4 w-full">
+          <h1 className="font-semibold">Add New Staff</h1>
+
+          {/* General Information Section */}
+          <div className="flex flex-col gap-4 w-full">
+            <FormSectionTitle title="General Information" />
+
+            <fieldset className="gap-4 w-full">
+              <div className="grid grid-cols-1 md:grid-cols-3 md:gap-x-10 gap-y-4">
+                <InputField
+                  label="Full Name"
+                  id="fullName"
+                  placeholder="Enter full name"
+                />
+                <InputField
+                  label="Date of Birth"
+                  id="dateOfBirth"
+                  type="date"
+                />
+                <SelectField
+                  label="Sex"
+                  id="sex"
+                  placeholder="Select Sex"
+                  options={[
+                    { value: "male", label: "Male" },
+                    { value: "female", label: "Female" },
+                  ]}
+                />
+                <InputField
+                  label="Nationality"
+                  id="nationality"
+                  placeholder="Enter nationality"
+                />
+                <SelectField
+                  label="Employment Type"
+                  id="employmentType"
+                  placeholder="Select an option"
+                  options={[
+                    { value: "international", label: "International" },
+                    { value: "national", label: "National" },
+                  ]}
+                />
+                <InputField
+                  label="Position"
+                  id="position"
+                  placeholder="Enter position"
+                />
+                <SelectField
+                  label="Unit"
+                  id="unit"
+                  placeholder="Select an option"
+                  options={[
+                    { value: "admin", label: "Admin" },
+                    { value: "communication", label: "Communication" },
+                    { value: "field", label: "Field" },
+                    {
+                      value: "informationManagement",
+                      label: "Information Management",
+                    },
+                    { value: "livelihood", label: "Livelihood" },
+                    { value: "management", label: "Management" },
+                    { value: "programme", label: "Programme" },
+                    { value: "projectControl", label: "Project Control" },
+                    { value: "protection", label: "Protection" },
+                    { value: "security", label: "Security" },
+                    { value: "shelter", label: "Shelter" },
+                    { value: "supply", label: "Supply" },
+                    { value: "transportation", label: "Transportation" },
+                  ]}
+                />
+                <SelectField
+                  label="Blood Type"
+                  id="bloodType"
+                  placeholder="Select an option"
+                  options={[
+                    { value: "aPlus", label: "A+" },
+                    { value: "bPlus", label: "B+" },
+                    { value: "abPlus", label: "AB+" },
+                    { value: "oPlus", label: "O+" },
+                    { value: "aNegative", label: "A-" },
+                    { value: "bNegative", label: "B-" },
+                    { value: "abNegative", label: "AB-" },
+                    { value: "oNegative", label: "O-" },
+                  ]}
+                />
+                <InputField
+                  label="Dependents"
+                  id="dependents"
+                  placeholder="Enter dependents"
+                />
+                <UploadPicture />
+              </div>
+            </fieldset>
+          </div>
+
+          {/* Tailwind divider */}
+          <div className="divider my-6 h-[1px] bg-gray-200"></div>
+
+          {/* Contact Information Section */}
+          <div className="flex flex-col gap-4 w-full">
+            <FormSectionTitle title="Contact Information" />
+
+            <fieldset className="gap-4 w-full">
+              <div className="grid grid-cols-1 md:grid-cols-3 md:gap-x-10 gap-y-4">
+                <InputField
+                  label="UNHCR Email"
+                  id="unhcrEmail"
+                  placeholder="Enter UNHCR email"
+                />
+                <InputField
+                  label="Private Email"
+                  id="privateEmail"
+                  placeholder="Enter private email"
+                />
+                <InputField
+                  label="Mobile Syriatel"
+                  id="mobileSyriatel"
+                  placeholder="Enter Syriatel number"
+                />
+                <InputField
+                  label="Mobile MTN"
+                  id="mobileMtn"
+                  placeholder="Enter MTN number"
+                />
+                <InputField
+                  label="Home Phone"
+                  id="homePhone"
+                  placeholder="Enter home phone number"
+                />
+                <InputField
+                  label="Extension"
+                  id="extension"
+                  placeholder="Enter extension"
+                />
+                <InputField
+                  label="Radio Call"
+                  id="radioCall"
+                  placeholder="Enter radio call"
+                />
+              </div>
+            </fieldset>
+          </div>
+
+          {/* Tailwind divider */}
+          <div className="divider my-6 h-[1px] bg-gray-200"></div>
+
+          {/* Official Documents Information Section */}
+          <div className="flex flex-col gap-4 w-full">
+            <FormSectionTitle title="Official Documents Information" />
+
+            <fieldset className="gap-4 w-full">
+              <div className="grid grid-cols-1 md:grid-cols-3 md:gap-x-10 gap-y-4">
+                <SelectField
+                  label="Contract Type"
+                  id="contractType"
+                  placeholder="Select an option"
+                  options={[
+                    { value: "fixed", label: "International" },
+                    { value: "temporary", label: "Temporary" },
+                  ]}
+                />
+                <InputField
+                  label="Contract Start Date"
+                  id="contractStartDate"
+                  type="date"
+                />
+                <InputField
+                  label="Contract End Date"
+                  id="contractEndDate"
+                  type="date"
+                />
+                <InputField
+                  label="National ID Number"
+                  id="nationalIdNumber"
+                  placeholder="Enter national ID number"
+                />
+                <InputField
+                  label="Passport Number"
+                  id="passportNumber"
+                  placeholder="Enter passport number"
+                />
+                <InputField
+                  label="Passport Expiry Date"
+                  id="passportExpiryDate"
+                  type="date"
+                />
+                <InputField
+                  label="UNLP Number"
+                  id="unlpNumber"
+                  placeholder="Enter passport number"
+                />
+                <InputField
+                  label="UNLP Expiry Date"
+                  id="unlpExpiryDate"
+                  type="date"
+                />
+              </div>
+            </fieldset>
+          </div>
+
+          {/* Tailwind divider */}
+          <div className="divider my-6 h-[1px] bg-gray-200"></div>
+
+          {/* Other Information Section */}
+          <div className="flex flex-col gap-4 w-full">
+            <FormSectionTitle title="Other Information" />
+
+            <fieldset className="gap-4 w-full">
+              <div className="grid grid-cols-1 md:grid-cols-3 md:gap-x-10 gap-y-4">
+                <SelectField
+                  label="Critical Staff"
+                  id="criticalStaff"
+                  placeholder="Select an option"
+                  options={[
+                    { value: "yes", label: "Yes" },
+                    { value: "no", label: "No" },
+                  ]}
+                />
+                <SelectField
+                  label="Warden"
+                  id="warden"
+                  placeholder="Select an option"
+                  options={[
+                    { value: "warden", label: "Warden" },
+                    { value: "deputy", label: "Deputy" },
+                    { value: "none", label: "None" },
+                  ]}
+                />
+                <SelectField
+                  label="Floor Marshal"
+                  id="floorMarshal"
+                  placeholder="Select an option"
+                  options={[
+                    { value: "yes", label: "Yes" },
+                    { value: "no", label: "No" },
+                  ]}
+                />
+                <SelectField
+                  label="ETB"
+                  id="etb"
+                  placeholder="Select an option"
+                  options={[
+                    { value: "yes", label: "Yes" },
+                    { value: "no", label: "No" },
+                  ]}
+                />
+                <SelectField
+                  label="IFAK"
+                  id="ifak"
+                  placeholder="Select an option"
+                  options={[
+                    { value: "yes", label: "Yes" },
+                    { value: "no", label: "No" },
+                  ]}
+                />
+                <SelectField
+                  label="Advanced Driving"
+                  id="advancedDriving"
+                  placeholder="Select an option"
+                  options={[
+                    { value: "yes", label: "Yes" },
+                    { value: "no", label: "No" },
+                  ]}
+                />
+                <SelectField
+                  label="Inside DS"
+                  id="insideDs"
+                  placeholder="Select an option"
+                  options={[
+                    { value: "yes", label: "Yes" },
+                    { value: "no", label: "No" },
+                  ]}
+                />
+                <SelectField
+                  label="Outside DS"
+                  id="outsideDs"
+                  placeholder="Select an option"
+                  options={[
+                    { value: "yes", label: "Yes" },
+                    { value: "no", label: "No" },
+                  ]}
+                />
+              </div>
+            </fieldset>
+          </div>
+
+          {/* Tailwind divider */}
+          <div className="divider my-6 h-[1px] bg-gray-200"></div>
+
+          {/* Address Information Section */}
+          <div className="flex flex-col gap-4 w-full">
+            <FormSectionTitle title="Address Information" />
+
+            <fieldset className="gap-4 w-full">
+              <div className="grid grid-cols-1 md:grid-cols-3 md:gap-x-10 gap-y-4">
+                <InputField
+                  label="Neighborhood"
+                  id="neighborhood"
+                  placeholder="Enter neighborhood"
+                />
+                <InputField
+                  label="Street"
+                  id="street"
+                  placeholder="Enter street"
+                />
+                <InputField
+                  label="Building"
+                  id="building"
+                  placeholder="Enter building"
+                />
+                <InputField
+                  label="Floor"
+                  id="floor"
+                  placeholder="Enter floor"
+                />
+                <InputField
+                  label="Apartment"
+                  id="apartment"
+                  placeholder="Enter apartment"
+                />
+                <InputField
+                  label="Latitude"
+                  id="latitude"
+                  placeholder="Enter latitude"
+                />
+                <InputField
+                  label="Longitude"
+                  id="longitude"
+                  placeholder="Enter longitude"
+                />
+              </div>
+            </fieldset>
+          </div>
+          <div className="flex flex-col gap-1 w-full mb-4">
+            <label className="text-sm text-gray-500">
+              Address on Google Maps
+            </label>
+            <span className="text-xs text-gray-500">
+              Choose location on the map
+            </span>
+            <GoogleMapComponent center={center} zoom={14} markers={markers} />
+          </div>
+
+          {/* Submit Buttons Section */}
+          <div className="flex justify-center items-center gap-4 mb-4">
+            <button
+              className="bg-mBlue text-sm text-white p-2 rounded-md w-16"
+              type="submit"
+            >
+              Add
+            </button>
+            <button
+              className="bg-mRed text-sm text-white p-2 rounded-md w-16"
+              type="button"
+            >
+              Cancel
+            </button>
+          </div>
+        </form>
+      </div>
+    </main>
+  );
+};
+
+export default AddStaffPage;
