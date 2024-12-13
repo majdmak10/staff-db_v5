@@ -1,12 +1,12 @@
 "use client";
 
-import { loginUser } from "@/lib/actions";
+import { loginAdmin } from "@/lib/actions";
 
 export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    const token = await loginUser(formData);
+    const token = await loginAdmin(formData);
 
     if (token) {
       document.cookie = `authToken=${token}; path=/;`;

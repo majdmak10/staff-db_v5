@@ -2,18 +2,20 @@ import jwt, { JwtPayload } from "jsonwebtoken";
 
 const JWT_SECRET = process.env.JWT_SECRET || "fallback_secret";
 
-export const createToken = (user: {
+export const createToken = (admin: {
   id: string;
   fullName: string;
+  email: string;
   username: string;
   role: string;
 }): string => {
   return jwt.sign(
     {
-      id: user.id,
-      fullName: user.fullName,
-      username: user.username, // Include username here
-      role: user.role,
+      id: admin.id,
+      fullName: admin.fullName,
+      email: admin.email,
+      username: admin.username, // Include username here
+      role: admin.role,
     },
     JWT_SECRET,
     { expiresIn: "1h" } // Token expiry time

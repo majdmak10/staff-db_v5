@@ -1,5 +1,5 @@
 import { Staff } from "@/models/models";
-import { User } from "@/models/models";
+import { Admin } from "@/models/models";
 import { connectToDB } from "@/utils/connectToDb";
 
 export const getStaff = async () => {
@@ -23,23 +23,23 @@ export const getStaffById = async (id: string) => {
   }
 };
 
-export const getUsers = async () => {
+export const getAdmins = async () => {
   try {
     connectToDB();
-    const users = await User.find();
-    return users;
+    const admins = await Admin.find();
+    return admins;
   } catch (err) {
     console.log(err);
-    throw new Error("Error getting users");
+    throw new Error("Error getting admins");
   }
 };
 
-export const getUserById = async (id: string) => {
+export const getAdminById = async (id: string) => {
   try {
-    const user = await User.findById(id);
-    return user;
+    const admin = await Admin.findById(id);
+    return admin;
   } catch (err) {
     console.log(err);
-    throw new Error("Failed to get staff member");
+    throw new Error("Failed to get admin");
   }
 };

@@ -2,8 +2,8 @@ import mongoose, { Schema, Document, Model } from "mongoose";
 
 // Define the Mongoose schema
 const StaffSchema = new Schema({
-  fullName: { type: String, required: true },
   picture: { type: String },
+  fullName: { type: String, required: true },
   sex: { type: String, required: true },
   email: { type: String, required: true },
   criticalStaff: { type: Boolean, required: true },
@@ -11,31 +11,39 @@ const StaffSchema = new Schema({
 
 // Define the TypeScript interface
 export interface IStaff extends Document {
-  fullName: string;
   picture?: string;
+  fullName: string;
   sex: string;
   email: string;
   criticalStaff: boolean;
 }
 
-const UserSchema = new Schema({
+const AdminSchema = new Schema({
+  picture: { type: String },
   fullName: { type: String, required: true },
+  email: { type: String, required: true },
   username: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  role: { type: String, required: true, enum: ["Super-Admin", "Admin"] }, // Role field
+  role: {
+    type: String,
+    required: true,
+    enum: ["Super-Admin", "Admin", "Guest"],
+  }, // Role field
 });
 
 // TypeScript interface
-export interface IUser extends Document {
+export interface IAdmin extends Document {
   _id: string; // Explicitly define _id as string
+  picture?: string;
   fullName: string;
+  email: string;
   username: string;
   password: string;
-  role: "Super-Admin" | "Admin";
+  role: "Super-Admin" | "Admin" | "Guest";
 }
 
 // Create the Mongoose model
 export const Staff: Model<IStaff> =
   mongoose.models.Staff || mongoose.model<IStaff>("Staff", StaffSchema);
-export const User: Model<IUser> =
-  mongoose.models.User || mongoose.model<IUser>("User", UserSchema);
+export const Admin: Model<IAdmin> =
+  mongoose.models.Admin || mongoose.model<IAdmin>("Admin", AdminSchema);

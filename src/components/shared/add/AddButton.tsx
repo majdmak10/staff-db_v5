@@ -1,17 +1,21 @@
 import Image from "next/image";
 import Link from "next/link";
 
-const AddButton: React.FC = () => {
+interface AddButtonProps {
+  href: string;
+}
+
+const AddButton: React.FC<AddButtonProps> = ({ href }) => {
   return (
     <div>
-      <Link href="/dashboard/staff/add">
-        <button className="bg-mBlue rounded-full p-2" title="Add Staff">
+      <Link href={href}>
+        <button className="bg-mBlue rounded-full p-2" title="Add">
           <Image
             src="/table_icons/add.png"
-            alt="Add Staff"
+            alt="Add"
             width={16}
             height={16}
-            title="Add Staff"
+            title="Add"
           />
         </button>
       </Link>

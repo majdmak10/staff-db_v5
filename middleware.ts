@@ -8,8 +8,8 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL("/login", req.url));
   }
 
-  const user = verifyToken(token);
-  if (!user || user.role !== "Super-Admin") {
+  const admin = verifyToken(token);
+  if (!admin || !["Super-Admin", "Admin", "Guest"].includes(admin.role)) {
     return NextResponse.redirect(new URL("/login", req.url));
   }
 

@@ -37,7 +37,8 @@ const EditStaff: React.FC<EditStaffProps> = async ({ params }) => {
             />
           </div>
           <div>
-            <select name="sex" defaultValue={String(staffMember.sex)}>
+            <label htmlFor="role">Role</label>
+            <select id="role" name="sex" defaultValue={String(staffMember.sex)}>
               <option value="Male">Male</option>
               <option value="Female">Female</option>
             </select>
@@ -51,8 +52,9 @@ const EditStaff: React.FC<EditStaffProps> = async ({ params }) => {
             />
           </div>
           <div>
-            <label>Critical?</label>
+            <label htmlFor="role">Critical?</label>
             <select
+              id="role"
               name="criticalStaff"
               defaultValue={String(staffMember.criticalStaff)}
             >

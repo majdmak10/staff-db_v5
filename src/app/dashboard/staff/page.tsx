@@ -1,9 +1,9 @@
 import Breadcrumbs from "@/components/layout/Breadcrumbs";
 import AddButton from "@/components/shared/add/AddButton";
+import DeleteButton from "@/components/staff/DeleteStaff/DeleteButton";
 import Image from "next/image";
 import Link from "next/link";
 import { getStaff } from "@/lib/data";
-import DeleteButton from "@/components/staff/DeleteStaff/DeleteButton";
 import { deleteStaff } from "@/lib/actions";
 
 const StaffPage = async () => {
@@ -18,7 +18,7 @@ const StaffPage = async () => {
             { label: "All Staff", href: "/dashboard/staff" },
           ]}
         />
-        <AddButton />
+        <AddButton href="/dashboard/staff/add" />
       </div>
       <div className="flex flex-col items-center justify-center bg-white rounded-lg p-4">
         <table className="w-full">

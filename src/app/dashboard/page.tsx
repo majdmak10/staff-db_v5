@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import StaffCard from "@/components/dashboard/StaffCard";
 // import StaffPanel from "@/components/StaffPanel";
 import UsefulLinks from "@/components/dashboard/UsefulLinks";
-import { getCurrentUserRole } from "@/lib/actions";
+import { getCurrentAdminRole } from "@/lib/actions";
 
 const Dashboard = () => {
   const [role, setRole] = useState<string | null>(null);
@@ -20,10 +20,10 @@ const Dashboard = () => {
         .split("; ")
         .find((row) => row.startsWith("authToken="))
         ?.split("=")[1];
-      const userRole = await getCurrentUserRole(cookie);
-      setRole(userRole);
+      const adminRole = await getCurrentAdminRole(cookie);
+      setRole(adminRole);
 
-      if (!userRole || userRole !== "Super-Admin") {
+      if (!adminRole || adminRole !== "Super-Admin") {
         router.push("/login"); // Redirect unauthorized users
       }
     };

@@ -1,7 +1,7 @@
 "use server";
 
 import { Staff } from "@/models/models";
-import { User } from "@/models/models";
+import { Admin } from "@/models/models";
 import { connectToDB } from "@/utils/connectToDb";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -78,8 +78,8 @@ export const deleteStaff = async (formData: FormData): Promise<void> => {
   revalidatePath("/dashboard/staff");
 };
 
-export const addUser = async (formData: FormData): Promise<void> => {
-  const { fullName, username, password, role } = Object.fromEntries(
+export const addAdmin = async (formData: FormData): Promise<void> => {
+  const { fullName, email, username, password, role } = Object.fromEntries(
     formData
   ) as Record<string, string>;
 
@@ -89,25 +89,29 @@ export const addUser = async (formData: FormData): Promise<void> => {
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const newUser = new User({
+    const newAdmin = new Admin({
       fullName,
+      email,
       username,
       password: hashedPassword,
-      role,
+      role:
+        role === "Super-Admin" || role === "Admin" || role === "Guest"
+          ? role
+          : "Guest", // Fallback role
     });
 
-    await newUser.save();
-    console.log("User added successfully");
+    await newAdmin.save();
+    console.log("Admin added successfully");
   } catch (err) {
-    console.error("Failed to add user:", err);
+    console.error("Failed to add admin:", err);
   }
 
-  revalidatePath("/dashboard/users");
-  redirect("/dashboard/users");
+  revalidatePath("/dashboard/admins");
+  redirect("/dashboard/admins");
 };
 
-export const updateUser = async (formData: FormData): Promise<void> => {
-  const { id, username, password, isAdmin } = Object.fromEntries(
+export const updateAdmin = async (formData: FormData): Promise<void> => {
+  const { id, fullName, email, username, password, role } = Object.fromEntries(
     formData
   ) as Record<string, string>;
 
@@ -115,9 +119,11 @@ export const updateUser = async (formData: FormData): Promise<void> => {
     await connectToDB();
 
     const updateFields = {
+      fullName,
+      email,
       username,
       password,
-      isAdmin: isAdmin === "true",
+      role: role === "true",
     };
 
     Object.keys(updateFields).forEach((key) => {
@@ -126,32 +132,34 @@ export const updateUser = async (formData: FormData): Promise<void> => {
       }
     });
 
-    await User.findByIdAndUpdate(id, updateFields);
-    console.log("User updated successfully");
+    await Admin.findByIdAndUpdate(id, updateFields);
+    console.log("Admin updated successfully");
   } catch (err) {
-    console.error("Failed to update user:", err);
+    console.error("Failed to update admin:", err);
   }
 
-  revalidatePath("/dashboard/users");
-  redirect("/dashboard/users");
+  revalidatePath("/dashboard/admins");
+  redirect("/dashboard/admins");
 };
 
-export const deleteUser = async (formData: FormData): Promise<void> => {
+export const deleteAdmin = async (formData: FormData): Promise<void> => {
   const { id } = Object.fromEntries(formData) as Record<string, string>;
 
   try {
     await connectToDB();
 
-    await User.findByIdAndDelete(id);
-    console.log("User deleted successfully");
+    await Admin.findByIdAndDelete(id);
+    console.log("Admin deleted successfully");
   } catch (err) {
-    console.error("Failed to delete user:", err);
+    console.error("Failed to delete admin:", err);
   }
 
-  revalidatePath("/dashboard/users");
+  revalidatePath("/dashboard/admins");
 };
 
-export const loginUser = async (formData: FormData): Promise<string | null> => {
+export const loginAdmin = async (
+  formData: FormData
+): Promise<string | null> => {
   const { username, password } = Object.fromEntries(formData) as Record<
     string,
     string
@@ -160,22 +168,23 @@ export const loginUser = async (formData: FormData): Promise<string | null> => {
   try {
     await connectToDB();
 
-    const user = await User.findOne({ username });
-    if (!user) {
-      throw new Error("User not found");
+    const admin = await Admin.findOne({ username });
+    if (!admin) {
+      throw new Error("Admin not found");
     }
 
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    const isPasswordValid = await bcrypt.compare(password, admin.password);
     if (!isPasswordValid) {
       throw new Error("Invalid password");
     }
 
     // Ensure _id is a string
     const token = createToken({
-      id: user._id.toString(),
-      fullName: user.fullName,
-      username: user.username,
-      role: user.role,
+      id: admin._id.toString(),
+      fullName: admin.fullName,
+      email: admin.email,
+      username: admin.username,
+      role: admin.role,
     });
     return token;
   } catch (err) {
@@ -184,10 +193,10 @@ export const loginUser = async (formData: FormData): Promise<string | null> => {
   }
 };
 
-export const getCurrentUserRole = async (
+export const getCurrentAdminRole = async (
   cookie: string | undefined
 ): Promise<string | null> => {
   if (!cookie) return null;
-  const user = verifyToken(cookie);
-  return user?.role || null;
+  const admin = verifyToken(cookie);
+  return admin?.role || null;
 };
