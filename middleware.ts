@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { verifyToken } from "@/lib/session";
+import { verifyToken, ROLE_PERMISSIONS } from "@/lib/session";
 
 export async function middleware(req: NextRequest) {
   const token = req.cookies.get("authToken")?.value;
@@ -9,8 +9,20 @@ export async function middleware(req: NextRequest) {
   }
 
   const admin = verifyToken(token);
+
+  // Determine which paths require specific permissions
+  const path = req.nextUrl.pathname;
+
   if (!admin || !["Super-Admin", "Admin", "Guest"].includes(admin.role)) {
     return NextResponse.redirect(new URL("/login", req.url));
+  }
+
+  // Additional path-based access control
+  if (
+    path.startsWith("/dashboard/admins") &&
+    !admin.permissions.canAccessAllDashboards
+  ) {
+    return NextResponse.redirect(new URL("/dashboard", req.url));
   }
 
   return NextResponse.next();

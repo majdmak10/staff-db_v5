@@ -11,6 +11,7 @@ interface SelectFieldProps {
   name: string;
   options: SelectOption[];
   placeholder?: string;
+  required?: boolean; // Add required prop
 }
 
 const SelectField: React.FC<SelectFieldProps> = ({

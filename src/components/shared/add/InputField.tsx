@@ -8,6 +8,7 @@ interface InputFieldProps {
   name: string;
   placeholder?: string;
   type?: string;
+  required?: boolean; // Add required prop
 }
 
 const InputField: React.FC<InputFieldProps> = ({
