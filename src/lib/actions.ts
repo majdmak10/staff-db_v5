@@ -1,22 +1,22 @@
 "use server";
 
 import { Staff } from "@/models/models";
-import { Admin } from "@/models/models";
+import { User } from "@/models/models";
 import { connectToDB } from "@/utils/connectToDb";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { createToken } from "@/lib/session";
-import { verifyToken } from "@/lib/session";
 import bcrypt from "bcrypt";
+import { promises as fs } from "fs";
+import path from "path";
 
 export const addStaff = async (formData: FormData): Promise<void> => {
-  const { fullName, sex, email, criticalStaff } = Object.fromEntries(
-    formData
-  ) as Record<string, string>;
+  const { profilePicture, fullName, sex, email, criticalStaff } =
+    Object.fromEntries(formData) as Record<string, string>;
 
   try {
     await connectToDB();
     const newStaff = new Staff({
+      profilePicture,
       fullName,
       sex,
       email,
@@ -33,14 +33,14 @@ export const addStaff = async (formData: FormData): Promise<void> => {
 };
 
 export const updateStaff = async (formData: FormData): Promise<void> => {
-  const { id, fullName, sex, email, criticalStaff } = Object.fromEntries(
-    formData
-  ) as Record<string, string>;
+  const { id, profilePicture, fullName, sex, email, criticalStaff } =
+    Object.fromEntries(formData) as Record<string, string>;
 
   try {
     await connectToDB();
 
     const updateFields = {
+      profilePicture,
       fullName,
       sex,
       email,
@@ -78,45 +78,115 @@ export const deleteStaff = async (formData: FormData): Promise<void> => {
   revalidatePath("/dashboard/staff");
 };
 
-export const addAdmin = async (formData: FormData): Promise<void> => {
+export const addUser = async (formData: FormData): Promise<void> => {
   const { fullName, email, password, confirmPassword, role } =
     Object.fromEntries(formData) as Record<string, string>;
+
+  // Get the file from formData
+  const profilePictureFile = formData.get("profilePicture") as File;
 
   try {
     await connectToDB();
 
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedConfirmPassword = await bcrypt.hash(confirmPassword, 10);
 
-    const newAdmin = new Admin({
+    // Handle profile picture upload
+    let profilePicturePath = "";
+    if (profilePictureFile && profilePictureFile.size > 0) {
+      // Get original filename and extension
+      const originalFilename = profilePictureFile.name;
+      const fileExtension = path.extname(originalFilename);
+      const baseFilename = path.basename(originalFilename, fileExtension);
+
+      // Ensure the upload directory exists
+      const uploadDir = path.join(
+        process.cwd(),
+        "public",
+        "uploads",
+        "profiles_pictures"
+      );
+      await fs.mkdir(uploadDir, { recursive: true });
+
+      // Function to generate unique filename
+      const generateUniqueFilename = async (
+        baseName: string,
+        ext: string,
+        counter = 0
+      ): Promise<string> => {
+        const suffix = counter > 0 ? `_${counter}` : "";
+        const potentialFilename = `${baseName}${suffix}${ext}`;
+        const fullPath = path.join(uploadDir, potentialFilename);
+
+        try {
+          // Check if file exists
+          await fs.access(fullPath);
+          // If file exists, try again with incremented counter
+          return generateUniqueFilename(baseName, ext, counter + 1);
+        } catch {
+          // File doesn't exist, so this filename is unique
+          return potentialFilename;
+        }
+      };
+
+      // Generate unique filename
+      const uniqueFilename = await generateUniqueFilename(
+        baseFilename,
+        fileExtension
+      );
+
+      // Convert File to Buffer
+      const bytes = await profilePictureFile.arrayBuffer();
+      const buffer = Buffer.from(bytes);
+
+      // Write file to public directory
+      const fullFilePath = path.join(uploadDir, uniqueFilename);
+      await fs.writeFile(fullFilePath, buffer);
+
+      // Store relative path for database and frontend
+      profilePicturePath = `/uploads/profiles_pictures/${uniqueFilename}`;
+    }
+
+    const newUser = new User({
+      profilePicture: profilePicturePath,
       fullName,
       email,
       password: hashedPassword,
-      confirmPassword,
+      confirmPassword: hashedConfirmPassword,
       role:
-        role === "Super-Admin" || role === "Admin" || role === "Guest"
+        role === "Admin" || role === "Editor" || role === "Guest"
           ? role
-          : "Guest", // Fallback role
+          : "Guest",
     });
 
-    await newAdmin.save();
-    console.log("Admin added successfully");
+    await newUser.save();
+    console.log("User added successfully");
   } catch (err) {
-    console.error("Failed to add admin:", err);
+    console.error("Failed to add user:", err);
+    throw err;
   }
 
   revalidatePath("/dashboard/admins");
   redirect("/dashboard/admins");
 };
 
-export const updateAdmin = async (formData: FormData): Promise<void> => {
-  const { id, fullName, email, password, confirmPassword, role } =
-    Object.fromEntries(formData) as Record<string, string>;
+export const updateUser = async (formData: FormData): Promise<void> => {
+  const {
+    id,
+    profilePicture,
+    fullName,
+    email,
+    password,
+    confirmPassword,
+    role,
+  } = Object.fromEntries(formData) as Record<string, string>;
 
   try {
     await connectToDB();
 
     const updateFields = {
+      profilePicture,
       fullName,
       email,
       password,
@@ -130,70 +200,27 @@ export const updateAdmin = async (formData: FormData): Promise<void> => {
       }
     });
 
-    await Admin.findByIdAndUpdate(id, updateFields);
-    console.log("Admin updated successfully");
+    await User.findByIdAndUpdate(id, updateFields);
+    console.log("User updated successfully");
   } catch (err) {
-    console.error("Failed to update admin:", err);
+    console.error("Failed to update user:", err);
   }
 
   revalidatePath("/dashboard/admins");
   redirect("/dashboard/admins");
 };
 
-export const deleteAdmin = async (formData: FormData): Promise<void> => {
+export const deleteUser = async (formData: FormData): Promise<void> => {
   const { id } = Object.fromEntries(formData) as Record<string, string>;
 
   try {
     await connectToDB();
 
-    await Admin.findByIdAndDelete(id);
-    console.log("Admin deleted successfully");
+    await User.findByIdAndDelete(id);
+    console.log("User deleted successfully");
   } catch (err) {
-    console.error("Failed to delete admin:", err);
+    console.error("Failed to delete user:", err);
   }
 
   revalidatePath("/dashboard/admins");
-};
-
-export const loginAdmin = async (
-  formData: FormData
-): Promise<string | null> => {
-  const { email, password } = Object.fromEntries(formData) as Record<
-    string,
-    string
-  >;
-
-  try {
-    await connectToDB();
-
-    const admin = await Admin.findOne({ email }).lean(); // Use .lean() to return a plain object
-    if (!admin) {
-      throw new Error("Admin not found");
-    }
-
-    const isPasswordValid = await bcrypt.compare(password, admin.password);
-    if (!isPasswordValid) {
-      throw new Error("Invalid password");
-    }
-
-    // Ensure _id is a string
-    const token = createToken({
-      id: admin._id.toString(),
-      fullName: admin.fullName,
-      email: admin.email,
-      role: admin.role,
-    });
-    return token;
-  } catch (err) {
-    console.error("Login failed:", err);
-    return null;
-  }
-};
-
-export const getCurrentAdminRole = async (
-  cookie: string | undefined
-): Promise<string | null> => {
-  if (!cookie) return null;
-  const admin = verifyToken(cookie);
-  return admin?.role || null;
 };

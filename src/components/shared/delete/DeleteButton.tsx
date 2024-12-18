@@ -1,11 +1,11 @@
 "use client";
 
 import React, { useState } from "react";
-import ConfirmationModal from "@/components/staff/DeleteStaff/ConfirmModal";
+import ConfirmationModal from "@/components/shared/delete/ConfirmModal";
 
 interface DeleteButtonProps {
   id: string;
-  type: "staff" | "admin";
+  type: "staff" | "user";
   deleteAction: (formData: FormData) => Promise<void>;
 }
 

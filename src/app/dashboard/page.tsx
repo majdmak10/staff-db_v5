@@ -1,35 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import StaffCard from "@/components/dashboard/StaffCard";
 // import StaffPanel from "@/components/StaffPanel";
 import UsefulLinks from "@/components/dashboard/UsefulLinks";
-import { getCurrentAdminRole } from "@/lib/actions";
 
 const Dashboard = () => {
-  const [role, setRole] = useState<string | null>(null);
-  const router = useRouter();
   const staffInside = 10; // Replace with actual data
   const staffOutside = 5; // Replace with actual data
   const totalStaff = staffInside + staffOutside;
-
-  useEffect(() => {
-    const fetchRole = async () => {
-      const cookie = document.cookie
-        .split("; ")
-        .find((row) => row.startsWith("authToken="))
-        ?.split("=")[1];
-      const adminRole = await getCurrentAdminRole(cookie);
-      setRole(adminRole);
-    };
-
-    fetchRole();
-  }, [router]);
-
-  if (role === null) {
-    return <p>Loading...</p>;
-  }
 
   return (
     <div className="flex gap-3 flex-col md:flex-row">

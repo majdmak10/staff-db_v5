@@ -1,6 +1,6 @@
 import Breadcrumbs from "@/components/layout/Breadcrumbs";
 import AddButton from "@/components/shared/add/AddButton";
-import DeleteButton from "@/components/staff/DeleteStaff/DeleteButton";
+import DeleteButton from "@/components/shared/delete/DeleteButton";
 import Image from "next/image";
 import Link from "next/link";
 import { getStaff } from "@/lib/data";

@@ -11,7 +11,7 @@ interface SelectFieldProps {
   name: string;
   options: SelectOption[];
   placeholder?: string;
-  required?: boolean; // Add required prop
+  error?: string;
 }
 
 const SelectField: React.FC<SelectFieldProps> = ({
@@ -20,6 +20,7 @@ const SelectField: React.FC<SelectFieldProps> = ({
   name,
   options,
   placeholder = "Select an option",
+  error,
 }) => (
   <div className="flex flex-col w-full gap-2">
     <label htmlFor={id} className="text-sm text-gray-500">
@@ -29,8 +30,10 @@ const SelectField: React.FC<SelectFieldProps> = ({
       id={id}
       name={name}
       aria-label={label}
-      defaultValue="" // Set default value to an empty string
-      className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full hover:ring-mBlue focus:ring-mBlue focus:outline-none transition-all duration-200 h-10"
+      defaultValue=""
+      className={`ring-[1.5px] p-2 rounded-md text-sm w-full hover:ring-mBlue focus:ring-mBlue focus:outline-none transition-all duration-200 h-10 ${
+        error ? "ring-red-500 text-red-600" : "ring-gray-300"
+      }`}
     >
       <option value="" disabled>
         {placeholder}
@@ -41,6 +44,7 @@ const SelectField: React.FC<SelectFieldProps> = ({
         </option>
       ))}
     </select>
+    {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
   </div>
 );
 

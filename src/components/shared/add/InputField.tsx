@@ -1,5 +1,3 @@
-// components/form/InputField.tsx
-
 import React from "react";
 
 interface InputFieldProps {
@@ -8,7 +6,8 @@ interface InputFieldProps {
   name: string;
   placeholder?: string;
   type?: string;
-  required?: boolean; // Add required prop
+  error?: string;
+  description?: string;
 }
 
 const InputField: React.FC<InputFieldProps> = ({
@@ -17,6 +16,8 @@ const InputField: React.FC<InputFieldProps> = ({
   name,
   placeholder,
   type = "text",
+  error,
+  description,
 }) => (
   <div className="flex flex-col w-full gap-2">
     <label htmlFor={id} className="text-sm text-gray-500">
@@ -28,8 +29,12 @@ const InputField: React.FC<InputFieldProps> = ({
       name={name}
       placeholder={placeholder}
       aria-label={label}
-      className="ring-[1.5px] ring-gray-300 p-2 rounded-md text-sm w-full hover:ring-mBlue focus:ring-mBlue focus:outline-none transition-all duration-200 h-10"
+      className={`ring-[1.5px] p-2 rounded-md text-sm w-full hover:ring-mBlue focus:ring-mBlue focus:outline-none transition-all duration-200 h-10 ${
+        error ? "ring-red-500 text-red-600" : "ring-gray-300"
+      }`}
     />
+    {description && <p className="text-xs text-gray-500 mt-1">{description}</p>}
+    {error && <p className="text-red-500 text-xs mt-1">{error}</p>}
   </div>
 );
 

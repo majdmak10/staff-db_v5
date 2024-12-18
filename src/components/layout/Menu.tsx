@@ -1,50 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useRouter } from "next/navigation";
-import { jwtDecode } from "jwt-decode";
-
-interface DecodedToken {
-  id: string;
-  username: string;
-  role: string;
-}
 
 const Menu = () => {
   const [hoveredItem, setHoveredItem] = useState<string | null>(null);
-  const [userRole, setUserRole] = useState<string>(""); // Store user role
   const pathname = usePathname();
-  const router = useRouter(); // Initialize useRouter for navigation
-
-  useEffect(() => {
-    const fetchRole = () => {
-      const cookie = document.cookie
-        .split("; ")
-        .find((row) => row.startsWith("authToken="))
-        ?.split("=")[1];
-
-      if (cookie) {
-        try {
-          const decoded = jwtDecode<DecodedToken>(cookie);
-          setUserRole(decoded.role);
-        } catch (err) {
-          console.error("Failed to decode token:", err);
-        }
-      }
-    };
-
-    fetchRole();
-  }, []);
-
-  const handleLogout = () => {
-    document.cookie =
-      "authToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC;";
-    // alert("Logged out successfully"); // Feedback
-    router.push("/login");
-  };
 
   const menuItems = [
     {
@@ -56,17 +19,12 @@ const Menu = () => {
           label: "Home",
           href: "/dashboard",
         },
-        // Conditional rendering for Super-Admin
-        ...(userRole === "Super-Admin"
-          ? [
-              {
-                icon: "/menu_icons/admin.png?v=1.0",
-                hoverIcon: "/menu_icons/admin_h.png?v=1.0",
-                label: "Admins",
-                href: "/dashboard/admins",
-              },
-            ]
-          : []),
+        {
+          icon: "/menu_icons/admin.png",
+          hoverIcon: "/menu_icons/admin_h.png",
+          label: "Admins",
+          href: "/dashboard/admins",
+        },
         {
           icon: "/menu_icons/staff.png?v=1.0",
           hoverIcon: "/menu_icons/staff_h.png?v=1.0",
@@ -155,7 +113,6 @@ const Menu = () => {
           hoverIcon: "/menu_icons/logout_h.png?v=1.0",
           label: "Logout",
           href: "#",
-          onClick: () => handleLogout(),
         },
       ],
     },
@@ -183,14 +140,6 @@ const Menu = () => {
                 }`}
                 onMouseEnter={() => !isActive && setHoveredItem(uniqueKey)}
                 onMouseLeave={() => setHoveredItem(null)}
-                onClick={
-                  item.label === "Logout"
-                    ? (e) => {
-                        e.preventDefault(); // Prevent default link navigation
-                        handleLogout();
-                      }
-                    : undefined
-                }
               >
                 <Image
                   src={

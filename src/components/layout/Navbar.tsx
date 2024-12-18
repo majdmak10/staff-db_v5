@@ -3,49 +3,15 @@
 import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import dynamic from "next/dynamic";
-import { jwtDecode } from "jwt-decode";
 
 const Search = dynamic(() => import("./Search"), {
   ssr: false,
 });
 
-interface DecodedToken {
-  id: string;
-  fullName: string;
-  role: string;
-}
-
 const Navbar = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const avatarRef = useRef<HTMLDivElement>(null);
-
-  const [fullName, setFullName] = useState<string>("Admin");
-  const [role, setRole] = useState<string>("Role");
-
-  // Decode the JWT and set the username and role
-  useEffect(() => {
-    const fetchUser = () => {
-      const cookie = document.cookie
-        .split("; ")
-        .find((row) => row.startsWith("authToken="))
-        ?.split("=")[1];
-
-      if (cookie) {
-        try {
-          const decoded = jwtDecode<DecodedToken>(cookie);
-          console.log("Decoded Token:", decoded); // Debugging line
-          setFullName(decoded.fullName || "Full Name");
-          // setUsername(decoded.username || "User");
-          setRole(decoded.role || "Role");
-        } catch (err) {
-          console.error("Failed to decode token:", err);
-        }
-      }
-    };
-
-    fetchUser();
-  }, []);
 
   const toggleDropdown = () => {
     setDropdownOpen((prev) => !prev);
@@ -72,7 +38,7 @@ const Navbar = () => {
   return (
     <div className="flex items-center justify-between p-4 bg-mBlue rounded-lg">
       {/* TITLE */}
-      <div className="text-white font-bold">Welcome, {fullName}</div>
+      <div className="text-white font-bold">Welcome, User</div>
 
       {/* SEARCH BAR and USER */}
       <div className="flex md:gap-2 items-center">
@@ -85,10 +51,10 @@ const Navbar = () => {
         <div className="relative flex items-center md:gap-2 justify-end w-full">
           <div className="flex flex-col">
             <span className="hidden md:block text-xs font-bold text-white">
-              {fullName}
+              User
             </span>
             <span className="hidden md:block text-[10px] text-white text-right">
-              {role}
+              Role
             </span>
           </div>
 
@@ -125,8 +91,8 @@ const Navbar = () => {
               className="absolute right-0 bottom-[-5px] transform translate-y-full w-32 bg-white shadow-lg rounded-lg p-2"
             >
               <div className="flex flex-col">
-                <span className="md:hidden text-xs font-bold">{fullName}</span>
-                <span className="md:hidden text-[10px]">{role}</span>
+                <span className="md:hidden text-xs font-bold">User</span>
+                <span className="md:hidden text-[10px]">Role</span>
                 <hr className="md:hidden my-2 border-[#d4d4d8]" />
               </div>
               <ul className="text-[14px] text-gray-700">

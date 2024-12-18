@@ -1,8 +1,9 @@
 import Breadcrumbs from "@/components/layout/Breadcrumbs";
 import InputField from "@/components/shared/add/InputField";
-import FormSectionTitle from "@/components/staff/AddStaff/FormSectionTitle";
 import SelectField from "@/components/shared/add/SelectField";
 import UploadPicture from "@/components/shared/add/UploadPicture";
+import FormSectionTitle from "@/components/staff/add/FormSectionTitle";
+import GoogleMapComponent from "@/components/shared/add/GoogleMapComponent";
 import { addStaff } from "@/lib/actions";
 
 const AddStaff: React.FC = () => {

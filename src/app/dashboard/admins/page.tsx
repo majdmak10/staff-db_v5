@@ -1,13 +1,49 @@
 import Breadcrumbs from "@/components/layout/Breadcrumbs";
 import AddButton from "@/components/shared/add/AddButton";
-import DeleteButton from "@/components/staff/DeleteStaff/DeleteButton";
+import DeleteButton from "@/components/shared/delete/DeleteButton";
 import Image from "next/image";
 import Link from "next/link";
-import { getAdmins } from "@/lib/data";
-import { deleteAdmin } from "@/lib/actions";
+import { getUsers } from "@/lib/data";
+import { deleteUser } from "@/lib/actions";
+import Table from "@/components/shared/table/Table";
 
 const AdminPage = async () => {
-  const admin = await getAdmins();
+  const user = await getUsers();
+
+  // Define columns for the Table component
+  const columns = [
+    { key: "profilePicture", label: "Picture" },
+    { key: "fullName", label: "Full Name" },
+    { key: "email", label: "Email" },
+    { key: "role", label: "Role" },
+    { key: "actions", label: "Actions" },
+  ];
+
+  // Transform user data to match the Table component's format
+  const data = user.map((user) => ({
+    profilePicture: (
+      <Image
+        src={user.profilePicture || "/profile_pictures/noProfilePicture_m.png"}
+        alt="Picture"
+        width={50}
+        height={50}
+        className="rounded-full"
+      />
+    ),
+    fullName: user.fullName,
+    email: user.email,
+    role: user.role,
+    actions: (
+      <div>
+        <Link href={`/dashboard/admins/${user.id}/edit`}>
+          <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-xs mr-2">
+            Edit
+          </button>
+        </Link>
+        <DeleteButton id={user.id} type="user" deleteAction={deleteUser} />
+      </div>
+    ),
+  }));
 
   return (
     <div className="flex flex-col gap-3">
@@ -21,43 +57,7 @@ const AdminPage = async () => {
         <AddButton href="/dashboard/admins/add" />
       </div>
       <div className="flex flex-col items-center justify-center bg-white rounded-lg p-4">
-        <table className="w-full">
-          <thead>
-            <tr>
-              <th className="px-4 py-2">Picture</th>
-              <th className="px-4 py-2">Name</th>
-              <th className="px-4 py-2">Role</th>
-              <th className="px-4 py-2">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {admin.map((admin) => (
-              <tr key={admin.id}>
-                <td className="border px-4 py-2">
-                  <Image
-                    src={
-                      admin.picture ||
-                      "/profile_pictures/noProfilePicture_m.png"
-                    }
-                    alt="Picture"
-                    width={50}
-                    height={50}
-                  />
-                </td>
-                <td className="border px-4 py-2">{admin.fullName}</td>
-                <td className="border px-4 py-2">{admin.role}</td>
-                <td className="border px-4 py-2">
-                  <Link href={`/dashboard/admins/${admin.id}/edit`}>
-                    <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-xs mr-2">
-                      Edit
-                    </button>
-                  </Link>
-                  <DeleteButton staffId={admin.id} deleteStaff={deleteAdmin} />
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <Table columns={columns} data={data} />
       </div>
     </div>
   );
