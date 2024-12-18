@@ -1,20 +1,20 @@
-import { getAdminById } from "@/lib/data";
+import { getUserById } from "@/lib/data";
 
-interface AdminProfileProps {
+interface UserProfileProps {
   params: { id: string };
 }
-const AdminProfile: React.FC<AdminProfileProps> = async ({ params }) => {
+const AdminProfile: React.FC<UserProfileProps> = async ({ params }) => {
   const { id } = await params;
-  const admin = await getAdminById(id);
+  const user = await getUserById(id);
 
-  if (!admin) {
+  if (!user) {
     return <div>Admin not found</div>;
   }
 
   return (
     <div>
-      <h1>{admin.fullName}</h1>
-      <p>{admin.role}</p>
+      <h1>{user.fullName}</h1>
+      <p>{user.role}</p>
     </div>
   );
 };

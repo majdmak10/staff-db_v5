@@ -1,6 +1,6 @@
 import Image from "next/image";
-import { getAdminById } from "@/lib/data";
-import { updateAdmin } from "@/lib/actions";
+import { getUserById } from "@/lib/data";
+import { updateUser } from "@/lib/actions";
 
 interface EditAdminProps {
   params: { id: string };
@@ -8,20 +8,22 @@ interface EditAdminProps {
 
 const EditAdmin: React.FC<EditAdminProps> = async ({ params }) => {
   const { id } = await params;
-  const admin = await getAdminById(id);
+  const user = await getUserById(id);
 
-  if (!admin) {
+  if (!user) {
     return <div>Admin not found</div>;
   }
 
   return (
     <div className="p-4 bg-white rounded-lg shadow-md">
       <h2 className="text-lg font-bold mb-4">Edit Admin</h2>
-      <form action={updateAdmin} method="post">
-        <input type="hidden" name="id" value={admin.id} />
+      <form action={updateUser}>
+        <input type="hidden" name="id" value={user.id} />
         <div>
           <Image
-            src={admin.picture || "/profile_pictures/noProfilePicture_m.png"}
+            src={
+              user.profilePicture || "/profile_pictures/noProfilePicture_m.png"
+            }
             alt="Picture"
             width={50}
             height={50}
@@ -30,15 +32,15 @@ const EditAdmin: React.FC<EditAdminProps> = async ({ params }) => {
             <input
               type="text"
               name="fullName"
-              defaultValue={admin.fullName}
-              placeholder={admin.fullName}
+              defaultValue={user.fullName}
+              placeholder={user.fullName}
             />
           </div>
           <div>
             <label htmlFor="role">Role</label>
-            <select id="role" name="role" defaultValue={String(admin.role)}>
-              <option value="Super-Admin">Super-Admin</option>
+            <select id="role" name="role" defaultValue={String(user.role)}>
               <option value="Admin">Admin</option>
+              <option value="Editor">Editor</option>
               <option value="Guest">Guest</option>
             </select>
           </div>

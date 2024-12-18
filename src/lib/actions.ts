@@ -191,7 +191,7 @@ export const updateUser = async (formData: FormData): Promise<void> => {
       email,
       password,
       confirmPassword,
-      role: role === "true",
+      role, // Directly assign the role as a string
     };
 
     Object.keys(updateFields).forEach((key) => {
