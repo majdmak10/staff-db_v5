@@ -22,10 +22,6 @@ const Dashboard = () => {
         ?.split("=")[1];
       const adminRole = await getCurrentAdminRole(cookie);
       setRole(adminRole);
-
-      if (!adminRole || adminRole !== "Super-Admin") {
-        router.push("/login"); // Redirect unauthorized users
-      }
     };
 
     fetchRole();

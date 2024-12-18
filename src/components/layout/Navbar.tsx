@@ -12,7 +12,6 @@ const Search = dynamic(() => import("./Search"), {
 interface DecodedToken {
   id: string;
   fullName: string;
-  username: string;
   role: string;
 }
 
@@ -21,8 +20,7 @@ const Navbar = () => {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const avatarRef = useRef<HTMLDivElement>(null);
 
-  const [fullName, setFullName] = useState<string>("User");
-  // const [username, setUsername] = useState<string>("User");
+  const [fullName, setFullName] = useState<string>("Admin");
   const [role, setRole] = useState<string>("Role");
 
   // Decode the JWT and set the username and role

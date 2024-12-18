@@ -21,8 +21,7 @@ export interface IStaff extends Document {
 const AdminSchema = new Schema({
   picture: { type: String },
   fullName: { type: String, required: true },
-  email: { type: String, required: true },
-  username: { type: String, required: true, unique: true },
+  email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   role: {
     type: String,
@@ -37,7 +36,6 @@ export interface IAdmin extends Document {
   picture?: string;
   fullName: string;
   email: string;
-  username: string;
   password: string;
   role: "Super-Admin" | "Admin" | "Guest";
 }

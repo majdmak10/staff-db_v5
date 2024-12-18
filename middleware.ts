@@ -1,5 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
-import { verifyToken, ROLE_PERMISSIONS } from "@/lib/session";
+import { verifyToken } from "@/lib/session";
+
+const roleRedirects = {
+  "Super-Admin": "/dashboard/admin",
+  Admin: "/dashboard/admin",
+  Guest: "/dashboard/guest",
+};
+
+function isValidRole(role: string): role is keyof typeof roleRedirects {
+  return role in roleRedirects;
+}
 
 export async function middleware(req: NextRequest) {
   const token = req.cookies.get("authToken")?.value;
@@ -8,26 +18,19 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(new URL("/login", req.url));
   }
 
-  const admin = verifyToken(token);
+  const user = verifyToken(token);
 
-  // Determine which paths require specific permissions
-  const path = req.nextUrl.pathname;
-
-  if (!admin || !["Super-Admin", "Admin", "Guest"].includes(admin.role)) {
+  if (!user || !isValidRole(user.role)) {
     return NextResponse.redirect(new URL("/login", req.url));
   }
 
-  // Additional path-based access control
-  if (
-    path.startsWith("/dashboard/admins") &&
-    !admin.permissions.canAccessAllDashboards
-  ) {
-    return NextResponse.redirect(new URL("/dashboard", req.url));
+  if (req.nextUrl.pathname === "/") {
+    return NextResponse.redirect(new URL(roleRedirects[user.role], req.url));
   }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*"],
+  matcher: ["/", "/dashboard/:path*"],
 };

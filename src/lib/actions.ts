@@ -6,31 +6,10 @@ import { connectToDB } from "@/utils/connectToDb";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createToken } from "@/lib/session";
-import { verifyToken, ROLE_PERMISSIONS } from "@/lib/session";
+import { verifyToken } from "@/lib/session";
 import bcrypt from "bcrypt";
 
-const checkPermission = (
-  token: string | undefined,
-  permission: keyof (typeof ROLE_PERMISSIONS)["Super-Admin"]
-) => {
-  if (!token) throw new Error("No authentication token");
-
-  const admin = verifyToken(token);
-  if (!admin) throw new Error("Invalid token");
-
-  if (!admin.permissions[permission]) {
-    throw new Error("Unauthorized");
-  }
-
-  return admin;
-};
-
-export const addStaff = async (
-  formData: FormData,
-  token?: string
-): Promise<void> => {
-  checkPermission(token, "canAddStaff");
-
+export const addStaff = async (formData: FormData): Promise<void> => {
   const { fullName, sex, email, criticalStaff } = Object.fromEntries(
     formData
   ) as Record<string, string>;
@@ -47,19 +26,13 @@ export const addStaff = async (
     console.log("Staff added successfully");
   } catch (err) {
     console.error("Failed to add staff:", err);
-    throw err;
   }
 
   revalidatePath("/dashboard/staff");
   redirect("/dashboard/staff");
 };
 
-export const updateStaff = async (
-  formData: FormData,
-  token?: string
-): Promise<void> => {
-  checkPermission(token, "canUpdateStaff");
-
+export const updateStaff = async (formData: FormData): Promise<void> => {
   const { id, fullName, sex, email, criticalStaff } = Object.fromEntries(
     formData
   ) as Record<string, string>;
@@ -84,19 +57,13 @@ export const updateStaff = async (
     console.log("Staff updated successfully");
   } catch (err) {
     console.error("Failed to update staff:", err);
-    throw err;
   }
 
   revalidatePath("/dashboard/staff");
   redirect("/dashboard/staff");
 };
 
-export const deleteStaff = async (
-  formData: FormData,
-  token?: string
-): Promise<void> => {
-  checkPermission(token, "canDeleteStaff");
-
+export const deleteStaff = async (formData: FormData): Promise<void> => {
   const { id } = Object.fromEntries(formData) as Record<string, string>;
 
   try {
@@ -106,21 +73,14 @@ export const deleteStaff = async (
     console.log("Staff deleted successfully");
   } catch (err) {
     console.error("Failed to delete staff:", err);
-    throw err;
   }
 
   revalidatePath("/dashboard/staff");
 };
 
-export const addAdmin = async (
-  formData: FormData,
-  token?: string
-): Promise<void> => {
-  checkPermission(token, "canAddAdmin");
-
-  const { fullName, email, username, password, role } = Object.fromEntries(
-    formData
-  ) as Record<string, string>;
+export const addAdmin = async (formData: FormData): Promise<void> => {
+  const { fullName, email, password, confirmPassword, role } =
+    Object.fromEntries(formData) as Record<string, string>;
 
   try {
     await connectToDB();
@@ -131,8 +91,8 @@ export const addAdmin = async (
     const newAdmin = new Admin({
       fullName,
       email,
-      username,
       password: hashedPassword,
+      confirmPassword,
       role:
         role === "Super-Admin" || role === "Admin" || role === "Guest"
           ? role
@@ -143,74 +103,44 @@ export const addAdmin = async (
     console.log("Admin added successfully");
   } catch (err) {
     console.error("Failed to add admin:", err);
-    throw err;
   }
 
   revalidatePath("/dashboard/admins");
   redirect("/dashboard/admins");
 };
 
-export const updateAdmin = async (
-  formData: FormData,
-  token?: string
-): Promise<void> => {
-  checkPermission(token, "canUpdateAdmin");
-
-  const { id, fullName, email, username, password, role } = Object.fromEntries(
-    formData
-  ) as Record<string, string>;
+export const updateAdmin = async (formData: FormData): Promise<void> => {
+  const { id, fullName, email, password, confirmPassword, role } =
+    Object.fromEntries(formData) as Record<string, string>;
 
   try {
     await connectToDB();
 
-    // Define an interface for the update fields
-    interface AdminUpdateFields {
-      fullName?: string;
-      email?: string;
-      username?: string;
-      password?: string;
-      role?: string;
-    }
+    const updateFields = {
+      fullName,
+      email,
+      password,
+      confirmPassword,
+      role: role === "true",
+    };
 
-    const updateFields: AdminUpdateFields = {};
-
-    // Type-safe way to add fields
-    if (fullName) updateFields.fullName = fullName;
-    if (email) updateFields.email = email;
-    if (username) updateFields.username = username;
-
-    // Only update password if provided
-    if (password) {
-      updateFields.password = await bcrypt.hash(password, 10);
-    }
-
-    // Only update role if the current user has permission
-    if (role) {
-      updateFields.role = role;
-    }
-
-    // Now use updateFields in your update operation
-    await Admin.findByIdAndUpdate(id, updateFields);
-
-    // Rest of the code remains the same
+    Object.keys(updateFields).forEach((key) => {
+      if (updateFields[key as keyof typeof updateFields] === "" || undefined) {
+        delete updateFields[key as keyof typeof updateFields];
+      }
+    });
 
     await Admin.findByIdAndUpdate(id, updateFields);
     console.log("Admin updated successfully");
   } catch (err) {
     console.error("Failed to update admin:", err);
-    throw err;
   }
 
   revalidatePath("/dashboard/admins");
   redirect("/dashboard/admins");
 };
 
-export const deleteAdmin = async (
-  formData: FormData,
-  token?: string
-): Promise<void> => {
-  checkPermission(token, "canDeleteAdmin");
-
+export const deleteAdmin = async (formData: FormData): Promise<void> => {
   const { id } = Object.fromEntries(formData) as Record<string, string>;
 
   try {
@@ -220,7 +150,6 @@ export const deleteAdmin = async (
     console.log("Admin deleted successfully");
   } catch (err) {
     console.error("Failed to delete admin:", err);
-    throw err;
   }
 
   revalidatePath("/dashboard/admins");
@@ -229,7 +158,7 @@ export const deleteAdmin = async (
 export const loginAdmin = async (
   formData: FormData
 ): Promise<string | null> => {
-  const { username, password } = Object.fromEntries(formData) as Record<
+  const { email, password } = Object.fromEntries(formData) as Record<
     string,
     string
   >;
@@ -237,32 +166,23 @@ export const loginAdmin = async (
   try {
     await connectToDB();
 
-    const admin = await Admin.findOne({ username });
+    const admin = await Admin.findOne({ email }).lean(); // Use .lean() to return a plain object
     if (!admin) {
-      console.error("Admin not found");
-      return null; // Return null if the admin is not found
+      throw new Error("Admin not found");
     }
-
-    console.log("Admin found:", admin);
 
     const isPasswordValid = await bcrypt.compare(password, admin.password);
     if (!isPasswordValid) {
-      console.error("Invalid password");
-      return null; // Return null if the password is invalid
+      throw new Error("Invalid password");
     }
 
-    console.log("Password is valid");
-
-    // Generate token
+    // Ensure _id is a string
     const token = createToken({
       id: admin._id.toString(),
       fullName: admin.fullName,
       email: admin.email,
-      username: admin.username,
       role: admin.role,
     });
-
-    console.log("Token generated:", token);
     return token;
   } catch (err) {
     console.error("Login failed:", err);

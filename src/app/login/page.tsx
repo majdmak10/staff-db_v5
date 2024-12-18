@@ -1,78 +1,96 @@
 "use client";
 
 import { loginAdmin } from "@/lib/actions";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
 
-export default function LoginPage() {
-  const router = useRouter();
-  const [error, setError] = useState<string | null>(null);
-
+const LoginPage = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
+    const token = await loginAdmin(formData);
 
-    try {
-      const token = await loginAdmin(formData);
-
-      if (token) {
-        // More secure way to store token
-        localStorage.setItem("authToken", token);
-        // Redirect to dashboard
-        router.push("/dashboard");
-      } else {
-        setError("Invalid credentials");
-      }
-    } catch (err) {
-      console.error("Login error:", err); // Log the error for debugging purposes
-      setError("An error occurred during login");
+    if (token) {
+      document.cookie = `authToken=${token}; path=/;`;
+      window.location.href = "/dashboard";
+    } else {
+      alert("Invalid credentials");
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-8 rounded shadow-md w-96">
-        <h2 className="text-2xl mb-4 text-center">Login</h2>
-        {error && (
-          <div className="bg-red-100 text-red-700 p-3 rounded mb-4">
-            {error}
-          </div>
-        )}
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label htmlFor="username" className="block mb-2">
-              Username
-            </label>
-            <input
-              type="text"
-              name="username"
-              id="username"
-              required
-              className="w-full px-3 py-2 border rounded"
-              placeholder="Enter your username"
-            />
-          </div>
-          <div className="mb-4">
-            <label htmlFor="password" className="block mb-2">
-              Password
-            </label>
-            <input
-              type="password"
-              name="password"
-              id="password"
-              required
-              className="w-full px-3 py-2 border rounded"
-              placeholder="Enter your password"
-            />
-          </div>
-          <button
-            type="submit"
-            className="w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600"
-          >
-            Login
-          </button>
-        </form>
+    <div className="h-screen flex items-center justify-center">
+      <div className="flex items-stretch">
+        <div className="flex flex-col bg-white p-12 w-[500px] rounded-l-lg">
+          <h2 className="mb-8 text-mBlue text-2xl font-bold">
+            UNHCR Aleppo SO Staff Database
+          </h2>
+          <h3 className="text-gray-800 text-xl font-semibold">Welcome back!</h3>
+          <p className="mb-6 text-gray-600 text-sm">
+            Please enter your credentials to login.
+          </p>
+          <form onSubmit={handleSubmit}>
+            <div className="mb-5">
+              <label
+                htmlFor="email"
+                className="block font-medium text-gray-700"
+              >
+                Email
+              </label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                placeholder="Enter email"
+                className="w-full p-2 mt-1 border border-gray-300 rounded-md"
+                required
+              />
+            </div>
+            <div className="mb-5">
+              <label
+                htmlFor="password"
+                className="block font-medium text-gray-700"
+              >
+                Password
+              </label>
+              <input
+                type="password"
+                id="password"
+                name="password"
+                placeholder="Enter password"
+                className="w-full p-2 mt-1 border border-gray-300 rounded-md"
+                required
+              />
+            </div>
+            <div className="flex justify-between items-center mb-5 gap-3">
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="rememberMe"
+                  name="rememberMe"
+                  className="mr-2"
+                />
+                <label htmlFor="rememberMe" className="text-gray-700">
+                  Remember me
+                </label>
+              </div>
+              <a
+                href="/forgot-password"
+                className="text-blue-600 hover:underline"
+              >
+                Forgot your password?
+              </a>
+            </div>
+            <button
+              type="submit"
+              className="w-full p-2 bg-blue-600 rounded-md text-white font-semibold hover:bg-blue-700 transition-colors"
+            >
+              Login
+            </button>
+          </form>
+        </div>
+        <div className="bg-[url('/login/unhcr-bg.jpg')] bg-cover bg-center w-[600px] rounded-r-lg overflow-hidden"></div>
       </div>
     </div>
   );
-}
+};
+
+export default LoginPage;

@@ -35,18 +35,21 @@ const AddAdmin: React.FC = () => {
                   id="email"
                   name="email"
                   placeholder="Enter email"
-                />
-                <InputField
-                  label="Username"
-                  id="username"
-                  name="username"
-                  placeholder="Enter username"
+                  type="email"
                 />
                 <InputField
                   label="Password"
                   id="password"
                   name="password"
                   placeholder="Enter password"
+                  type="password"
+                />
+                <InputField
+                  label="Confirm Password"
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  placeholder="Enter confirm password"
+                  type="password"
                 />
                 <SelectField
                   label="Role"

@@ -1,4 +1,5 @@
 import Link from "next/link";
+// import { redirect } from "next/navigation";
 
 const Homepage = () => {
   return (
@@ -7,6 +8,7 @@ const Homepage = () => {
       <Link href="/dashboard">Go to Dashboard</Link>
     </div>
   );
+  // redirect("/login");
 };
 
 export default Homepage;
