@@ -1,20 +1,25 @@
 import { getUserById } from "@/lib/data";
+import Image from "next/image";
 
-interface UserProfileProps {
-  params: { id: string };
-}
-const AdminProfile: React.FC<UserProfileProps> = async ({ params }) => {
-  const { id } = await params;
-  const user = await getUserById(id);
+const AdminProfile = async ({ params }: { params: { id: string } }) => {
+  const user = await getUserById(params.id);
 
   if (!user) {
-    return <div>Admin not found</div>;
+    return <div>User not found</div>;
   }
 
   return (
-    <div>
-      <h1>{user.fullName}</h1>
-      <p>{user.role}</p>
+    <div className="flex flex-col items-center gap-4 p-4 bg-white rounded-lg">
+      <Image
+        src={user.profilePicture || "/avatars/noAvatar.png"}
+        alt={`${user.fullName}'s Profile Picture`}
+        width={180}
+        height={200}
+        className="rounded-3xl object-fill border-2 border-[#eaeaea]"
+      />
+      <h1 className="text-xl font-semibold">{user.fullName}</h1>
+      <p>Email: {user.email}</p>
+      <p>Role: {user.role}</p>
     </div>
   );
 };

@@ -216,6 +216,26 @@ export const deleteUser = async (formData: FormData): Promise<void> => {
   try {
     await connectToDB();
 
+    // Find the user to get the profile picture path
+    const user = await User.findById(id);
+
+    if (user?.profilePicture) {
+      const profilePicturePath = path.join(
+        process.cwd(),
+        "public",
+        user.profilePicture
+      );
+
+      try {
+        // Remove the profile picture file
+        await fs.unlink(profilePicturePath);
+        console.log("Profile picture deleted successfully");
+      } catch (fileError) {
+        console.error("Failed to delete profile picture:", fileError);
+      }
+    }
+
+    // Delete the user from the database
     await User.findByIdAndDelete(id);
     console.log("User deleted successfully");
   } catch (err) {

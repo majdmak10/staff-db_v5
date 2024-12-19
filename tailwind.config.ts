@@ -6,6 +6,13 @@ export default {
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
+  safelist: [
+    "w-[50px]",
+    "w-[100px]",
+    "w-[150px]",
+    "w-[200px]",
+    "w-[250px]", // Add all needed widths
+  ],
   theme: {
     extend: {
       colors: {

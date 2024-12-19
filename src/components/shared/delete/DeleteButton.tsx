@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import ConfirmationModal from "@/components/shared/delete/ConfirmModal";
+import Image from "next/image";
 
 interface DeleteButtonProps {
   id: string;
@@ -28,12 +29,16 @@ const DeleteButton: React.FC<DeleteButtonProps> = ({
 
   return (
     <>
-      <button
-        onClick={() => setModalOpen(true)}
-        className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded text-xs"
-      >
-        Delete
+      <button onClick={() => setModalOpen(true)} title="Delete">
+        <Image
+          src="/table_icons/delete.png"
+          alt="Delete"
+          width={20}
+          height={20}
+          title="Delete"
+        />
       </button>
+
       <ConfirmationModal
         isOpen={isModalOpen}
         message={`Are you sure you want to delete this ${type}?`}

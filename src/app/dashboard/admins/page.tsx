@@ -10,35 +10,54 @@ import Table from "@/components/shared/table/Table";
 const AdminPage = async () => {
   const user = await getUsers();
 
-  // Define columns for the Table component
   const columns = [
-    { key: "profilePicture", label: "Picture" },
-    { key: "fullName", label: "Full Name" },
-    { key: "email", label: "Email" },
-    { key: "role", label: "Role" },
-    { key: "actions", label: "Actions" },
+    {
+      key: "checkbox",
+      label: <input type="checkbox" aria-label="Select all rows" />,
+      width: "50px",
+    },
+    { key: "profilePicture", label: "Picture", width: "100px" },
+    { key: "fullName", label: "Full Name", width: "200px" },
+    { key: "email", label: "Email", width: "250px" },
+    { key: "role", label: "Role", width: "150px" },
+    { key: "actions", label: "Actions", width: "150px" },
   ];
 
-  // Transform user data to match the Table component's format
   const data = user.map((user) => ({
+    checkbox: <input type="checkbox" aria-label="Select row" />, // Row checkbox
     profilePicture: (
-      <Image
-        src={user.profilePicture || "/profile_pictures/noProfilePicture_m.png"}
-        alt="Picture"
-        width={50}
-        height={50}
-        className="rounded-full"
-      />
+      <Link href={`/dashboard/admins/${user.id}`}>
+        <Image
+          src={user.profilePicture || "/avatars/noAvatar.png"}
+          alt="Picture"
+          width={50}
+          height={50}
+          className="rounded-full"
+        />
+      </Link>
     ),
-    fullName: user.fullName,
+    fullName: (
+      <Link href={`/dashboard/admins/${user.id}`}>{user.fullName}</Link>
+    ),
     email: user.email,
     role: user.role,
     actions: (
-      <div>
+      <div className="flex gap-2 justify-start items-center">
+        <Link href={`/dashboard/admins/${user.id}`}>
+          <Image
+            src="/table_icons/view.png"
+            alt="View"
+            width={20}
+            height={20}
+          />
+        </Link>
         <Link href={`/dashboard/admins/${user.id}/edit`}>
-          <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-xs mr-2">
-            Edit
-          </button>
+          <Image
+            src="/table_icons/edit.png"
+            alt="Edit"
+            width={20}
+            height={20}
+          />
         </Link>
         <DeleteButton id={user.id} type="user" deleteAction={deleteUser} />
       </div>
