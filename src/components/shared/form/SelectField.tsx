@@ -23,7 +23,7 @@ const SelectField: React.FC<SelectFieldProps> = ({
   error,
 }) => (
   <div className="flex flex-col w-full gap-2">
-    <label htmlFor={id} className="text-sm text-gray-500">
+    <label htmlFor={id} className="text-sm text-gray-500 font-semibold">
       {label}
     </label>
     <select
@@ -31,7 +31,7 @@ const SelectField: React.FC<SelectFieldProps> = ({
       name={name}
       aria-label={label}
       defaultValue=""
-      className={`ring-[1.5px] p-2 rounded-md text-sm w-full hover:ring-mBlue focus:ring-mBlue focus:outline-none transition-all duration-200 h-10 ${
+      className={`ring-[1.5px] p-2 rounded-md text-sm text-gray-400 w-full hover:ring-mBlue focus:ring-mBlue focus:outline-none transition-all duration-200 h-10 ${
         error ? "ring-red-500 text-red-600" : "ring-gray-300"
       }`}
     >

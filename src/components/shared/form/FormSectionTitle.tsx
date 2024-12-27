@@ -7,7 +7,7 @@ interface FormSectionTitleProps {
 }
 
 const FormSectionTitle: React.FC<FormSectionTitleProps> = ({ title }) => (
-  <h2 className="text-gray-500 font-medium">{title}</h2>
+  <h2 className="text-gray-500 font-semibold">{title}</h2>
 );
 
 export default FormSectionTitle;

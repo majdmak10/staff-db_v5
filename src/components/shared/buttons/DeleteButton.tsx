@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import ConfirmationModal from "@/components/shared/delete/ConfirmModal";
+import ConfirmationModal from "@/components/shared/buttons/ConfirmModal";
 import Image from "next/image";
 
 interface DeleteButtonProps {

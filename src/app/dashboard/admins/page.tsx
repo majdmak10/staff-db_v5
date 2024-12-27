@@ -1,6 +1,6 @@
 import Breadcrumbs from "@/components/layout/Breadcrumbs";
-import AddButton from "@/components/shared/add/AddButton";
-import DeleteButton from "@/components/shared/delete/DeleteButton";
+import AddButton from "@/components/shared/buttons/AddButton";
+import DeleteButton from "@/components/shared/buttons/DeleteButton";
 import Image from "next/image";
 import Link from "next/link";
 import { getUsers } from "@/lib/data";
@@ -18,6 +18,7 @@ const AdminPage = async () => {
     },
     { key: "profilePicture", label: "Picture", width: "100px" },
     { key: "fullName", label: "Full Name", width: "200px" },
+    { key: "position", label: "Position", width: "200px" },
     { key: "email", label: "Email", width: "250px" },
     { key: "role", label: "Role", width: "150px" },
     { key: "actions", label: "Actions", width: "150px" },
@@ -28,17 +29,23 @@ const AdminPage = async () => {
     profilePicture: (
       <Link href={`/dashboard/admins/${user.id}`}>
         <Image
-          src={user.profilePicture || "/avatars/noAvatar.png"}
-          alt="Picture"
+          src={
+            user.profilePicture ||
+            (user.sex === "male"
+              ? "/avatars/noProfilePicture_m.png"
+              : "/avatars/noProfilePicture_f.png")
+          }
+          alt={`${user.fullName}'s Profile Picture`}
           width={50}
           height={50}
-          className="rounded-full"
+          className="rounded-full w-[50px] h-[50px] object-fill"
         />
       </Link>
     ),
     fullName: (
       <Link href={`/dashboard/admins/${user.id}`}>{user.fullName}</Link>
     ),
+    position: user.position || "N/A",
     email: user.email,
     role: user.role,
     actions: (

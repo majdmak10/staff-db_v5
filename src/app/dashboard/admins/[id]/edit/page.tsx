@@ -1,17 +1,18 @@
 import Breadcrumbs from "@/components/layout/Breadcrumbs";
-import InputField from "@/components/shared/add/InputField";
-import SelectField from "@/components/shared/add/SelectField";
-import UploadPicture from "@/components/shared/add/UploadPicture";
+import InputField from "@/components/shared/form/InputField";
+import SelectField from "@/components/shared/form/SelectField";
+import UploadPicture from "@/components/shared/form/UploadPicture";
 import Image from "next/image";
 import { getUserById } from "@/lib/data";
 import { updateUser } from "@/lib/actions";
+import CancelButton from "@/components/shared/buttons/CancelButton";
 
 interface EditAdminProps {
   params: { id: string };
 }
 
 const EditAdmin: React.FC<EditAdminProps> = async ({ params }) => {
-  const { id } = await params;
+  const { id } = params;
   const user = await getUserById(id);
 
   if (!user) {
@@ -19,72 +20,87 @@ const EditAdmin: React.FC<EditAdminProps> = async ({ params }) => {
   }
 
   return (
-    <div className="flex items-center bg-white rounded-lg p-4">
-      <form action={updateUser}>
+    <main className="flex flex-col gap-3">
+      <Breadcrumbs
+        className="flex items-center justify-between bg-white rounded-lg p-4"
+        items={[
+          { label: "Dashboard", href: "/dashboard" },
+          { label: "All Admins", href: "/dashboard/admins" },
+          { label: "Edit Admin", href: `/dashboard/admins/${user.id}/edit` },
+        ]}
+      />
+      <form
+        action={updateUser}
+        className="flex flex-col gap-4 bg-white rounded-lg p-4"
+      >
         <h1 className="font-semibold">Edit Admin</h1>
         <input type="hidden" name="id" value={user.id} />
-        <div className="flex flex-col gap-4 w-full">
-          <fieldset className="gap-4 w-full">
-            <div className="grid grid-cols-1 md:grid-cols-2 md:gap-x-10 gap-y-5">
-              <div>
-                <InputField
-                  label="Full Name"
-                  id="fullName"
-                  name="fullName"
-                  placeholder={user.fullName}
-                />
-              </div>
-            </div>
-          </fieldset>
-        </div>
-        <div>
-          <button>Save</button>
-          <button>Cancel</button>
-        </div>
-      </form>
-
-      {/* <form action={updateUser}>
-        <input type="hidden" name="id" value={user.id} />
-        <div>
-          <Image
-            src={user.profilePicture || "/avatars/noAvatar.png"}
-            alt="Picture"
-            width={50}
-            height={50}
-          />
-          <div>
-            <label htmlFor="fullName">Full Name</label>
-            <input
-              type="text"
+        <div className="grid grid-cols-10 gap-x-20">
+          <div className="col-span-3 flex flex-col items-center">
+            <Image
+              src={
+                user.profilePicture ||
+                (user.sex === "male"
+                  ? "/avatars/noProfilePicture_m.png"
+                  : "/avatars/noProfilePicture_f.png")
+              }
+              alt={`${user.fullName}'s Profile Picture`}
+              width={50}
+              height={50}
+              className="rounded-full w-[150px] h-[150px] object-fill"
+            />
+            <UploadPicture
+              label="Profile Picture"
+              id="profilePicture"
+              name="profilePicture"
+              uploadIcon="/table_icons/cloud-c.png"
+            />
+          </div>
+          <div className="col-span-4 space-y-4">
+            <InputField
+              label="Full Name"
+              id="fullName"
               name="fullName"
-              defaultValue={user.fullName}
               placeholder={user.fullName}
             />
-          </div>
-          <div>
-            <label htmlFor="email">Email</label>
-            <input
-              type="email"
+            <InputField
+              label="Position"
+              id="position"
+              name="position"
+              placeholder={user.position}
+            />
+            <InputField
+              label="Email"
+              id="email"
               name="email"
-              defaultValue={user.email}
               placeholder={user.email}
             />
-          </div>
-          <div>
-            <label htmlFor="role">Role</label>
-            <select id="role" name="role" defaultValue={String(user.role)}>
-              <option value="Admin">Admin</option>
-              <option value="Editor">Editor</option>
-              <option value="Guest">Guest</option>
-            </select>
-          </div>
-          <div>
-            <button>Save</button>
-            <button>Cancel</button>
+            <SelectField
+              label="Role"
+              id="role"
+              name="role"
+              placeholder={user.role}
+              options={[
+                { value: "Admin", label: "Admin" },
+                { value: "Editor", label: "Editor" },
+                { value: "Guest", label: "Guest" },
+              ]}
+            />
           </div>
         </div>
-      </form> */}
-    </div>
+
+        {/* Submit Buttons Section */}
+        <div className="flex justify-center items-center gap-4 mt-4">
+          <button
+            type="submit"
+            className="bg-mBlue text-sm text-white p-2 rounded-md w-16"
+          >
+            Save
+          </button>
+          <CancelButton /> {/* Use the CancelButton component */}
+        </div>
+      </form>
+    </main>
   );
 };
 

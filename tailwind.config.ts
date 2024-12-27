@@ -9,9 +9,22 @@ export default {
   safelist: [
     "w-[50px]",
     "w-[100px]",
+    "w-[110px]",
+    "w-[120px]",
+    "w-[130px]",
+    "w-[140px]",
     "w-[150px]",
+    "w-[160px]",
+    "w-[170px]",
+    "w-[180px]",
+    "w-[190px]",
     "w-[200px]",
-    "w-[250px]", // Add all needed widths
+    "w-[220px]",
+    "w-[250px]",
+    "w-[300px]",
+    "w-[350px]",
+    "w-[400px]",
+    "w-[500px]",
   ],
   theme: {
     extend: {

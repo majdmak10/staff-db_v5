@@ -6,13 +6,14 @@ import { usePathname } from "next/navigation";
 
 interface BreadcrumbsProps {
   items: { label: string; href: string }[];
+  className?: string; // Allow passing a custom className
 }
 
-const Breadcrumbs: React.FC<BreadcrumbsProps> = ({ items }) => {
+const Breadcrumbs: React.FC<BreadcrumbsProps> = ({ items, className }) => {
   const pathname = usePathname();
 
   return (
-    <div>
+    <div className={className}>
       <nav className="flex items-center justify-center text-sm">
         {items.map((item, index) => {
           const isActive = pathname === item.href;

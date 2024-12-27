@@ -45,7 +45,7 @@ const UploadPicture: React.FC<UploadPictureProps> = ({
 
   return (
     <div className="flex flex-col w-full gap-2">
-      <label htmlFor={id} className="text-sm text-gray-500">
+      <label htmlFor={id} className="text-sm text-gray-500 font-semibold">
         {label}
       </label>
 

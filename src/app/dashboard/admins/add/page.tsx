@@ -3,17 +3,20 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Breadcrumbs from "@/components/layout/Breadcrumbs";
-import InputField from "@/components/shared/add/InputField";
-import SelectField from "@/components/shared/add/SelectField";
-import UploadPicture from "@/components/shared/add/UploadPicture";
+import InputField from "@/components/shared/form/InputField";
+import SelectField from "@/components/shared/form/SelectField";
+import UploadPicture from "@/components/shared/form/UploadPicture";
 import { addUser } from "@/lib/actions";
 
 const AddAdmin: React.FC = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const router = useRouter();
 
+
   const validateForm = (formData: FormData) => {
     const fullName = formData.get("fullName") as string;
+    const sex = formData.get("sex") as string;
+    const position = formData.get("position") as string;
     const email = formData.get("email") as string;
     const password = formData.get("password") as string;
     const confirmPassword = formData.get("confirmPassword") as string;
@@ -52,6 +55,16 @@ const AddAdmin: React.FC = () => {
     // Full Name validation
     if (!fullName || fullName.trim() === "") {
       newErrors.fullName = "Full Name is required";
+    }
+
+    // Sex validation
+    if (!sex || sex === "") {
+      newErrors.sex = "Sex is required";
+    }
+
+    // Position validation
+    if (!position || position === "") {
+      newErrors.position = "Position is required";
     }
 
     // Email validation
@@ -105,107 +118,108 @@ const AddAdmin: React.FC = () => {
 
   return (
     <main className="flex flex-col gap-3">
-      <div className="flex items-center justify-between bg-white rounded-lg p-4">
-        <Breadcrumbs
-          items={[
-            { label: "Dashboard", href: "/dashboard" },
-            { label: "All Admins", href: "/dashboard/admins" },
-            { label: "Add New Admin", href: "/dashboard/admins/add" },
-          ]}
-        />
-      </div>
+      <Breadcrumbs
+        className="flex items-center justify-between bg-white rounded-lg p-4"
+        items={[
+          { label: "Dashboard", href: "/dashboard" },
+          { label: "All Admins", href: "/dashboard/admins" },
+          { label: "Add New Admin", href: "/dashboard/admins/add" },
+        ]}
+      />
+      <form
+        action={handleSubmit}
+        className="flex flex-col gap-4 w-full bg-white rounded-lg p-4"
+      >
+        <h1 className="font-semibold">Add New Admin</h1>
 
-      <div className="flex items-center bg-white rounded-lg p-4">
-        <form action={handleSubmit} className="flex flex-col gap-4 w-full">
-          <h1 className="font-semibold">Add New Admin</h1>
-
-          {errors.submit && (
-            <div className="bg-red-100 text-red-700 p-3 rounded-md">
-              {errors.submit}
-            </div>
-          )}
-
-          <div className="flex flex-col gap-4 w-full">
-            <fieldset className="gap-4 w-full">
-              <div className="grid grid-cols-1 md:grid-cols-2 md:gap-x-10 gap-y-5">
-                <div className="col-span-1">
-                  <InputField
-                    label="Full Name"
-                    id="fullName"
-                    name="fullName"
-                    placeholder="Enter full name"
-                    error={errors.fullName}
-                  />
-                </div>
-                <div className="col-span-1">
-                  <InputField
-                    label="Email"
-                    id="email"
-                    name="email"
-                    placeholder="Enter email"
-                    type="email"
-                    error={errors.email}
-                  />
-                </div>
-                <div className="col-span-1">
-                  <InputField
-                    label="Password"
-                    id="password"
-                    name="password"
-                    placeholder="Enter password"
-                    type="password"
-                    error={errors.password}
-                  />
-                </div>
-                <div className="col-span-1">
-                  <InputField
-                    label="Confirm Password"
-                    id="confirmPassword"
-                    name="confirmPassword"
-                    placeholder="Enter confirm password"
-                    type="password"
-                    error={errors.confirmPassword}
-                  />
-                </div>
-                <div className="col-span-1">
-                  <SelectField
-                    label="Role"
-                    id="role"
-                    name="role"
-                    placeholder="Select role"
-                    options={[
-                      { value: "Super-Admin", label: "Super-Admin" },
-                      { value: "Admin", label: "Admin" },
-                      { value: "Guest", label: "Guest" },
-                    ]}
-                    error={errors.role}
-                  />
-                </div>
-                <div className="col-span-1">
-                  <UploadPicture name="profilePicture" />
-                </div>
-              </div>
-            </fieldset>
+        {errors.submit && (
+          <div className="bg-red-100 text-red-700 p-3 rounded-md">
+            {errors.submit}
           </div>
+        )}
 
-          {/* Submit Buttons Section */}
-          <div className="flex justify-center items-center gap-4 mt-4 mb-4">
-            <button
-              className="bg-mBlue text-sm text-white p-2 rounded-md w-16"
-              type="submit"
-            >
-              Add
-            </button>
-            <button
-              className="bg-mRed text-sm text-white p-2 rounded-md w-16"
-              type="button"
-              onClick={handleCancel}
-            >
-              Cancel
-            </button>
-          </div>
-        </form>
-      </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 md:gap-x-10 gap-y-5">
+          <InputField
+            label="Full Name"
+            id="fullName"
+            name="fullName"
+            placeholder="Enter full name"
+            error={errors.fullName}
+          />
+          <SelectField
+            label="Sex"
+            id="sex"
+            name="sex"
+            placeholder="Select sex"
+            options={[
+              { value: "Female", label: "Female" },
+              { value: "Male", label: "Male" },
+            ]}
+            error={errors.sex}
+          />
+          <InputField
+            label="Position"
+            id="position"
+            name="position"
+            placeholder="Enter position"
+            type="position"
+            error={errors.position}
+          />
+          <InputField
+            label="Email"
+            id="email"
+            name="email"
+            placeholder="Enter email"
+            type="email"
+            error={errors.email}
+          />
+          <InputField
+            label="Password"
+            id="password"
+            name="password"
+            placeholder="Enter password"
+            type="password"
+            error={errors.password}
+          />
+          <InputField
+            label="Confirm Password"
+            id="confirmPassword"
+            name="confirmPassword"
+            placeholder="Enter confirm password"
+            type="password"
+            error={errors.confirmPassword}
+          />
+          <SelectField
+            label="Role"
+            id="role"
+            name="role"
+            placeholder="Select role"
+            options={[
+              { value: "Admin", label: "Admin" },
+              { value: "Editor", label: "Editor" },
+              { value: "Guest", label: "Guest" },
+            ]}
+            error={errors.role}
+          />
+          <UploadPicture name="profilePicture" />
+        </div>
+
+        <div className="flex justify-center gap-4 mt-4">
+          <button
+            className="bg-mBlue text-sm text-white p-2 rounded-md w-16"
+            type="submit"
+          >
+            Add
+          </button>
+          <button
+            className="bg-mRed text-sm text-white p-2 rounded-md w-16"
+            type="button"
+            onClick={handleCancel}
+          >
+            Cancel
+          </button>
+        </div>
+      </form>
     </main>
   );
 };
