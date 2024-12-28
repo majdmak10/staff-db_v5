@@ -13,12 +13,6 @@ const AddStaff = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const router = useRouter();
 
-  const [formData, setFormData] = useState<Record<string, string>>({});
-
-  const handleSelectChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setFormData({ ...formData, [event.target.name]: event.target.value });
-  };
-
   const validateForm = (formData: FormData) => {
     const fullName = formData.get("fullName") as string;
     const sex = formData.get("sex") as string;
@@ -332,12 +326,7 @@ const AddStaff = () => {
               { value: "Yes", label: "Yes" },
               { value: "No", label: "No" },
             ]}
-            value={formData.criticalStaff || ""} // Bind value to state
-            onChange={handleSelectChange} // Update state on change
           />
-          {formData.criticalStaff === "" && (
-            <p className="text-gray-500 text-sm mt-1">N/A</p>
-          )}
           <SelectField
             label="Warden"
             id="warden"
