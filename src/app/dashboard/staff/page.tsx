@@ -65,7 +65,7 @@ const StaffPage = async () => {
         <Image
           src={
             staff.profilePicture ||
-            (staff.sex === "male"
+            (staff.sex === "Male"
               ? "/avatars/noProfilePicture_m.png"
               : "/avatars/noProfilePicture_f.png")
           }
