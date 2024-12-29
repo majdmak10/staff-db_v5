@@ -29,6 +29,7 @@ const AddEmployee = () => {
 
     return newErrors;
   };
+
   const handleSubmit = async (formData: FormData) => {
     const validationErrors = validateForm(formData);
 
@@ -43,7 +44,6 @@ const AddEmployee = () => {
     try {
       await addEmployee(formData);
     } catch (error) {
-      // Handle any submission errors
       console.error("Submission error:", error);
       setErrors({ submit: "Failed to add employee. Please try again." });
     }
@@ -59,8 +59,8 @@ const AddEmployee = () => {
         className="flex items-center justify-between bg-white rounded-lg p-4"
         items={[
           { label: "Dashboard", href: "/dashboard" },
-          { label: "All Employees", href: "/dashboard/employee" },
-          { label: "Add New Employee", href: "/dashboard/employee/add" },
+          { label: "All Employees", href: "/dashboard/employees" },
+          { label: "Add New Employee", href: "/dashboard/employees/add" },
         ]}
       />
       <form
@@ -93,6 +93,16 @@ const AddEmployee = () => {
               { value: "Male", label: "Male" },
             ]}
             error={errors.sex}
+          />
+          <SelectField
+            label="Active Status"
+            id="isActive"
+            name="isActive"
+            placeholder="Select active status"
+            options={[
+              { value: "true", label: "Active" },
+              { value: "false", label: "Inactive" },
+            ]}
           />
         </div>
 

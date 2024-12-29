@@ -6,7 +6,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 export const addEmployee = async (formData: FormData): Promise<void> => {
-  const { fullName, sex } = Object.fromEntries(formData) as Record<
+  const { fullName, sex, isActive } = Object.fromEntries(formData) as Record<
     string,
     string
   >;
@@ -17,15 +17,17 @@ export const addEmployee = async (formData: FormData): Promise<void> => {
     const newEmployee = new Employee({
       fullName: fullName || "N/A",
       sex: sex || "N/A",
+      isActive:
+        isActive === "true" ? true : isActive === "false" ? false : null, // Use null for "N/A"
     });
 
     await newEmployee.save();
-    console.log("Staff added successfully");
+    console.log("Employee added successfully");
   } catch (err) {
-    console.error("Failed to add staff:", err);
+    console.error("Failed to add employee:", err);
     throw err;
   }
 
-  revalidatePath("/dashboard/staff");
-  redirect("/dashboard/staff");
+  revalidatePath("/dashboard/employees");
+  redirect("/dashboard/employees");
 };

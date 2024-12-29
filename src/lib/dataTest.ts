@@ -5,6 +5,7 @@ export const getEmployees = async () => {
   try {
     connectToDB();
     const employees = await Employee.find();
+    console.log("Retrieved Employees:", employees); // Add this line
     return employees;
   } catch (err) {
     console.log(err);

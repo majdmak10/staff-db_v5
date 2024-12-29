@@ -9,11 +9,18 @@ const EmployeesPage = async () => {
   const columns = [
     { key: "fullName", label: "Full Name", width: "200px" },
     { key: "sex", label: "Sex", width: "200px" },
+    { key: "isActive", label: "Active", width: "150px" }, // Add new column
   ];
 
   const data = employee.map((employee) => ({
     fullName: employee.fullName || "N/A",
     sex: employee.sex || "N/A",
+    isActive:
+      employee.isActive === true
+        ? "Yes"
+        : employee.isActive === false
+        ? "No"
+        : "N/A", // Handle null or undefined
   }));
 
   return (
@@ -22,7 +29,7 @@ const EmployeesPage = async () => {
         <Breadcrumbs
           items={[
             { label: "Dashboard", href: "/dashboard" },
-            { label: "All Admins", href: "/dashboard/admins" },
+            { label: "All Employees", href: "/dashboard/employees" },
           ]}
         />
         <AddButton href="/dashboard/employees/add" />

@@ -32,6 +32,12 @@ const Menu = () => {
           href: "/dashboard/staff",
         },
         {
+          icon: "/menu_icons/staff.png?v=1.0",
+          hoverIcon: "/menu_icons/staff_h.png?v=1.0",
+          label: "Employees",
+          href: "/dashboard/employees",
+        },
+        {
           icon: "/menu_icons/critical_staff.png?v=1.0",
           hoverIcon: "/menu_icons/critical_staff_h.png?v=1.0",
           label: "Critical Staff",
