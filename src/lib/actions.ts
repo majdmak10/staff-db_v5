@@ -150,14 +150,31 @@ export const addStaff = async (formData: FormData): Promise<void> => {
       passportExpiryDate: passportExpiryDate || null,
       unlpNumber: unlpNumber || "N/A",
       unlpExpiryDate: unlpExpiryDate || null,
-      criticalStaff: criticalStaff === "Yes",
+      criticalStaff:
+        criticalStaff === "true"
+          ? true
+          : criticalStaff === "false"
+          ? false
+          : null, // Use null for "N/A"
       warden: warden || "N/A",
-      floorMarshal: floorMarshal === "Yes",
-      etb: etb === "Yes",
-      ifak: ifak === "Yes",
-      advancedDriving: advancedDriving === "Yes",
-      insideDs: insideDs === "Yes",
-      outsideDs: outsideDs === "Yes",
+      floorMarshal:
+        floorMarshal === "true"
+          ? true
+          : floorMarshal === "false"
+          ? false
+          : null,
+      etb: etb === "true" ? true : etb === "false" ? false : null,
+      ifak: ifak === "true" ? true : ifak === "false" ? false : null,
+      advancedDriving:
+        advancedDriving === "true"
+          ? true
+          : advancedDriving === "false"
+          ? false
+          : null,
+      insideDs:
+        insideDs === "true" ? true : insideDs === "false" ? false : null,
+      outsideDs:
+        outsideDs === "true" ? true : outsideDs === "false" ? false : null,
       address,
     });
 

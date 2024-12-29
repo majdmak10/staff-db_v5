@@ -80,7 +80,7 @@ const StaffPage = async () => {
       <Link href={`/dashboard/staff/${staff.id}`}>{staff.fullName}</Link>
     ),
     dateOfBirth: staff.dateOfBirth
-      ? new Date(staff.dateOfBirth).toLocaleDateString("en-US")
+      ? new Date(staff.dateOfBirth).toLocaleDateString("en-GB") // Format as dd/mm/yyyy
       : "N/A", // Ensure it's a string
     sex: staff.sex || "N/A",
     nationality: staff.nationality || "N/A",
@@ -101,30 +101,51 @@ const StaffPage = async () => {
       : "N/A", // Convert to string
     contractType: staff.contractType || "N/A",
     contractStartDate: staff.contractStartDate
-      ? new Date(staff.contractStartDate).toLocaleDateString("en-US")
+      ? new Date(staff.contractStartDate).toLocaleDateString("en-GB")
       : "N/A", // Ensure it's a string
     contractEndDate: staff.contractEndDate
-      ? new Date(staff.contractEndDate).toLocaleDateString("en-US")
+      ? new Date(staff.contractEndDate).toLocaleDateString("en-GB")
       : "N/A", // Ensure it's a string
     nationalIdNumber: staff.nationalIdNumber || "N/A",
     passportNumber: staff.passportNumber || "N/A",
     passportExpiryDate: staff.passportExpiryDate
-      ? new Date(staff.passportExpiryDate).toLocaleDateString("en-US")
+      ? new Date(staff.passportExpiryDate).toLocaleDateString("en-GB")
       : "N/A", // Ensure it's a string
     unlpNumber: staff.unlpNumber || "N/A",
     unlpExpiryDate: staff.unlpExpiryDate
-      ? new Date(staff.unlpExpiryDate).toLocaleDateString("en-US")
+      ? new Date(staff.unlpExpiryDate).toLocaleDateString("en-GB")
       : "N/A", // Ensure it's a string
-    criticalStaff: staff.criticalStaff ? "Yes" : "No",
+    criticalStaff:
+      staff.criticalStaff === true
+        ? "Yes"
+        : staff.criticalStaff === false
+        ? "No"
+        : "N/A", // Handle null or undefined
     warden: staff.warden || "N/A",
-    floorMarshal: staff.floorMarshal ? "Yes" : "No",
-    etb: staff.etb ? "Yes" : "No",
-    ifak: staff.ifak ? "Yes" : "No",
-    advancedDriving: staff.advancedDriving ? "Yes" : "No",
-    insideDs: staff.insideDs ? "Yes" : "No",
-    outsideDs: staff.outsideDs ? "Yes" : "No",
+    floorMarshal:
+      staff.floorMarshal === true
+        ? "Yes"
+        : staff.floorMarshal === false
+        ? "No"
+        : "N/A",
+    etb: staff.etb === true ? "Yes" : staff.etb === false ? "No" : "N/A",
+    ifak: staff.ifak === true ? "Yes" : staff.ifak === false ? "No" : "N/A",
+    advancedDriving:
+      staff.advancedDriving === true
+        ? "Yes"
+        : staff.advancedDriving === false
+        ? "No"
+        : "N/A",
+    insideDs:
+      staff.insideDs === true ? "Yes" : staff.insideDs === false ? "No" : "N/A",
+    outsideDs:
+      staff.outsideDs === true
+        ? "Yes"
+        : staff.outsideDs === false
+        ? "No"
+        : "N/A",
     address: staff.address
-      ? `${staff.address.neighborhood}, ${staff.address.street}, ${staff.address.building}, ${staff.address.floor}, ${staff.address.apartment}`
+      ? `Neighborhood: ${staff.address.neighborhood}, Street: ${staff.address.street}, Building: ${staff.address.building}, Floor: ${staff.address.floor}, Apartment: ${staff.address.apartment}`
       : "N/A",
     actions: (
       <div className="flex gap-2 justify-start items-center">

@@ -323,8 +323,8 @@ const AddStaff = () => {
             name="criticalStaff"
             placeholder="Select an option"
             options={[
-              { value: "Yes", label: "Yes" },
-              { value: "No", label: "No" },
+              { value: "true", label: "Yes" },
+              { value: "false", label: "No" },
             ]}
           />
           <SelectField
@@ -344,8 +344,8 @@ const AddStaff = () => {
             name="floorMarshal"
             placeholder="Select an option"
             options={[
-              { value: "Yes", label: "Yes" },
-              { value: "No", label: "No" },
+              { value: "true", label: "Yes" },
+              { value: "false", label: "No" },
             ]}
           />
           <SelectField
@@ -354,8 +354,8 @@ const AddStaff = () => {
             name="etb"
             placeholder="Select an option"
             options={[
-              { value: "Yes", label: "Yes" },
-              { value: "No", label: "No" },
+              { value: "true", label: "Yes" },
+              { value: "false", label: "No" },
             ]}
           />
           <SelectField
@@ -364,8 +364,8 @@ const AddStaff = () => {
             name="ifak"
             placeholder="Select an option"
             options={[
-              { value: "Yes", label: "Yes" },
-              { value: "No", label: "No" },
+              { value: "true", label: "Yes" },
+              { value: "false", label: "No" },
             ]}
           />
           <SelectField
@@ -374,8 +374,8 @@ const AddStaff = () => {
             name="advancedDriving"
             placeholder="Select an option"
             options={[
-              { value: "Yes", label: "Yes" },
-              { value: "No", label: "No" },
+              { value: "true", label: "Yes" },
+              { value: "false", label: "No" },
             ]}
           />
           <SelectField
@@ -384,8 +384,8 @@ const AddStaff = () => {
             name="insideDs"
             placeholder="Select an option"
             options={[
-              { value: "Yes", label: "Yes" },
-              { value: "No", label: "No" },
+              { value: "true", label: "Yes" },
+              { value: "false", label: "No" },
             ]}
           />
           <SelectField
@@ -394,8 +394,8 @@ const AddStaff = () => {
             name="outsideDs"
             placeholder="Select an option"
             options={[
-              { value: "Yes", label: "Yes" },
-              { value: "No", label: "No" },
+              { value: "true", label: "Yes" },
+              { value: "false", label: "No" },
             ]}
           />
         </div>

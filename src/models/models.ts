@@ -1,62 +1,5 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
 
-// Define the emergency contact schema
-const emergencyContactSchema = new Schema({
-  fullName: { type: String },
-  relationship: { type: String },
-  mobile: { type: String },
-});
-
-// Define the address schema
-const addressSchema = new Schema({
-  neighborhood: { type: String },
-  street: { type: String },
-  building: { type: String },
-  floor: { type: String },
-  apartment: { type: String },
-  latitude: { type: String },
-  longitude: { type: String },
-});
-
-// Define the Mongoose schema
-const StaffSchema = new Schema({
-  profilePicture: { type: String },
-  fullName: { type: String, required: true },
-  dateOfBirth: { type: Date },
-  sex: { type: String },
-  nationality: { type: String },
-  employmentType: { type: String },
-  position: { type: String },
-  unit: { type: String },
-  bloodType: { type: String },
-  dependents: { type: String },
-  unhcrEmail: { type: String },
-  privateEmail: { type: String },
-  mobileSyriatel: { type: String },
-  mobileMtn: { type: String },
-  homePhone: { type: String },
-  extension: { type: String },
-  radio: { type: String },
-  emergencyContact: { type: emergencyContactSchema },
-  contractType: { type: String },
-  contractStartDate: { type: Date },
-  contractEndDate: { type: Date },
-  nationalIdNumber: { type: String },
-  passportNumber: { type: String },
-  passportExpiryDate: { type: Date },
-  unlpNumber: { type: String },
-  unlpExpiryDate: { type: Date },
-  criticalStaff: { type: Boolean, default: null },
-  warden: { type: String },
-  floorMarshal: { type: Boolean, default: null },
-  etb: { type: Boolean, default: null },
-  ifak: { type: Boolean, default: null },
-  advancedDriving: { type: Boolean, default: null },
-  insideDs: { type: Boolean, default: null },
-  outsideDs: { type: Boolean, default: null },
-  address: { type: addressSchema },
-});
-
 // Define the emergency contact interface
 export interface IEmergencyContact {
   fullName?: string;
@@ -76,6 +19,7 @@ export interface IAddress {
 
 // Define the TypeScript interface
 export interface IStaff extends Document {
+  _id: string;
   profilePicture?: string;
   fullName: string;
   dateOfBirth?: Date;
@@ -113,19 +57,71 @@ export interface IStaff extends Document {
   address?: IAddress;
 }
 
-const UserSchema = new Schema({
-  profilePicture: { type: String },
-  fullName: { type: String, required: true },
-  sex: { type: String, required: true },
-  position: { type: String, required: true },
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-  role: {
-    type: String,
-    required: true,
-    enum: ["Admin", "Editor", "Guest"],
-  }, // Role field
+// Define the emergency contact schema
+const emergencyContactSchema = new Schema({
+  fullName: { type: String },
+  relationship: { type: String },
+  mobile: { type: String },
 });
+
+// Define the address schema
+const addressSchema = new Schema({
+  neighborhood: { type: String },
+  street: { type: String },
+  building: { type: String },
+  floor: { type: String },
+  apartment: { type: String },
+  latitude: { type: String },
+  longitude: { type: String },
+});
+
+// Define the Mongoose schema
+const StaffSchema = new Schema(
+  {
+    profilePicture: { type: String },
+    fullName: { type: String, required: true },
+    dateOfBirth: { type: Date },
+    sex: { type: String },
+    nationality: { type: String },
+    employmentType: { type: String },
+    position: { type: String },
+    unit: { type: String },
+    bloodType: { type: String },
+    dependents: { type: String },
+    unhcrEmail: { type: String, unique: true, match: /.+\@.+\..+/ },
+    privateEmail: { type: String, unique: true, match: /.+\@.+\..+/ },
+    mobileSyriatel: { type: String },
+    mobileMtn: { type: String },
+    homePhone: { type: String },
+    extension: { type: String },
+    radio: { type: String },
+    emergencyContact: { type: emergencyContactSchema },
+    contractType: { type: String },
+    contractStartDate: { type: Date },
+    contractEndDate: { type: Date },
+    nationalIdNumber: { type: String },
+    passportNumber: { type: String },
+    passportExpiryDate: { type: Date },
+    unlpNumber: { type: String },
+    unlpExpiryDate: { type: Date },
+    criticalStaff: { type: Boolean, default: true },
+    warden: { type: String },
+    floorMarshal: { type: Boolean, default: true },
+    etb: { type: Boolean, default: true },
+    ifak: { type: Boolean, default: true },
+    advancedDriving: { type: Boolean, default: true },
+    insideDs: { type: Boolean, default: true },
+    outsideDs: { type: Boolean, default: true },
+    address: { type: addressSchema },
+  },
+  { timestamps: true }
+);
+
+export enum UserRole {
+  Admin = "Admin",
+  Editor = "Editor",
+  Guest = "Guest",
+}
 
 // TypeScript interface
 export interface IUser extends Document {
@@ -136,11 +132,26 @@ export interface IUser extends Document {
   position: string;
   email: string;
   password: string;
-  role: "Admin" | "Editor" | "Guest";
+  role: UserRole;
 }
 
+const UserSchema = new Schema(
+  {
+    profilePicture: { type: String },
+    fullName: { type: String, required: true },
+    sex: { type: String, required: true },
+    position: { type: String, required: true },
+    email: { type: String, required: true, unique: true },
+    password: { type: String, required: true },
+    role: { type: String, enum: Object.values(UserRole) },
+  },
+  { timestamps: true }
+);
+
 // Create the Mongoose model
-export const Staff: Model<IStaff> =
-  mongoose.models.Staff || mongoose.model<IStaff>("Staff", StaffSchema);
-export const User: Model<IUser> =
-  mongoose.models.User || mongoose.model<IUser>("User", UserSchema);
+function getModel<T>(name: string, schema: Schema): Model<T> {
+  return mongoose.models[name] || mongoose.model<T>(name, schema);
+}
+
+export const Staff = getModel<IStaff>("Staff", StaffSchema);
+export const User = getModel<IUser>("User", UserSchema);
