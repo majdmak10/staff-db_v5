@@ -1,32 +1,26 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Image from "next/image";
 
-const TableSearch = ({ onSearch }: { onSearch: (value: string) => void }) => {
-  // State to keep track of the search input value
+type Props = {
+  onSearch: (value: string) => void;
+};
+
+const TableSearch = ({ onSearch }: Props) => {
   const [searchValue, setSearchValue] = useState("");
-  const [isClient, setIsClient] = useState(false); // New state to check client-side rendering
 
-  useEffect(() => {
-    setIsClient(true); // Set to true when on the client side
-  }, []);
-
-  // Function to handle input change
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setSearchValue(value);
-    onSearch(value); // Pass the value to the parent component
+    onSearch(value);
   };
 
-  // Function to clear the input
   const handleClear = () => {
-    setSearchValue(""); // Clear the local state
-    onSearch(""); // Notify the parent to clear the search
+    setSearchValue("");
+    onSearch("");
   };
-
-  if (!isClient) return null; // Only render on client side
 
   return (
-    <div className="w-full md:w-auto flex items-center gap-2 text-xs rounded-full border border-gray-300 px-2">
+    <div className="w-full md:w-auto flex items-center gap-2 text-xs rounded-full ring-[1.5px] ring-gray-300 px-2">
       <Image
         src="/table_icons/search.png"
         alt="Search Icon"
@@ -40,14 +34,17 @@ const TableSearch = ({ onSearch }: { onSearch: (value: string) => void }) => {
         className="w-[200px] flex-none p-2 bg-transparent outline-none"
         onChange={handleInputChange}
       />
-      {searchValue && (
-        <button
-          onClick={handleClear}
-          className="text-gray-500 focus:outline-none text-md font-bold py-1 px-2 rounded-full bg-gray-100 hover:bg-gray-200 border border-gray-300"
-        >
+      <button
+        type="button"
+        onClick={handleClear}
+        className={`text-gray-500 hover:text-gray-700 focus:outline-none ${
+          searchValue ? "visible" : "invisible"
+        }`}
+      >
+        <span className="text-md font-bold py-1 px-2 rounded-full bg-gray-200 border border-gray-400">
           X
-        </button>
-      )}
+        </span>
+      </button>
     </div>
   );
 };
