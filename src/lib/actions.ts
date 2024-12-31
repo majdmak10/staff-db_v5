@@ -465,3 +465,19 @@ export const deleteUser = async (formData: FormData): Promise<void> => {
 
   revalidatePath("/dashboard/admins");
 };
+
+export const deleteSelectedStaff = async (ids: string[]): Promise<void> => {
+  try {
+    await connectToDB();
+
+    // Delete multiple staff
+    await Staff.deleteMany({ _id: { $in: ids } });
+
+    console.log("Selected staff deleted successfully");
+  } catch (err) {
+    console.error("Failed to delete selected staff:", err);
+    throw err;
+  }
+
+  revalidatePath("/dashboard/staff");
+};

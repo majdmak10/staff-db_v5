@@ -7,7 +7,9 @@ const TableControls = () => {
     <div className="flex items-center gap-2">
       <button
         className="w-7 h-7 flex items-center justify-center rounded-full bg-mYellow"
-        //   onClick={onColumns}
+        title="Show/Hide Columns"
+        aria-label="Show/Hide Columns"
+        // onClick={onColumns}
       >
         <Image
           src="/table_icons/columns.png"
@@ -19,7 +21,9 @@ const TableControls = () => {
       <span className="text-sm">Columns</span>
       <button
         className="w-7 h-7 flex items-center justify-center rounded-full bg-mYellow"
-        //   onClick={onFilter}
+        title="Filter Data"
+        aria-label="Filter Data"
+        // onClick={onFilter}
       >
         <Image
           src="/table_icons/filter.png"
@@ -31,7 +35,9 @@ const TableControls = () => {
       <span className="text-sm">Filter</span>
       <button
         className="w-7 h-7 flex items-center justify-center rounded-full bg-mYellow"
-        //   onClick={onExport}
+        title="Export Data"
+        aria-label="Export Data"
+        // onClick={onExport}
       >
         <Image
           src="/table_icons/export.png"

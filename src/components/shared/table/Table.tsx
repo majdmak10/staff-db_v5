@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useRef } from "react";
+import TableControls from "./TableControls";
 
 interface Column {
   key: string;
@@ -51,6 +52,7 @@ const Table: React.FC<TableProps> = ({ columns, data }) => {
 
   return (
     <div className="overflow-x-auto w-full">
+      <TableControls />
       <table className="mt-4 pb-10 w-full min-w-full table-fixed mb-2">
         <thead>
           <tr className="text-gray-600 text-sm">
