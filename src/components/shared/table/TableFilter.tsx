@@ -1,148 +1,138 @@
-import React, { useState, useEffect, useRef } from "react";
+"use client";
+
+import React, { useState } from "react";
 
 interface Column {
   key: string;
   label: string | JSX.Element;
 }
 
+interface Filter {
+  column: string;
+  operator: string;
+  value: string;
+}
+
 interface TableFilterProps {
   columns: Column[];
-  onFilterApply: (filters: {
-    column: string;
-    operator: string;
-    value: string;
-  }) => void;
-  onClose: () => void;
+  onApply: (filters: Filter[]) => void;
+  onClear: () => void;
 }
 
 const TableFilter: React.FC<TableFilterProps> = ({
   columns,
-  onFilterApply,
-  onClose,
+  onApply,
+  onClear,
 }) => {
-  const [selectedColumn, setSelectedColumn] = useState<string>("");
-  const [selectedOperator, setSelectedOperator] = useState<string>("contains");
-  const [filterValue, setFilterValue] = useState<string>("");
+  const [filters, setFilters] = useState<Filter[]>([
+    { column: "", operator: "", value: "" },
+  ]);
 
-  const filterMenuRef = useRef<HTMLDivElement>(null);
-
-  // Close the menu when clicking outside of it
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        filterMenuRef.current &&
-        !filterMenuRef.current.contains(event.target as Node)
-      ) {
-        onClose(); // Close the menu
-      }
-    };
-
-    document.addEventListener("click", handleClickOutside);
-    return () => {
-      document.removeEventListener("click", handleClickOutside);
-    };
-  }, [onClose]);
-
-  const handleApplyFilter = () => {
-    if (selectedColumn && filterValue) {
-      onFilterApply({
-        column: selectedColumn,
-        operator: selectedOperator,
-        value: filterValue,
-      });
-      // Do not close the menu on apply
-    }
+  const handleFilterChange = (
+    index: number,
+    key: keyof Filter,
+    value: string
+  ) => {
+    setFilters((prev) => {
+      const updatedFilters = [...prev];
+      updatedFilters[index][key] = value;
+      return updatedFilters;
+    });
   };
 
-  const handleClearFilter = () => {
-    setSelectedColumn("");
-    setSelectedOperator("contains");
-    setFilterValue("");
-    // Do not close the menu on clear
+  const handleAddFilter = () => {
+    setFilters((prev) => [...prev, { column: "", operator: "", value: "" }]);
+  };
+
+  const handleApply = () => {
+    onApply(filters);
+  };
+
+  const handleClear = () => {
+    setFilters([{ column: "", operator: "", value: "" }]);
+    onClear();
   };
 
   return (
-    <div
-      ref={filterMenuRef}
-      className="absolute bg-white shadow-lg rounded-md p-4 w-80 z-20"
-    >
-      {/* Column Selection */}
-      <div className="mb-4">
-        <label
-          htmlFor="column"
-          className="block text-sm font-medium text-gray-700"
-        >
-          Column
-        </label>
-        <select
-          id="column"
-          value={selectedColumn}
-          onChange={(e) => setSelectedColumn(e.target.value)}
-          className="w-full border border-gray-300 rounded-md p-2 text-sm"
-        >
-          <option value="" disabled>
-            Select column
-          </option>
-          {columns.map((column) => (
-            <option key={column.key} value={column.key}>
-              {typeof column.label === "string" ? column.label : column.key}
-            </option>
-          ))}
-        </select>
-      </div>
+    <div className="bg-white border rounded shadow-lg p-4 w-72 text-sm mt-2">
+      {filters.map((filter, index) => (
+        <div key={index}>
+          <div className="flex items-center mb-3">
+            <label className="block text-sm font-medium text-gray-700 mr-2 w-20">
+              Column
+            </label>
+            <select
+              aria-label="column"
+              value={filter.column}
+              onChange={(e) =>
+                handleFilterChange(index, "column", e.target.value)
+              }
+              className="w-full p-1 border rounded"
+            >
+              <option value="">Select column</option>
+              {columns.map((col) => (
+                <option key={col.key} value={col.key}>
+                  {col.label}
+                </option>
+              ))}
+            </select>
+          </div>
 
-      {/* Operator Selection */}
-      <div className="mb-4">
-        <label
-          htmlFor="operator"
-          className="block text-sm font-medium text-gray-700"
-        >
-          Operator
-        </label>
-        <select
-          id="operator"
-          value={selectedOperator}
-          onChange={(e) => setSelectedOperator(e.target.value)}
-          className="w-full border border-gray-300 rounded-md p-2 text-sm"
-        >
-          <option value="contains">Contains</option>
-          <option value="equals">Equals</option>
-          <option value="startsWith">Starts with</option>
-          <option value="endsWith">Ends with</option>
-        </select>
-      </div>
+          <div className="flex items-center mb-3">
+            <label className="block text-sm font-medium text-gray-700 mt-2 mr-2 w-20">
+              Operator
+            </label>
+            <select
+              aria-label="operator"
+              value={filter.operator}
+              onChange={(e) =>
+                handleFilterChange(index, "operator", e.target.value)
+              }
+              className="w-full p-1 border rounded"
+            >
+              <option value="">Select operator</option>
+              <option value="contains">Contains</option>
+              <option value="equals">Equals</option>
+              <option value="starts with">Starts With</option>
+              <option value="ends with">Ends With</option>
+            </select>
+          </div>
 
-      {/* Filter Value */}
-      <div className="mb-4">
-        <label
-          htmlFor="value"
-          className="block text-sm font-medium text-gray-700"
-        >
-          Value
-        </label>
-        <input
-          id="value"
-          type="text"
-          value={filterValue}
-          onChange={(e) => setFilterValue(e.target.value)}
-          className="w-full border border-gray-300 rounded-md p-2 text-sm"
-          placeholder="Enter filter value"
-        />
-      </div>
+          <div className="flex items-center">
+            <label className="block text-sm font-medium text-gray-700 mt-2 mr-2 w-20">
+              Value
+            </label>
+            <input
+              aria-label="value"
+              type="text"
+              value={filter.value}
+              onChange={(e) =>
+                handleFilterChange(index, "value", e.target.value)
+              }
+              className="w-full p-1 border rounded"
+            />
+          </div>
+        </div>
+      ))}
 
-      {/* Action Buttons */}
-      <div className="flex justify-between items-center">
+      <div className="flex justify-center items-center gap-2 mt-4 border-t pt-4">
         <button
-          onClick={handleApplyFilter}
-          className="bg-blue-500 text-white px-4 py-2 rounded-md text-sm"
+          onClick={handleApply}
+          className="text-sm bg-mBlue text-white rounded hover:bg-mBlueDark w-20 py-1"
         >
-          Apply Filter
+          Apply
         </button>
         <button
-          onClick={handleClearFilter}
-          className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md text-sm"
+          onClick={handleAddFilter}
+          className="text-sm bg-gray-200 text-gray-700 rounded hover:bg-gray-300 w-20 py-1"
         >
-          Clear Filter
+          Add
+        </button>
+        <button
+          onClick={handleClear}
+          className="text-sm bg-gray-200 text-gray-700 rounded hover:bg-gray-300 w-20 py-1"
+        >
+          Clear
         </button>
       </div>
     </div>

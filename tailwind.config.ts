@@ -31,6 +31,7 @@ export default {
       colors: {
         mBodyBg: "#f0f2f5",
         mBlue: "#007fff",
+        mBlueDark: "#0072e6",
         mBlueLight: "#d5e5fa",
         mGreen: "#14a37f",
         mRed: "#ff4569",

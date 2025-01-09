@@ -17,11 +17,45 @@ interface TableProps {
 
 const Table: React.FC<TableProps> = ({ columns, data }) => {
   const [visibleColumns, setVisibleColumns] = useState<string[]>(
-    columns.map((col) => col.key) // Initially, all columns are visible
+    columns.map((col) => col.key)
   );
+
+  const [filteredData, setFilteredData] = useState(data);
 
   const handleVisibleColumnsChange = (updatedColumns: string[]) => {
     setVisibleColumns(updatedColumns);
+  };
+
+  const handleFilterApply = (
+    filters: { column: string; operator: string; value: string }[]
+  ) => {
+    const newData = data.filter((row) => {
+      return filters.every(({ column, operator, value }) => {
+        const cellValue = row[column];
+        const cellText =
+          typeof cellValue === "string"
+            ? cellValue
+            : typeof cellValue === "object" && cellValue?.props?.children
+            ? String(cellValue.props.children)
+            : "";
+
+        if (operator === "contains") {
+          return cellText.toLowerCase().includes(value.toLowerCase());
+        } else if (operator === "equals") {
+          return cellText.toLowerCase() === value.toLowerCase();
+        } else if (operator === "starts with") {
+          return cellText.toLowerCase().startsWith(value.toLowerCase());
+        } else if (operator === "ends with") {
+          return cellText.toLowerCase().endsWith(value.toLowerCase());
+        }
+        return true;
+      });
+    });
+    setFilteredData(newData);
+  };
+
+  const handleFilterClear = () => {
+    setFilteredData(data);
   };
 
   const filteredColumns = columns.filter((col) =>
@@ -35,11 +69,19 @@ const Table: React.FC<TableProps> = ({ columns, data }) => {
         columns={columns}
         visibleColumns={visibleColumns}
         onColumnChange={handleVisibleColumnsChange}
+        onFilterApply={handleFilterApply}
+        onFilterClear={handleFilterClear}
       />
       {visibleColumns.length === 0 ? (
         <div className="flex items-center justify-center py-10">
           <p className="text-gray-500">
             No columns to display. Please select columns to show.
+          </p>
+        </div>
+      ) : filteredData.length === 0 ? ( // Check for no filtered data
+        <div className="flex items-center justify-center py-10">
+          <p className="text-gray-500">
+            No results. Please check the filter and try again.
           </p>
         </div>
       ) : (
@@ -68,7 +110,7 @@ const Table: React.FC<TableProps> = ({ columns, data }) => {
             </tr>
           </thead>
           <tbody>
-            {data.map((row, rowIndex) => (
+            {filteredData.map((row, rowIndex) => (
               <tr
                 key={rowIndex}
                 className="hover:bg-gray-100 text-sm items-center"
