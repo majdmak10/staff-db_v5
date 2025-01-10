@@ -100,90 +100,106 @@ const Table: React.FC<TableProps> = ({ columns, data }) => {
   );
 
   return (
-    <div className="overflow-x-auto w-full">
-      <TableControls
-        columns={columns}
-        visibleColumns={visibleColumns}
-        data={filteredData}
-        selectedRows={selectedRows}
-        onColumnChange={handleVisibleColumnsChange}
-        onFilterApply={handleFilterApply}
-        onFilterClear={handleFilterClear}
-      />
-      {visibleColumns.length === 0 ? (
-        <div className="flex items-center justify-center py-10">
-          <p className="text-gray-500">
-            No columns to display. Please select columns to show.
-          </p>
-        </div>
-      ) : filteredData.length === 0 ? (
-        <div className="flex items-center justify-center py-10">
-          <p className="text-gray-500">
-            No results. Please check the filter and try again.
-          </p>
-        </div>
-      ) : (
-        <table className="mt-8 pb-10 w-full min-w-full table-fixed mb-2">
-          <thead>
-            <tr className="text-gray-600 text-sm">
-              {filteredColumns.map((column) => (
-                <th
-                  key={column.key}
-                  className={clsx(
-                    "p-3 border-b border-gray-200 text-gray-600 font-semibold text-left items-center",
-                    column.width && `w-[${column.width}]`
-                  )}
-                >
-                  {column.key === "checkbox" ? (
-                    <input
-                      aria-label="Select all rows"
-                      ref={headerCheckboxRef}
-                      type="checkbox"
-                      checked={selectedRows.length === filteredData.length}
-                      onChange={handleSelectAll}
-                      className="w-4 h-4 accent-mBlue mt-1"
-                    />
-                  ) : (
-                    column.label
-                  )}
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {filteredData.map((row, rowIndex) => (
-              <tr
-                key={rowIndex}
-                className="hover:bg-gray-100 text-sm items-center"
-              >
-                {filteredColumns.map((column) => (
-                  <td
-                    key={column.key}
-                    className={clsx(
-                      "px-3 py-1 border-b border-gray-200",
-                      column.width && `w-[${column.width}]`
-                    )}
+    <div className="w-full">
+      <div className="sticky top-0 bg-white z-10 py-2">
+        <TableControls
+          columns={columns}
+          visibleColumns={visibleColumns}
+          data={filteredData}
+          selectedRows={selectedRows}
+          onColumnChange={handleVisibleColumnsChange}
+          onFilterApply={handleFilterApply}
+          onFilterClear={handleFilterClear}
+        />
+      </div>
+
+      <div className="relative">
+        <div className="overflow-x-auto w-full">
+          {visibleColumns.length === 0 || filteredData.length === 0 ? (
+            <EmptyState
+              message={
+                visibleColumns.length === 0
+                  ? "No columns to display. Please select columns to show."
+                  : "No results found. Please check the filter and try again."
+              }
+            />
+          ) : (
+            <table className="my-2 w-full min-w-full table-fixed">
+              <thead>
+                <tr className="text-gray-600 text-sm">
+                  {filteredColumns.map((column) => (
+                    <th
+                      key={column.key}
+                      className={clsx(
+                        "group p-3 border-b border-gray-200 text-gray-600 font-semibold text-left items-center sticky top-0 tracking-wider",
+                        column.width && `w-[${column.width}]`
+                      )}
+                    >
+                      {column.key === "checkbox" ? (
+                        <input
+                          aria-label="Select all rows"
+                          ref={headerCheckboxRef}
+                          type="checkbox"
+                          checked={selectedRows.length === filteredData.length}
+                          onChange={handleSelectAll}
+                          className="w-4 h-4 accent-mBlue mt-1"
+                        />
+                      ) : (
+                        <>
+                          <span>{column.label}</span>
+                          <span className="invisible group-hover:visible ml-2">
+                            ↕
+                          </span>
+                        </>
+                      )}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="bg-white">
+                {filteredData.map((row, rowIndex) => (
+                  <tr
+                    key={rowIndex}
+                    className="group hover:bg-gray-50 transition-colors duration-150 text-sm items-center"
                   >
-                    {column.key === "checkbox" ? (
-                      <input
-                        aria-label="Select row"
-                        type="checkbox"
-                        checked={selectedRows.includes(rowIndex)}
-                        onChange={() => handleRowSelect(rowIndex)}
-                        className="w-4 h-4 accent-mBlue"
-                      />
-                    ) : (
-                      row[column.key]
-                    )}
-                  </td>
+                    {filteredColumns.map((column) => (
+                      <td
+                        key={column.key}
+                        className={clsx(
+                          "px-3 py-1 border-b border-gray-200",
+                          column.width && `w-[${column.width}]`
+                        )}
+                      >
+                        {column.key === "checkbox" ? (
+                          <input
+                            aria-label="Select row"
+                            type="checkbox"
+                            checked={selectedRows.includes(rowIndex)}
+                            onChange={() => handleRowSelect(rowIndex)}
+                            className="w-4 h-4 accent-mBlue"
+                          />
+                        ) : (
+                          <div className="max-w-full truncate">
+                            {row[column.key]}
+                          </div>
+                        )}
+                      </td>
+                    ))}
+                  </tr>
                 ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
+              </tbody>
+            </table>
+          )}
+        </div>
+      </div>
     </div>
   );
 };
+
+const EmptyState: React.FC<{ message: string }> = ({ message }) => (
+  <div className="flex flex-col items-center justify-center py-16 px-4">
+    <p className="text-gray-500 text-center max-w-md">{message}</p>
+  </div>
+);
 
 export default Table;

@@ -1,4 +1,3 @@
-// TableControls.tsx
 "use client";
 
 import { useState, useRef, useEffect } from "react";
@@ -58,9 +57,9 @@ const TableControls: React.FC<TableControlsProps> = ({
   );
 
   return (
-    <div className="flex md:flex-row items-center justify-center md:justify-between gap-2 w-full md:w-auto absolute">
+    <div className="relative flex items-center justify-center gap-2 w-full md:flex-row md:justify-start md:items-center md:w-auto">
       {/* Columns selection */}
-      <div className="flex items-center gap-2">
+      <div className="relative flex items-center gap-2">
         <button
           className="w-7 h-7 flex items-center justify-center rounded-full bg-mYellow"
           title="Show/Hide Columns"
@@ -74,9 +73,9 @@ const TableControls: React.FC<TableControlsProps> = ({
             height={14}
           />
         </button>
-        <span className="text-sm">Columns</span>
+        <span className="text-sm font-medium text-gray-600">Columns</span>
         {showColumnSelector && (
-          <div className="absolute top-full left-0 z-10">
+          <div className="absolute top-full left-0 z-50">
             <TableColumnsSelection
               columns={columns}
               visibleColumns={visibleColumns}
@@ -88,7 +87,7 @@ const TableControls: React.FC<TableControlsProps> = ({
       </div>
 
       {/* Filter */}
-      <div className="flex items-center gap-2" ref={filterRef}>
+      <div className="relative flex items-center gap-2" ref={filterRef}>
         <button
           className="w-7 h-7 flex items-center justify-center rounded-full bg-mYellow"
           title="Filter Data"
@@ -102,9 +101,9 @@ const TableControls: React.FC<TableControlsProps> = ({
             height={14}
           />
         </button>
-        <span className="text-sm">Filter</span>
+        <span className="text-sm font-medium text-gray-600">Filter</span>
         {showFilter && (
-          <div className="absolute top-full left-0 z-10">
+          <div className="absolute top-full left-0 z-50">
             <TableFilter
               columns={filteredColumns}
               onApply={onFilterApply}
@@ -115,7 +114,7 @@ const TableControls: React.FC<TableControlsProps> = ({
       </div>
 
       {/* Export */}
-      <div className="flex items-center gap-2" ref={exportRef}>
+      <div className="relative flex items-center gap-2" ref={exportRef}>
         <button
           className="w-7 h-7 flex items-center justify-center rounded-full bg-mYellow"
           title="Export Data"
@@ -129,7 +128,7 @@ const TableControls: React.FC<TableControlsProps> = ({
             height={14}
           />
         </button>
-        <span className="text-sm">Export</span>
+        <span className="text-sm font-medium text-gray-600">Export</span>
         {showExport && (
           <TableExport
             columns={columns}
@@ -140,6 +139,12 @@ const TableControls: React.FC<TableControlsProps> = ({
           />
         )}
       </div>
+      {/* Add selection count if rows are selected */}
+      {selectedRows && selectedRows.length > 0 && (
+        <div className="ml-auto px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-sm">
+          {selectedRows.length} selected
+        </div>
+      )}
     </div>
   );
 };

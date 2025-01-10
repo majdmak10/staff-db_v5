@@ -1,4 +1,3 @@
-// TableExport.tsx
 "use client";
 
 import { useRef, useEffect } from "react";
@@ -18,6 +17,7 @@ interface ExportProps {
   selectedRows?: number[];
   onClose: () => void;
 }
+
 
 const TableExport: React.FC<ExportProps> = ({
   columns,
@@ -103,7 +103,7 @@ const TableExport: React.FC<ExportProps> = ({
       }
 
       const workbook = new ExcelJS.Workbook();
-      const worksheet = workbook.addWorksheet("Aleppo Staff"); // Sheet name
+      const worksheet = workbook.addWorksheet("Aleppo Staff");
 
       // Add headers
       const headers = Object.keys(processedData[0]);
@@ -126,9 +126,14 @@ const TableExport: React.FC<ExportProps> = ({
         worksheet.addRow(row);
       });
 
-      // Get today's date in the format YYYY-MM-DD
       const today = new Date();
-      const formattedDate = today.toISOString().split("T")[0];
+      const formattedDate = `${String(today.getDate()).padStart(
+        2,
+        "0"
+      )}-${String(today.getMonth() + 1).padStart(
+        2,
+        "0"
+      )}-${today.getFullYear()}`;
 
       // Save the file with the desired name
       const buffer = await workbook.xlsx.writeBuffer();
@@ -175,9 +180,14 @@ const TableExport: React.FC<ExportProps> = ({
 
       docContent += "</table></body></html>";
 
-      // Get today's date in the format YYYY-MM-DD
       const today = new Date();
-      const formattedDate = today.toISOString().split("T")[0];
+      const formattedDate = `${String(today.getDate()).padStart(
+        2,
+        "0"
+      )}-${String(today.getMonth() + 1).padStart(
+        2,
+        "0"
+      )}-${today.getFullYear()}`;
 
       const blob = new Blob([docContent], { type: "application/msword" });
       const link = document.createElement("a");
@@ -194,7 +204,7 @@ const TableExport: React.FC<ExportProps> = ({
   return (
     <div
       ref={menuRef}
-      className="absolute top-full right-0 left-44 mt-2 bg-white rounded shadow-lg border border-gray-200 py-2 min-w-[150px] z-50"
+      className="top-full right-0 left-auto mt-2 bg-white rounded shadow-lg border border-gray-200 py-2 min-w-[150px] z-50"
     >
       <button
         onClick={exportToExcel}

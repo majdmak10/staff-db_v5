@@ -77,15 +77,16 @@ const TableColumnsSelection: React.FC<TableColumnsSelectionProps> = ({
   return (
     <div
       ref={menuRef}
-      className="bg-white border rounded shadow-lg p-4 w-64 text-sm absolute mt-2"
+      className="bg-white border rounded shadow-lg p-4 w-72 animate-in fade-in duration-200 text-sm mt-2"
     >
+      {/* Search Section */}
       <div className="relative mb-2">
         <Image
           src="/table_icons/search.png"
           alt="Search"
           width={14}
           height={14}
-          className="absolute left-2 top-2.5"
+          className="absolute left-3 top-1/2 transform -translate-y-1/2 opacity-50"
         />
         <input
           type="text"
@@ -94,13 +95,15 @@ const TableColumnsSelection: React.FC<TableColumnsSelectionProps> = ({
             // Implement search logic here if needed
             console.log("Search event triggered: ", e.target.value);
           }}
-          className="w-full pl-8 p-2 border rounded text-xs"
+          className="w-full pl-9 pr-3 py-3 text-xs border rounded focus:outline-none focus:ring-1 focus:ring-mBlue focus:border-transparent"
         />
       </div>
+
+      {/* Columns List */}
       <div className="overflow-y-auto max-h-64">
         {columns.map((col) => (
-          <div key={col.key} className="flex items-center justify-between py-1">
-            <label className="flex items-center">
+          <div key={col.key} className="flex items-center py-1 ">
+            <label className="flex items-center w-full cursor-pointer">
               <input
                 type="checkbox"
                 checked={visibleColumns.includes(col.key)}
@@ -112,7 +115,9 @@ const TableColumnsSelection: React.FC<TableColumnsSelectionProps> = ({
           </div>
         ))}
       </div>
-      <div className="flex items-center justify-between mt-2 border-t border-gray-200 pt-4">
+
+      {/* Footer Controls */}
+      <div className="flex items-center justify-between mt-2 pt-4 border-t border-gray-200">
         <label
           onClick={handleToggleAll}
           className="flex items-center cursor-pointer"

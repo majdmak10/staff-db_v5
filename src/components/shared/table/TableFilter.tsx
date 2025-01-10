@@ -54,7 +54,7 @@ const TableFilter: React.FC<TableFilterProps> = ({
   };
 
   return (
-    <div className="bg-white border rounded shadow-lg p-4 w-72 text-sm mt-2">
+    <div className="top-full left-0 z-10 bg-white border rounded shadow-lg p-4 w-72 text-sm mt-2">
       {filters.map((filter, index) => (
         <div key={index} className="mb-4 border-b pb-4">
           <div className="flex items-center mb-3">
