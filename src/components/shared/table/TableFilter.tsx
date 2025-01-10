@@ -56,7 +56,7 @@ const TableFilter: React.FC<TableFilterProps> = ({
   return (
     <div className="bg-white border rounded shadow-lg p-4 w-72 text-sm mt-2">
       {filters.map((filter, index) => (
-        <div key={index}>
+        <div key={index} className="mb-4 border-b pb-4">
           <div className="flex items-center mb-3">
             <label className="block text-sm font-medium text-gray-700 mr-2 w-20">
               Column
@@ -115,7 +115,7 @@ const TableFilter: React.FC<TableFilterProps> = ({
         </div>
       ))}
 
-      <div className="flex justify-center items-center gap-2 mt-4 border-t pt-4">
+      <div className="flex justify-center items-center gap-2 mt-4">
         <button
           onClick={handleApply}
           className="text-sm bg-mBlue text-white rounded hover:bg-mBlueDark w-20 py-1"

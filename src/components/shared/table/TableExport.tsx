@@ -3,10 +3,7 @@
 
 import { useRef, useEffect } from "react";
 import * as XLSX from "xlsx";
-import { Document, Packer, Paragraph, Table, TableRow, TableCell } from "docx";
-import { saveAs } from "file-saver";
 
-// Add the Column interface
 interface Column {
   key: string;
   label: string | JSX.Element;
@@ -41,99 +38,154 @@ const TableExport: React.FC<ExportProps> = ({
   }, [onClose]);
 
   const processData = () => {
-    // Filter columns to exclude checkbox and profilePicture
-    const exportableColumns = columns.filter(
-      (col) =>
-        visibleColumns.includes(col.key) &&
-        col.key !== "checkbox" &&
-        col.key !== "profilePicture"
-    );
+    try {
+      // Filter columns to exclude checkbox, profilePicture, and actions
+      const exportableColumns = columns.filter(
+        (col) =>
+          visibleColumns.includes(col.key) &&
+          !["checkbox", "profilePicture", "actions"].includes(col.key)
+      );
 
-    // Filter rows if selectedRows is provided
-    const rowsToExport = selectedRows
-      ? data.filter((_, index) => selectedRows.includes(index))
-      : data;
+      // If no exportable columns, return empty array
+      if (exportableColumns.length === 0) {
+        return { data: [], headers: [] };
+      }
 
-    // Process data for export
-    return rowsToExport.map((row) => {
-      const processedRow: { [key: string]: string } = {};
-      exportableColumns.forEach((col) => {
-        const value = row[col.key];
-        processedRow[col.key] =
-          typeof value === "string"
-            ? value
-            : value?.props?.children
-            ? String(value.props.children)
-            : "";
+      // Filter rows if selectedRows is provided
+      const rowsToExport = selectedRows
+        ? data.filter((_, index) => selectedRows.includes(index))
+        : data;
+
+      // If no rows to export, return empty array
+      if (rowsToExport.length === 0) {
+        return { data: [], headers: [] };
+      }
+
+      // Create headers map (key to label)
+      const headers = exportableColumns.reduce((acc, col) => {
+        acc[col.key] =
+          typeof col.label === "string"
+            ? col.label
+            : col.label?.props?.children || col.key;
+        return acc;
+      }, {} as { [key: string]: string });
+
+      // Process data for export
+      const processedData = rowsToExport.map((row) => {
+        const processedRow: { [key: string]: string } = {};
+        exportableColumns.forEach((col) => {
+          const value = row[col.key];
+          processedRow[headers[col.key]] =
+            typeof value === "string"
+              ? value
+              : value?.props?.children
+              ? String(value.props.children)
+              : "";
+        });
+        return processedRow;
       });
-      return processedRow;
-    });
+
+      return { data: processedData, headers };
+    } catch (error) {
+      console.error("Error processing data:", error);
+      return { data: [], headers: [] };
+    }
   };
 
   const exportToExcel = () => {
-    const processedData = processData();
-    const worksheet = XLSX.utils.json_to_sheet(processedData);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Data");
-    XLSX.writeFile(workbook, "table-export.xlsx");
-    onClose();
+    try {
+      const { data: processedData, headers } = processData();
+
+      // Check if we have data to export
+      if (!processedData || processedData.length === 0) {
+        alert("No data available to export");
+        return;
+      }
+
+      // Create workbook and worksheet
+      const worksheet = XLSX.utils.json_to_sheet(processedData);
+      const workbook = XLSX.utils.book_new();
+
+      // Add formatting only if we have data
+      if (processedData.length > 0) {
+        // Get the column headers
+        const headerKeys = Object.keys(processedData[0]);
+
+        // Apply header style to each header cell
+        headerKeys.forEach((_, index) => {
+          const cellRef = XLSX.utils.encode_cell({ r: 0, c: index });
+          if (!worksheet[cellRef]) worksheet[cellRef] = { v: "" };
+          worksheet[cellRef].s = {
+            font: { bold: true, color: { rgb: "000000" } },
+            fill: { fgColor: { rgb: "EFEFEF" } },
+            border: {
+              top: { style: "thin", color: { rgb: "000000" } },
+              bottom: { style: "thin", color: { rgb: "000000" } },
+              left: { style: "thin", color: { rgb: "000000" } },
+              right: { style: "thin", color: { rgb: "000000" } },
+            },
+          };
+        });
+      }
+
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Data");
+      XLSX.writeFile(workbook, "table-export.xlsx");
+      onClose();
+    } catch (error) {
+      console.error("Error exporting to Excel:", error);
+      alert("Failed to export data. Please try again.");
+    }
   };
 
-  const exportToWord = async () => {
-    const processedData = processData();
-    const exportableColumns = columns.filter(
-      (col) =>
-        visibleColumns.includes(col.key) &&
-        col.key !== "checkbox" &&
-        col.key !== "profilePicture"
-    );
+  const exportToWord = () => {
+    try {
+      const { data: processedData } = processData();
 
-    // Create header row
-    const headerRow = new TableRow({
-      children: exportableColumns.map(
-        (col) =>
-          new TableCell({
-            children: [new Paragraph({ text: String(col.label) })],
-          })
-      ),
-    });
+      // Check if we have data to export
+      if (!processedData || processedData.length === 0) {
+        alert("No data available to export");
+        return;
+      }
 
-    // Create data rows
-    const dataRows = processedData.map(
-      (row) =>
-        new TableRow({
-          children: exportableColumns.map(
-            (col) =>
-              new TableCell({
-                children: [new Paragraph({ text: row[col.key] || "" })],
-              })
-          ),
-        })
-    );
+      let docContent =
+        '<html><body><table border="1" style="border-collapse: collapse; width: 100%;">';
 
-    // Create document
-    const doc = new Document({
-      sections: [
-        {
-          children: [
-            new Table({
-              rows: [headerRow, ...dataRows],
-            }),
-          ],
-        },
-      ],
-    });
+      // Add header row with styling
+      if (processedData.length > 0) {
+        docContent += '<tr style="background-color: #f2f2f2;">';
+        Object.keys(processedData[0]).forEach((key) => {
+          docContent += `<th style="padding: 8px; text-align: left; border: 1px solid #ddd; font-weight: bold;">${key}</th>`;
+        });
+        docContent += "</tr>";
 
-    // Generate and save document
-    const blob = await Packer.toBlob(doc);
-    saveAs(blob, "table-export.docx");
-    onClose();
+        // Add data rows
+        processedData.forEach((row) => {
+          docContent += "<tr>";
+          Object.values(row).forEach((value) => {
+            docContent += `<td style="padding: 8px; border: 1px solid #ddd;">${value}</td>`;
+          });
+          docContent += "</tr>";
+        });
+      }
+
+      docContent += "</table></body></html>";
+
+      const blob = new Blob([docContent], { type: "application/msword" });
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = "table-export.doc";
+      link.click();
+      onClose();
+    } catch (error) {
+      console.error("Error exporting to Word:", error);
+      alert("Failed to export data. Please try again.");
+    }
   };
 
   return (
     <div
       ref={menuRef}
-      className="absolute top-full right-0 mt-2 bg-white rounded-lg shadow-lg border border-gray-200 py-2 min-w-[150px]"
+      className="absolute top-full right-0 left-44 mt-2 bg-white rounded shadow-lg border border-gray-200 py-2 min-w-[150px] z-50"
     >
       <button
         onClick={exportToExcel}

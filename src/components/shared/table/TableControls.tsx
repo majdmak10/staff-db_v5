@@ -58,7 +58,7 @@ const TableControls: React.FC<TableControlsProps> = ({
   );
 
   return (
-    <div className="flex flex-col md:flex-row items-center justify-center md:justify-between gap-2 w-full md:w-auto absolute">
+    <div className="flex md:flex-row items-center justify-center md:justify-between gap-2 w-full md:w-auto absolute">
       {/* Columns selection */}
       <div className="flex items-center gap-2">
         <button

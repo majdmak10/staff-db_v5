@@ -1,7 +1,7 @@
 // Table.tsx
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import clsx from "clsx";
 import TableControls from "./TableControls";
 
@@ -22,6 +22,23 @@ const Table: React.FC<TableProps> = ({ columns, data }) => {
   );
   const [filteredData, setFilteredData] = useState(data);
   const [selectedRows, setSelectedRows] = useState<number[]>([]);
+  const headerCheckboxRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    // Update header checkbox state
+    if (headerCheckboxRef.current) {
+      if (selectedRows.length === 0) {
+        headerCheckboxRef.current.checked = false;
+        headerCheckboxRef.current.indeterminate = false;
+      } else if (selectedRows.length === filteredData.length) {
+        headerCheckboxRef.current.checked = true;
+        headerCheckboxRef.current.indeterminate = false;
+      } else {
+        headerCheckboxRef.current.checked = false;
+        headerCheckboxRef.current.indeterminate = true;
+      }
+    }
+  }, [selectedRows, filteredData.length]);
 
   const handleVisibleColumnsChange = (updatedColumns: string[]) => {
     setVisibleColumns(updatedColumns);
@@ -53,10 +70,12 @@ const Table: React.FC<TableProps> = ({ columns, data }) => {
       });
     });
     setFilteredData(newData);
+    setSelectedRows([]); // Clear selection when filter changes
   };
 
   const handleFilterClear = () => {
     setFilteredData(data);
+    setSelectedRows([]); // Clear selection when filter is cleared
   };
 
   const handleRowSelect = (index: number) => {
@@ -118,7 +137,8 @@ const Table: React.FC<TableProps> = ({ columns, data }) => {
                 >
                   {column.key === "checkbox" ? (
                     <input
-                      aria-label="Select All"
+                      aria-label="Select all rows"
+                      ref={headerCheckboxRef}
                       type="checkbox"
                       checked={selectedRows.length === filteredData.length}
                       onChange={handleSelectAll}
@@ -147,7 +167,7 @@ const Table: React.FC<TableProps> = ({ columns, data }) => {
                   >
                     {column.key === "checkbox" ? (
                       <input
-                        aria-label="Select Row"
+                        aria-label="Select row"
                         type="checkbox"
                         checked={selectedRows.includes(rowIndex)}
                         onChange={() => handleRowSelect(rowIndex)}

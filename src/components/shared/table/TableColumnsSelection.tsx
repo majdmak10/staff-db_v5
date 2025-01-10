@@ -77,7 +77,7 @@ const TableColumnsSelection: React.FC<TableColumnsSelectionProps> = ({
   return (
     <div
       ref={menuRef}
-      className="bg-white border rounded shadow-lg p-4 w-64 text-sm relative mt-2"
+      className="bg-white border rounded shadow-lg p-4 w-64 text-sm absolute mt-2"
     >
       <div className="relative mb-2">
         <Image
