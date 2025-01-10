@@ -2,7 +2,8 @@
 "use client";
 
 import { useRef, useEffect } from "react";
-import * as XLSX from "xlsx";
+import ExcelJS from "exceljs";
+import { saveAs } from "file-saver"; // For saving the file
 
 interface Column {
   key: string;
@@ -92,44 +93,45 @@ const TableExport: React.FC<ExportProps> = ({
     }
   };
 
-  const exportToExcel = () => {
+  const exportToExcel = async () => {
     try {
-      const { data: processedData, headers } = processData();
+      const { data: processedData } = processData();
 
-      // Check if we have data to export
       if (!processedData || processedData.length === 0) {
         alert("No data available to export");
         return;
       }
 
-      // Create workbook and worksheet
-      const worksheet = XLSX.utils.json_to_sheet(processedData);
-      const workbook = XLSX.utils.book_new();
+      const workbook = new ExcelJS.Workbook();
+      const worksheet = workbook.addWorksheet("Data");
 
-      // Add formatting only if we have data
-      if (processedData.length > 0) {
-        // Get the column headers
-        const headerKeys = Object.keys(processedData[0]);
+      // Add headers
+      const headers = Object.keys(processedData[0]);
+      worksheet.columns = headers.map((header) => ({
+        header,
+        key: header,
+        width: 20,
+      }));
 
-        // Apply header style to each header cell
-        headerKeys.forEach((_, index) => {
-          const cellRef = XLSX.utils.encode_cell({ r: 0, c: index });
-          if (!worksheet[cellRef]) worksheet[cellRef] = { v: "" };
-          worksheet[cellRef].s = {
-            font: { bold: true, color: { rgb: "000000" } },
-            fill: { fgColor: { rgb: "EFEFEF" } },
-            border: {
-              top: { style: "thin", color: { rgb: "000000" } },
-              bottom: { style: "thin", color: { rgb: "000000" } },
-              left: { style: "thin", color: { rgb: "000000" } },
-              right: { style: "thin", color: { rgb: "000000" } },
-            },
-          };
-        });
-      }
+      // Style the headers
+      worksheet.getRow(1).font = { bold: true, color: { argb: "FFFFFFFF" } };
+      worksheet.getRow(1).fill = {
+        type: "pattern",
+        pattern: "solid",
+        fgColor: { argb: "FF4F81BD" },
+      };
 
-      XLSX.utils.book_append_sheet(workbook, worksheet, "Data");
-      XLSX.writeFile(workbook, "table-export.xlsx");
+      // Add data rows
+      processedData.forEach((row) => {
+        worksheet.addRow(row);
+      });
+
+      // Save the file
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], {
+        type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      });
+      saveAs(blob, "table-export.xlsx");
       onClose();
     } catch (error) {
       console.error("Error exporting to Excel:", error);

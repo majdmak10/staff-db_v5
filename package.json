@@ -13,6 +13,7 @@
     "bcrypt": "^5.1.1",
     "clsx": "^2.1.1",
     "docx": "^9.1.0",
+    "exceljs": "^4.4.0",
     "file-saver": "^2.0.5",
     "js-file-download": "^0.4.12",
     "jsonwebtoken": "^9.0.2",
@@ -22,7 +23,8 @@
     "next-auth": "^5.0.0-beta.25",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "xlsx": "^0.18.5"
+    "xlsx": "^0.18.5",
+    "xlsx-style": "^0.8.13"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
