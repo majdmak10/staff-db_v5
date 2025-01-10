@@ -1,19 +1,23 @@
+// TableControls.tsx
 "use client";
 
 import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import TableColumnsSelection from "./TableColumnsSelection";
 import TableFilter from "./TableFilter";
+import TableExport from "./TableExport";
 
 interface Column {
   key: string;
   label: string | JSX.Element;
-  width?: string; // Optional width property
+  width?: string;
 }
 
 interface TableControlsProps {
   columns: Column[];
   visibleColumns: string[];
+  data: Array<{ [key: string]: string | JSX.Element }>;
+  selectedRows?: number[];
   onColumnChange: (updatedColumns: string[]) => void;
   onFilterApply: (
     filters: { column: string; operator: string; value: string }[]
@@ -24,13 +28,17 @@ interface TableControlsProps {
 const TableControls: React.FC<TableControlsProps> = ({
   columns,
   visibleColumns,
+  data,
+  selectedRows,
   onColumnChange,
   onFilterApply,
   onFilterClear,
 }) => {
   const [showColumnSelector, setShowColumnSelector] = useState(false);
   const [showFilter, setShowFilter] = useState(false);
+  const [showExport, setShowExport] = useState(false);
   const filterRef = useRef<HTMLDivElement | null>(null);
+  const exportRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -45,7 +53,6 @@ const TableControls: React.FC<TableControlsProps> = ({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Filter out the "picture" column
   const filteredColumns = columns.filter(
     (col) => col.key !== "checkbox" && col.key !== "profilePicture"
   );
@@ -71,12 +78,10 @@ const TableControls: React.FC<TableControlsProps> = ({
         {showColumnSelector && (
           <div className="absolute top-full left-0 z-10">
             <TableColumnsSelection
-              columns={columns} // Use filtered columns
+              columns={columns}
               visibleColumns={visibleColumns}
-              onChange={(updatedColumns) => {
-                onColumnChange(updatedColumns); // Immediately apply changes
-              }}
-              onClose={() => setShowColumnSelector(false)} // Close menu on outside click
+              onChange={onColumnChange}
+              onClose={() => setShowColumnSelector(false)}
             />
           </div>
         )}
@@ -101,7 +106,7 @@ const TableControls: React.FC<TableControlsProps> = ({
         {showFilter && (
           <div className="absolute top-full left-0 z-10">
             <TableFilter
-              columns={filteredColumns} // Use filtered columns
+              columns={filteredColumns}
               onApply={onFilterApply}
               onClear={onFilterClear}
             />
@@ -110,12 +115,12 @@ const TableControls: React.FC<TableControlsProps> = ({
       </div>
 
       {/* Export */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2" ref={exportRef}>
         <button
           className="w-7 h-7 flex items-center justify-center rounded-full bg-mYellow"
           title="Export Data"
           aria-label="Export Data"
-          // onClick={onExport}
+          onClick={() => setShowExport((prev) => !prev)}
         >
           <Image
             src="/table_icons/export.png"
@@ -125,6 +130,15 @@ const TableControls: React.FC<TableControlsProps> = ({
           />
         </button>
         <span className="text-sm">Export</span>
+        {showExport && (
+          <TableExport
+            columns={columns}
+            visibleColumns={visibleColumns}
+            data={data}
+            selectedRows={selectedRows}
+            onClose={() => setShowExport(false)}
+          />
+        )}
       </div>
     </div>
   );

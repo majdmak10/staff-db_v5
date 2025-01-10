@@ -1,3 +1,4 @@
+// Table.tsx
 "use client";
 
 import React, { useState } from "react";
@@ -7,7 +8,7 @@ import TableControls from "./TableControls";
 interface Column {
   key: string;
   label: string | JSX.Element;
-  width?: string; // Optional width property
+  width?: string;
 }
 
 interface TableProps {
@@ -19,8 +20,8 @@ const Table: React.FC<TableProps> = ({ columns, data }) => {
   const [visibleColumns, setVisibleColumns] = useState<string[]>(
     columns.map((col) => col.key)
   );
-
   const [filteredData, setFilteredData] = useState(data);
+  const [selectedRows, setSelectedRows] = useState<number[]>([]);
 
   const handleVisibleColumnsChange = (updatedColumns: string[]) => {
     setVisibleColumns(updatedColumns);
@@ -58,16 +59,35 @@ const Table: React.FC<TableProps> = ({ columns, data }) => {
     setFilteredData(data);
   };
 
+  const handleRowSelect = (index: number) => {
+    setSelectedRows((prev) => {
+      if (prev.includes(index)) {
+        return prev.filter((i) => i !== index);
+      } else {
+        return [...prev, index];
+      }
+    });
+  };
+
+  const handleSelectAll = () => {
+    if (selectedRows.length === filteredData.length) {
+      setSelectedRows([]);
+    } else {
+      setSelectedRows(Array.from({ length: filteredData.length }, (_, i) => i));
+    }
+  };
+
   const filteredColumns = columns.filter((col) =>
     visibleColumns.includes(col.key)
   );
 
   return (
     <div className="overflow-x-auto w-full">
-      {/* Pass props to TableControls */}
       <TableControls
         columns={columns}
         visibleColumns={visibleColumns}
+        data={filteredData}
+        selectedRows={selectedRows}
         onColumnChange={handleVisibleColumnsChange}
         onFilterApply={handleFilterApply}
         onFilterClear={handleFilterClear}
@@ -78,7 +98,7 @@ const Table: React.FC<TableProps> = ({ columns, data }) => {
             No columns to display. Please select columns to show.
           </p>
         </div>
-      ) : filteredData.length === 0 ? ( // Check for no filtered data
+      ) : filteredData.length === 0 ? (
         <div className="flex items-center justify-center py-10">
           <p className="text-gray-500">
             No results. Please check the filter and try again.
@@ -98,8 +118,10 @@ const Table: React.FC<TableProps> = ({ columns, data }) => {
                 >
                   {column.key === "checkbox" ? (
                     <input
+                      aria-label="Select All"
                       type="checkbox"
-                      aria-label="Select"
+                      checked={selectedRows.length === filteredData.length}
+                      onChange={handleSelectAll}
                       className="w-4 h-4 accent-mBlue mt-1"
                     />
                   ) : (
@@ -123,7 +145,17 @@ const Table: React.FC<TableProps> = ({ columns, data }) => {
                       column.width && `w-[${column.width}]`
                     )}
                   >
-                    {row[column.key]}
+                    {column.key === "checkbox" ? (
+                      <input
+                        aria-label="Select Row"
+                        type="checkbox"
+                        checked={selectedRows.includes(rowIndex)}
+                        onChange={() => handleRowSelect(rowIndex)}
+                        className="w-4 h-4 accent-mBlue"
+                      />
+                    ) : (
+                      row[column.key]
+                    )}
                   </td>
                 ))}
               </tr>
