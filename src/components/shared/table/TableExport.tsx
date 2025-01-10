@@ -103,7 +103,7 @@ const TableExport: React.FC<ExportProps> = ({
       }
 
       const workbook = new ExcelJS.Workbook();
-      const worksheet = workbook.addWorksheet("Data");
+      const worksheet = workbook.addWorksheet("Aleppo Staff"); // Sheet name
 
       // Add headers
       const headers = Object.keys(processedData[0]);
@@ -126,12 +126,16 @@ const TableExport: React.FC<ExportProps> = ({
         worksheet.addRow(row);
       });
 
-      // Save the file
+      // Get today's date in the format YYYY-MM-DD
+      const today = new Date();
+      const formattedDate = today.toISOString().split("T")[0];
+
+      // Save the file with the desired name
       const buffer = await workbook.xlsx.writeBuffer();
       const blob = new Blob([buffer], {
         type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       });
-      saveAs(blob, "table-export.xlsx");
+      saveAs(blob, `Aleppo_Staff_${formattedDate}.xlsx`);
       onClose();
     } catch (error) {
       console.error("Error exporting to Excel:", error);
@@ -143,7 +147,6 @@ const TableExport: React.FC<ExportProps> = ({
     try {
       const { data: processedData } = processData();
 
-      // Check if we have data to export
       if (!processedData || processedData.length === 0) {
         alert("No data available to export");
         return;
@@ -172,10 +175,14 @@ const TableExport: React.FC<ExportProps> = ({
 
       docContent += "</table></body></html>";
 
+      // Get today's date in the format YYYY-MM-DD
+      const today = new Date();
+      const formattedDate = today.toISOString().split("T")[0];
+
       const blob = new Blob([docContent], { type: "application/msword" });
       const link = document.createElement("a");
       link.href = URL.createObjectURL(blob);
-      link.download = "table-export.doc";
+      link.download = `Aleppo_Staff_${formattedDate}.doc`;
       link.click();
       onClose();
     } catch (error) {
