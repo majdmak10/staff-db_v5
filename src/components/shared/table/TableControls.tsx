@@ -57,7 +57,7 @@ const TableControls: React.FC<TableControlsProps> = ({
   );
 
   return (
-    <div className="relative flex flex-row items-center justify-center gap-2 w-full md:justify-start md:w-auto">
+    <div className="relative flex flex-row items-center justify-start gap-2 w-full md:w-auto">
       {/* Columns selection */}
       <div className="relative flex items-center gap-2">
         <button
@@ -75,14 +75,12 @@ const TableControls: React.FC<TableControlsProps> = ({
         </button>
         <span className="text-sm font-medium text-gray-600">Columns</span>
         {showColumnSelector && (
-          <div className="top-full left-0 z-50">
-            <TableColumnsSelection
-              columns={columns}
-              visibleColumns={visibleColumns}
-              onChange={onColumnChange}
-              onClose={() => setShowColumnSelector(false)}
-            />
-          </div>
+          <TableColumnsSelection
+            columns={columns}
+            visibleColumns={visibleColumns}
+            onChange={onColumnChange}
+            onClose={() => setShowColumnSelector(false)}
+          />
         )}
       </div>
 
@@ -139,7 +137,7 @@ const TableControls: React.FC<TableControlsProps> = ({
       </div>
       {/* Add selection count if rows are selected */}
       {selectedRows && selectedRows.length > 0 && (
-        <div className="ml-auto px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-sm">
+        <div className="ml-auto px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-[10px] md:text-sm">
           {selectedRows.length} selected
         </div>
       )}

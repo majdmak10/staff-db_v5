@@ -203,7 +203,7 @@ const TableExport: React.FC<ExportProps> = ({
   return (
     <div
       ref={menuRef}
-      className="absolute top-full left-0 mt-2 py-2 bg-white border rounded shadow-lg w-full max-w-sm md:w-auto animate-in fade-in duration-200 text-sm z-50"
+      className="absolute top-full left-0 mt-2 py-2 bg-white border rounded shadow-lg w-36 animate-in fade-in duration-200 text-sm z-50"
     >
       <button
         onClick={exportToExcel}
