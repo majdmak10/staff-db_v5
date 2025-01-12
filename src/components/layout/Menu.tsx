@@ -136,30 +136,40 @@ const Menu = () => {
             const isActive = pathname === item.href;
 
             return (
-              <Link
-                href={item.href}
+              <div
                 key={item.label}
-                className={`flex items-center justify-center lg:justify-start gap-4 p-2 md:px-2 hover:text-mBlue rounded-lg hover:bg-mHover ${
-                  isActive
-                    ? "text-mBlue rounded-lg bg-mHover"
-                    : "mText hover:text-mBlue hover:rounded-lg hover:bg-mHover"
-                }`}
+                className="relative flex flex-col items-center lg:items-start"
                 onMouseEnter={() => !isActive && setHoveredItem(uniqueKey)}
                 onMouseLeave={() => setHoveredItem(null)}
               >
-                <Image
-                  src={
-                    hoveredItem === uniqueKey || isActive
-                      ? item.hoverIcon
-                      : item.icon
-                  }
-                  alt=""
-                  width={20}
-                  height={20}
-                  className="w-5 h-5"
-                />
-                <span className="hidden lg:block">{item.label}</span>
-              </Link>
+                <Link
+                  href={item.href}
+                  className={`flex items-center justify-center lg:justify-start gap-4 p-2 md:px-2 hover:text-mBlue rounded-lg hover:bg-mHover w-full ${
+                    isActive
+                      ? "text-mBlue rounded-lg bg-mHover"
+                      : "mText hover:text-mBlue hover:rounded-lg hover:bg-mHover"
+                  }`}
+                >
+                  <Image
+                    src={
+                      hoveredItem === uniqueKey || isActive
+                        ? item.hoverIcon
+                        : item.icon
+                    }
+                    alt=""
+                    width={20}
+                    height={20}
+                    className="w-5 h-5"
+                  />
+                  <span className="hidden lg:block">{item.label}</span>
+                </Link>
+                {/* Tooltip for small screens */}
+                {hoveredItem === uniqueKey && (
+                  <span className="lg:hidden absolute top-1.5 left-10 text-xs bg-mBlue text-white px-2 py-1 rounded shadow-md whitespace-nowrap">
+                    {item.label}
+                  </span>
+                )}
+              </div>
             );
           })}
 

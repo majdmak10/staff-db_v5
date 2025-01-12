@@ -77,7 +77,7 @@ const TableColumnsSelection: React.FC<TableColumnsSelectionProps> = ({
   return (
     <div
       ref={menuRef}
-      className="bg-white border rounded shadow-lg p-4 w-72 animate-in fade-in duration-200 text-sm mt-2"
+      className="absolute top-full left-0 mt-2 p-4 bg-white border rounded shadow-lg min-w-72 animate-in fade-in duration-200 text-sm z-50"
     >
       {/* Search Section */}
       <div className="relative mb-2">

@@ -57,7 +57,7 @@ const TableControls: React.FC<TableControlsProps> = ({
   );
 
   return (
-    <div className="relative flex items-center justify-center gap-2 w-full md:flex-row md:justify-start md:items-center md:w-auto">
+    <div className="relative flex flex-row items-center justify-center gap-2 w-full md:justify-start md:w-auto">
       {/* Columns selection */}
       <div className="relative flex items-center gap-2">
         <button
@@ -75,7 +75,7 @@ const TableControls: React.FC<TableControlsProps> = ({
         </button>
         <span className="text-sm font-medium text-gray-600">Columns</span>
         {showColumnSelector && (
-          <div className="absolute top-full left-0 z-50">
+          <div className="top-full left-0 z-50">
             <TableColumnsSelection
               columns={columns}
               visibleColumns={visibleColumns}
@@ -103,13 +103,11 @@ const TableControls: React.FC<TableControlsProps> = ({
         </button>
         <span className="text-sm font-medium text-gray-600">Filter</span>
         {showFilter && (
-          <div className="absolute top-full left-0 z-50">
-            <TableFilter
-              columns={filteredColumns}
-              onApply={onFilterApply}
-              onClear={onFilterClear}
-            />
-          </div>
+          <TableFilter
+            columns={filteredColumns}
+            onApply={onFilterApply}
+            onClear={onFilterClear}
+          />
         )}
       </div>
 

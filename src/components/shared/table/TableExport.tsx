@@ -18,7 +18,6 @@ interface ExportProps {
   onClose: () => void;
 }
 
-
 const TableExport: React.FC<ExportProps> = ({
   columns,
   visibleColumns,
@@ -204,7 +203,7 @@ const TableExport: React.FC<ExportProps> = ({
   return (
     <div
       ref={menuRef}
-      className="top-full right-0 left-auto mt-2 bg-white rounded shadow-lg border border-gray-200 py-2 min-w-[150px] z-50"
+      className="absolute top-full left-0 mt-2 py-2 bg-white border rounded shadow-lg w-full max-w-sm md:w-auto animate-in fade-in duration-200 text-sm z-50"
     >
       <button
         onClick={exportToExcel}

@@ -1,73 +1,67 @@
-import { useState, useCallback } from "react";
-import clsx from "clsx";
+import { useState, useRef, useEffect } from "react";
 
-interface ColumnWidth {
+interface ColumnWidths {
   [key: string]: number;
 }
 
-export const useColumnResize = (initialWidths: ColumnWidth = {}) => {
-  const [columnWidths, setColumnWidths] = useState<ColumnWidth>(initialWidths);
-  const [resizingColumn, setResizingColumn] = useState<string | null>(null);
+export const useColumnResize = (
+  initialColumns: { key: string; width?: string }[]
+) => {
+  const [columnWidths, setColumnWidths] = useState<ColumnWidths>({});
+  const [isResizing, setIsResizing] = useState(false);
+  const [currentResizer, setCurrentResizer] = useState<string | null>(null);
+  const resizeStartXRef = useRef<number>(0);
+  const initialWidthRef = useRef<number>(0);
 
-  const handleResizeStart = useCallback((columnKey: string) => {
-    setResizingColumn(columnKey);
-  }, []);
+  useEffect(() => {
+    // Initialize column widths
+    const initialWidths: ColumnWidths = {};
+    initialColumns.forEach((col) => {
+      initialWidths[col.key] = col.width ? parseInt(col.width) : 150;
+    });
+    setColumnWidths(initialWidths);
+  }, [initialColumns]);
 
-  const handleResizeEnd = useCallback(() => {
-    setResizingColumn(null);
-  }, []);
+  const handleResizeStart = (e: React.MouseEvent, columnKey: string) => {
+    e.preventDefault();
+    setIsResizing(true);
+    setCurrentResizer(columnKey);
+    resizeStartXRef.current = e.clientX;
+    initialWidthRef.current = columnWidths[columnKey];
+  };
 
-  const handleResize = useCallback((columnKey: string, width: number) => {
+  const handleResizeMove = (e: MouseEvent) => {
+    if (!isResizing || !currentResizer) return;
+
+    const diff = e.clientX - resizeStartXRef.current;
+    const newWidth = Math.max(50, initialWidthRef.current + diff);
+
     setColumnWidths((prev) => ({
       ...prev,
-      [columnKey]: Math.max(width, 100), // Minimum width of 100px
+      [currentResizer]: newWidth,
     }));
-  }, []);
+  };
+
+  const handleResizeEnd = () => {
+    setIsResizing(false);
+    setCurrentResizer(null);
+  };
+
+  useEffect(() => {
+    if (isResizing) {
+      window.addEventListener("mousemove", handleResizeMove);
+      window.addEventListener("mouseup", handleResizeEnd);
+    }
+
+    return () => {
+      window.removeEventListener("mousemove", handleResizeMove);
+      window.removeEventListener("mouseup", handleResizeEnd);
+    };
+  }, [isResizing]);
 
   return {
     columnWidths,
-    resizingColumn,
+    isResizing,
     handleResizeStart,
-    handleResize,
-    handleResizeEnd,
   };
-};
-
-// ResizeHandle Component
-const ResizeHandle: React.FC<{
-  column: string;
-  onResizeStart: (column: string) => void;
-  onResize: (column: string, width: number) => void;
-  onResizeEnd: () => void;
-}> = ({ column, onResizeStart, onResize, onResizeEnd }) => {
-  return (
-    <div
-      className={clsx(
-        "absolute right-0 top-0 h-full w-1 cursor-col-resize",
-        "hover:bg-blue-400 hover:opacity-50",
-        "group-hover:visible invisible"
-      )}
-      onMouseDown={(e) => {
-        e.preventDefault();
-        onResizeStart(column);
-
-        const startX = e.pageX;
-        const startWidth = e.currentTarget.parentElement?.offsetWidth || 0;
-
-        const handleMouseMove = (e: MouseEvent) => {
-          const diff = e.pageX - startX;
-          onResize(column, startWidth + diff);
-        };
-
-        const handleMouseUp = () => {
-          document.removeEventListener("mousemove", handleMouseMove);
-          document.removeEventListener("mouseup", handleMouseUp);
-          onResizeEnd();
-        };
-
-        document.addEventListener("mousemove", handleMouseMove);
-        document.addEventListener("mouseup", handleMouseUp);
-      }}
-    />
-  );
 };
