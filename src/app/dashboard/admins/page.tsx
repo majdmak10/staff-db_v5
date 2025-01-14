@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import Breadcrumbs from "@/components/layout/Breadcrumbs";
 import AddButton from "@/components/shared/buttons/AddButton";
 import DeleteButton from "@/components/shared/buttons/DeleteButton";
@@ -6,6 +8,7 @@ import Link from "next/link";
 import { getUsers } from "@/lib/data";
 import { deleteUser } from "@/lib/actions";
 import Table from "@/components/shared/table/Table";
+import { Suspense } from "react";
 
 const AdminPage = async () => {
   const user = await getUsers();
@@ -72,20 +75,22 @@ const AdminPage = async () => {
   }));
 
   return (
-    <div className="flex flex-col gap-3">
-      <div className="flex items-center justify-between bg-white rounded-lg p-4">
-        <Breadcrumbs
-          items={[
-            { label: "Dashboard", href: "/dashboard" },
-            { label: "All Admins", href: "/dashboard/admins" },
-          ]}
-        />
-        <AddButton href="/dashboard/admins/add" />
+    <Suspense fallback={<div>Loading...</div>}>
+      <div className="flex flex-col gap-3">
+        <div className="flex items-center justify-between bg-white rounded-lg p-4">
+          <Breadcrumbs
+            items={[
+              { label: "Dashboard", href: "/dashboard" },
+              { label: "All Admins", href: "/dashboard/admins" },
+            ]}
+          />
+          <AddButton href="/dashboard/admins/add" />
+        </div>
+        <div className="flex flex-col items-center justify-center bg-white rounded-lg p-4">
+          <Table columns={columns} data={data} />
+        </div>
       </div>
-      <div className="flex flex-col items-center justify-center bg-white rounded-lg p-4">
-        <Table columns={columns} data={data} />
-      </div>
-    </div>
+    </Suspense>
   );
 };
 

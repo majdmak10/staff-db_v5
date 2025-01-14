@@ -9,6 +9,11 @@ import bcrypt from "bcrypt";
 import { promises as fs } from "fs";
 import path from "path";
 
+export interface DeleteActionResult {
+  success: boolean;
+  error?: unknown;
+}
+
 export const addStaff = async (formData: FormData): Promise<void> => {
   const profilePictureFile = formData.get("profilePicture") as File;
 
@@ -190,50 +195,231 @@ export const addStaff = async (formData: FormData): Promise<void> => {
 };
 
 export const updateStaff = async (formData: FormData): Promise<void> => {
-  const { id, profilePicture, fullName, sex, email, criticalStaff } =
-    Object.fromEntries(formData) as Record<string, string>;
+  const staffId = formData.get("id") as string;
+  const profilePictureFile = formData.get("profilePicture") as File;
+
+  const emergencyContact = {
+    fullName: formData.get("emergencyContactName") || "N/A",
+    relationship: formData.get("emergencyContactRelationship") || "N/A",
+    mobile: formData.get("emergencyContactMobile") || "N/A",
+  };
+
+  const address = {
+    neighborhood: formData.get("addressNeighborhood") || "N/A",
+    street: formData.get("addressStreet") || "N/A",
+    building: formData.get("addressBuilding") || "N/A",
+    floor: formData.get("addressFloor") || "N/A",
+    apartment: formData.get("addressApartment") || "N/A",
+    latitude: formData.get("latitude") || "N/A",
+    longitude: formData.get("longitude") || "N/A",
+  };
 
   try {
     await connectToDB();
 
-    const updateFields = {
-      profilePicture,
-      fullName,
-      sex,
-      email,
-      criticalStaff: criticalStaff === "true",
-    };
+    const staff = await Staff.findById(staffId);
+    if (!staff) {
+      throw new Error("Staff not found");
+    }
 
-    Object.keys(updateFields).forEach((key) => {
-      if (updateFields[key as keyof typeof updateFields] === "" || undefined) {
-        delete updateFields[key as keyof typeof updateFields];
+    // Handle profile picture update
+    let profilePicturePath = staff.profilePicture;
+    if (profilePictureFile && profilePictureFile.size > 0) {
+      // Remove old profile picture if it exists
+      if (profilePicturePath) {
+        const oldFilePath = path.join(
+          process.cwd(),
+          "public",
+          profilePicturePath
+        );
+        try {
+          await fs.unlink(oldFilePath);
+          console.log(`Old profile picture removed: ${oldFilePath}`);
+        } catch (err) {
+          if (err instanceof Error) {
+            console.error(
+              `Failed to remove old profile picture: ${err.message}`
+            );
+          } else {
+            console.error(
+              "An unknown error occurred while removing the old profile picture."
+            );
+          }
+        }
       }
+
+      // Upload new profile picture
+      const originalFilename = profilePictureFile.name;
+      const fileExtension = path.extname(originalFilename);
+      const baseFilename = path.basename(originalFilename, fileExtension);
+
+      const uploadDir = path.join(
+        process.cwd(),
+        "public",
+        "uploads",
+        "profiles_pictures",
+        "staff"
+      );
+      await fs.mkdir(uploadDir, { recursive: true });
+
+      const generateUniqueFilename = async (
+        baseName: string,
+        ext: string,
+        counter = 0
+      ): Promise<string> => {
+        const suffix = counter > 0 ? `_${counter}` : "";
+        const potentialFilename = `${baseName}${suffix}${ext}`;
+        const fullPath = path.join(uploadDir, potentialFilename);
+
+        try {
+          await fs.access(fullPath);
+          return generateUniqueFilename(baseName, ext, counter + 1);
+        } catch {
+          return potentialFilename;
+        }
+      };
+
+      const uniqueFilename = await generateUniqueFilename(
+        baseFilename,
+        fileExtension
+      );
+
+      const bytes = await profilePictureFile.arrayBuffer();
+      const buffer = Buffer.from(bytes);
+
+      const fullFilePath = path.join(uploadDir, uniqueFilename);
+      await fs.writeFile(fullFilePath, buffer);
+
+      profilePicturePath = `/uploads/profiles_pictures/staff/${uniqueFilename}`;
+    }
+
+    // Update staff details
+    Object.assign(staff, {
+      profilePicture: profilePicturePath,
+      fullName: formData.get("fullName") || staff.fullName,
+      dateOfBirth: formData.get("dateOfBirth") || staff.dateOfBirth,
+      sex: formData.get("sex") || staff.sex,
+      nationality: formData.get("nationality") || staff.nationality,
+      employmentType: formData.get("employmentType") || staff.employmentType,
+      position: formData.get("position") || staff.position,
+      unit: formData.get("unit") || staff.unit,
+      bloodType: formData.get("bloodType") || staff.bloodType,
+      dependents: formData.get("dependents") || staff.dependents,
+      unhcrEmail: formData.get("unhcrEmail") || staff.unhcrEmail,
+      privateEmail: formData.get("privateEmail") || staff.privateEmail,
+      mobileSyriatel: formData.get("mobileSyriatel") || staff.mobileSyriatel,
+      mobileMtn: formData.get("mobileMtn") || staff.mobileMtn,
+      homePhone: formData.get("homePhone") || staff.homePhone,
+      extension: formData.get("extension") || staff.extension,
+      radio: formData.get("radio") || staff.radio,
+      emergencyContact,
+      contractType: formData.get("contractType") || staff.contractType,
+      contractStartDate:
+        formData.get("contractStartDate") || staff.contractStartDate,
+      contractEndDate: formData.get("contractEndDate") || staff.contractEndDate,
+      nationalIdNumber:
+        formData.get("nationalIdNumber") || staff.nationalIdNumber,
+      passportNumber: formData.get("passportNumber") || staff.passportNumber,
+      passportExpiryDate:
+        formData.get("passportExpiryDate") || staff.passportExpiryDate,
+      unlpNumber: formData.get("unlpNumber") || staff.unlpNumber,
+      unlpExpiryDate: formData.get("unlpExpiryDate") || staff.unlpExpiryDate,
+      criticalStaff:
+        formData.get("criticalStaff") === "true"
+          ? true
+          : formData.get("criticalStaff") === "false"
+          ? false
+          : staff.criticalStaff,
+      warden: formData.get("warden") || staff.warden,
+      floorMarshal:
+        formData.get("floorMarshal") === "true"
+          ? true
+          : formData.get("floorMarshal") === "false"
+          ? false
+          : staff.floorMarshal,
+      etb:
+        formData.get("etb") === "true"
+          ? true
+          : formData.get("etb") === "false"
+          ? false
+          : staff.etb,
+      ifak:
+        formData.get("ifak") === "true"
+          ? true
+          : formData.get("ifak") === "false"
+          ? false
+          : staff.ifak,
+      advancedDriving:
+        formData.get("advancedDriving") === "true"
+          ? true
+          : formData.get("advancedDriving") === "false"
+          ? false
+          : staff.advancedDriving,
+      insideDs:
+        formData.get("insideDs") === "true"
+          ? true
+          : formData.get("insideDs") === "false"
+          ? false
+          : staff.insideDs,
+      outsideDs:
+        formData.get("outsideDs") === "true"
+          ? true
+          : formData.get("outsideDs") === "false"
+          ? false
+          : staff.outsideDs,
+      address,
     });
 
-    await Staff.findByIdAndUpdate(id, updateFields);
+    await staff.save();
     console.log("Staff updated successfully");
   } catch (err) {
-    console.error("Failed to update staff:", err);
+    if (err instanceof Error) {
+      console.error("Failed to update staff:", err.message);
+    } else {
+      console.error("An unknown error occurred:", err);
+    }
+    throw err;
   }
 
   revalidatePath("/dashboard/staff");
   redirect("/dashboard/staff");
 };
 
-export const deleteStaff = async (formData: FormData): Promise<void> => {
+export async function deleteStaff(
+  formData: FormData
+): Promise<DeleteActionResult> {
+  "use server";
   const { id } = Object.fromEntries(formData) as Record<string, string>;
 
   try {
     await connectToDB();
 
+    // Find the user to get the profile picture path
+    const staff = await Staff.findById(id);
+
+    if (staff?.profilePicture) {
+      const profilePicturePath = path.join(
+        process.cwd(),
+        "public",
+        staff.profilePicture
+      );
+
+      try {
+        await fs.unlink(profilePicturePath);
+      } catch (fileError) {
+        console.error("Failed to delete profile picture:", fileError);
+      }
+    }
+
+    // Delete the staff from the database
     await Staff.findByIdAndDelete(id);
-    console.log("Staff deleted successfully");
+
+    return { success: true };
   } catch (err) {
     console.error("Failed to delete staff:", err);
+    return { success: false, error: err };
   }
-
-  revalidatePath("/dashboard/staff");
-};
+}
 
 export const addUser = async (formData: FormData): Promise<void> => {
   const { fullName, sex, position, email, password, confirmPassword, role } =
@@ -303,7 +489,7 @@ export const addUser = async (formData: FormData): Promise<void> => {
       await fs.writeFile(fullFilePath, buffer);
 
       // Store relative path for database and frontend
-      profilePicturePath = `/uploads/profiles_pictures/${uniqueFilename}`;
+      profilePicturePath = `/uploads/profiles_pictures/admins/${uniqueFilename}`;
     }
 
     const newUser = new User({
@@ -321,9 +507,9 @@ export const addUser = async (formData: FormData): Promise<void> => {
     });
 
     await newUser.save();
-    console.log("User added successfully");
+    console.log("Admin added successfully");
   } catch (err) {
-    console.error("Failed to add user:", err);
+    console.error("Failed to add admin:", err);
     throw err;
   }
 
@@ -375,7 +561,7 @@ export const updateUser = async (formData: FormData): Promise<void> => {
     const buffer = Buffer.from(await profilePictureFile.arrayBuffer());
     await fs.writeFile(fullPath, buffer);
 
-    profilePicturePath = `/uploads/profiles_pictures/${uniqueFilename}`;
+    profilePicturePath = `/uploads/profiles_pictures/admins/${uniqueFilename}`;
   }
 
   try {
@@ -431,7 +617,10 @@ export const updateUser = async (formData: FormData): Promise<void> => {
   redirect("/dashboard/admins");
 };
 
-export const deleteUser = async (formData: FormData): Promise<void> => {
+export async function deleteUser(
+  formData: FormData
+): Promise<DeleteActionResult> {
+  "use server";
   const { id } = Object.fromEntries(formData) as Record<string, string>;
 
   try {
@@ -448,9 +637,7 @@ export const deleteUser = async (formData: FormData): Promise<void> => {
       );
 
       try {
-        // Remove the profile picture file
         await fs.unlink(profilePicturePath);
-        console.log("Profile picture deleted successfully");
       } catch (fileError) {
         console.error("Failed to delete profile picture:", fileError);
       }
@@ -458,26 +645,10 @@ export const deleteUser = async (formData: FormData): Promise<void> => {
 
     // Delete the user from the database
     await User.findByIdAndDelete(id);
-    console.log("User deleted successfully");
+
+    return { success: true };
   } catch (err) {
     console.error("Failed to delete user:", err);
+    return { success: false, error: err };
   }
-
-  revalidatePath("/dashboard/admins");
-};
-
-export const deleteSelectedStaff = async (ids: string[]): Promise<void> => {
-  try {
-    await connectToDB();
-
-    // Delete multiple staff
-    await Staff.deleteMany({ _id: { $in: ids } });
-
-    console.log("Selected staff deleted successfully");
-  } catch (err) {
-    console.error("Failed to delete selected staff:", err);
-    throw err;
-  }
-
-  revalidatePath("/dashboard/staff");
-};
+}

@@ -12,7 +12,6 @@ const AddAdmin: React.FC = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const router = useRouter();
 
-
   const validateForm = (formData: FormData) => {
     const fullName = formData.get("fullName") as string;
     const sex = formData.get("sex") as string;
