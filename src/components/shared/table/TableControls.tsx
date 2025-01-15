@@ -1,3 +1,4 @@
+// TableControls.tsx
 "use client";
 
 import { useState, useRef, useEffect } from "react";
@@ -5,6 +6,7 @@ import Image from "next/image";
 import TableColumnsSelection from "./TableColumnsSelection";
 import TableFilter from "./TableFilter";
 import TableExport from "./TableExport";
+import DeleteSelectedButton from "../buttons/DeleteSelectedButton";
 
 interface Column {
   key: string;
@@ -16,22 +18,28 @@ interface TableControlsProps {
   columns: Column[];
   visibleColumns: string[];
   data: Array<{ [key: string]: string | JSX.Element }>;
-  selectedRows?: number[];
+  selectedRows: number[];
   onColumnChange: (updatedColumns: string[]) => void;
   onFilterApply: (
     filters: { column: string; operator: string; value: string }[]
   ) => void;
   onFilterClear: () => void;
+  deleteAction: (
+    formData: FormData
+  ) => Promise<{ success: boolean; error?: string }>; // Updated type
+  onRowsDeleted: () => void;
 }
 
 const TableControls: React.FC<TableControlsProps> = ({
   columns,
   visibleColumns,
   data,
-  selectedRows,
+  selectedRows = [], // Default to an empty array
   onColumnChange,
   onFilterApply,
   onFilterClear,
+  deleteAction,
+  onRowsDeleted,
 }) => {
   const [showColumnSelector, setShowColumnSelector] = useState(false);
   const [showFilter, setShowFilter] = useState(false);
@@ -55,6 +63,17 @@ const TableControls: React.FC<TableControlsProps> = ({
   const filteredColumns = columns.filter(
     (col) => col.key !== "checkbox" && col.key !== "profilePicture"
   );
+
+  const selectedIds = selectedRows
+    .map((rowIndex) => {
+      const row = data[rowIndex];
+      if (!row || !row.id) {
+        console.error(`Row at index ${rowIndex} is missing an id.`);
+        return undefined; // Skip invalid rows
+      }
+      return row.id as string;
+    })
+    .filter((id): id is string => id !== undefined); // Remove undefined values
 
   return (
     <div className="relative flex flex-row items-center justify-start gap-2 w-full md:w-auto">
@@ -135,8 +154,17 @@ const TableControls: React.FC<TableControlsProps> = ({
           />
         )}
       </div>
+
+      {/* Delete Selected Button */}
+      <DeleteSelectedButton
+        selectedIds={selectedIds}
+        type="staff"
+        deleteAction={deleteAction}
+        onSuccess={onRowsDeleted}
+      />
+
       {/* Add selection count if rows are selected */}
-      {selectedRows && selectedRows.length > 0 && (
+      {selectedRows.length > 0 && (
         <div className="ml-auto px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-[10px] md:text-sm">
           {selectedRows.length} selected
         </div>

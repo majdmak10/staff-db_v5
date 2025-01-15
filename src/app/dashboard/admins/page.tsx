@@ -28,6 +28,7 @@ const AdminPage = async () => {
   ];
 
   const data = user.map((user) => ({
+    id: user.id,
     checkbox: <input type="checkbox" aria-label="Select row" />, // Row checkbox
     profilePicture: (
       <Link href={`/dashboard/admins/${user.id}`}>

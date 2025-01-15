@@ -4,14 +4,16 @@ import React, { useState } from "react";
 import ConfirmationModal from "@/components/shared/buttons/ConfirmModal";
 import Image from "next/image";
 
-interface DeleteSelectedProps {
+interface DeleteSelectedButtonProps {
   selectedIds: string[];
   type: "staff" | "user";
-  deleteAction: (formData: FormData) => Promise<void>;
+  deleteAction: (
+    formData: FormData
+  ) => Promise<{ success: boolean; error?: string }>;
   onSuccess?: () => void;
 }
 
-const DeleteSelected: React.FC<DeleteSelectedProps> = ({
+const DeleteSelectedButton: React.FC<DeleteSelectedButtonProps> = ({
   selectedIds,
   type,
   deleteAction,
@@ -23,15 +25,26 @@ const DeleteSelected: React.FC<DeleteSelectedProps> = ({
     setModalOpen(false);
 
     try {
-      // Delete each selected item
+      console.log("Deleting selected IDs:", selectedIds); // Debug log
       for (const id of selectedIds) {
+        if (!id) {
+          console.error("Encountered undefined id during deletion.");
+          continue;
+        }
+
         const formData = new FormData();
         formData.append("id", id);
         formData.append("type", type);
-        await deleteAction(formData);
+
+        const result = await deleteAction(formData);
+
+        if (!result.success) {
+          console.error(`Failed to delete ${id}:`, result.error);
+          alert(`Error deleting item: ${result.error}`);
+          return;
+        }
       }
 
-      // Call onSuccess callback if provided
       if (onSuccess) {
         onSuccess();
       }
@@ -67,4 +80,4 @@ const DeleteSelected: React.FC<DeleteSelectedProps> = ({
   );
 };
 
-export default DeleteSelected;
+export default DeleteSelectedButton;

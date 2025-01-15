@@ -11,7 +11,7 @@ import path from "path";
 
 export interface DeleteActionResult {
   success: boolean;
-  error?: unknown;
+  error?: string; // Ensure error is always a string or undefined
 }
 
 export const addStaff = async (formData: FormData): Promise<void> => {
@@ -389,35 +389,44 @@ export async function deleteStaff(
   formData: FormData
 ): Promise<DeleteActionResult> {
   "use server";
-  const { id } = Object.fromEntries(formData) as Record<string, string>;
+
+  const ids = formData.getAll("id") as string[];
 
   try {
     await connectToDB();
 
-    // Find the user to get the profile picture path
-    const staff = await Staff.findById(id);
+    for (const id of ids) {
+      // Find the user to get the profile picture path
+      const staff = await Staff.findById(id);
 
-    if (staff?.profilePicture) {
-      const profilePicturePath = path.join(
-        process.cwd(),
-        "public",
-        staff.profilePicture
-      );
+      if (staff?.profilePicture) {
+        const profilePicturePath = path.join(
+          process.cwd(),
+          "public",
+          staff.profilePicture
+        );
 
-      try {
-        await fs.unlink(profilePicturePath);
-      } catch (fileError) {
-        console.error("Failed to delete profile picture:", fileError);
+        try {
+          await fs.unlink(profilePicturePath);
+        } catch (fileError) {
+          console.error(
+            `Failed to delete profile picture for ${id}:`,
+            fileError
+          );
+        }
       }
-    }
 
-    // Delete the staff from the database
-    await Staff.findByIdAndDelete(id);
+      // Delete the staff from the database
+      await Staff.findByIdAndDelete(id);
+    }
 
     return { success: true };
   } catch (err) {
     console.error("Failed to delete staff:", err);
-    return { success: false, error: err };
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : "Unknown error", // Ensure error is string
+    };
   }
 }
 
@@ -621,34 +630,46 @@ export async function deleteUser(
   formData: FormData
 ): Promise<DeleteActionResult> {
   "use server";
-  const { id } = Object.fromEntries(formData) as Record<string, string>;
+
+  const ids = formData.getAll("id") as string[];
 
   try {
     await connectToDB();
 
-    // Find the user to get the profile picture path
-    const user = await User.findById(id);
+    for (const id of ids) {
+      // Find the user to get the profile picture path
+      const user = await User.findById(id);
 
-    if (user?.profilePicture) {
-      const profilePicturePath = path.join(
-        process.cwd(),
-        "public",
-        user.profilePicture
-      );
+      if (user?.profilePicture) {
+        const profilePicturePath = path.join(
+          process.cwd(),
+          "public",
+          "uploads",
+          "profile_pictures",
+          "admins",
+          user.profilePicture
+        );
 
-      try {
-        await fs.unlink(profilePicturePath);
-      } catch (fileError) {
-        console.error("Failed to delete profile picture:", fileError);
+        try {
+          await fs.unlink(profilePicturePath);
+        } catch (fileError) {
+          console.error(
+            `Failed to delete profile picture for ${id}:`,
+            fileError
+          );
+        }
       }
-    }
 
-    // Delete the user from the database
-    await User.findByIdAndDelete(id);
+      // Delete the user from the database
+      await User.findByIdAndDelete(id);
+    }
 
     return { success: true };
   } catch (err) {
-    console.error("Failed to delete user:", err);
-    return { success: false, error: err };
+    console.error("Failed to delete admin:", err);
+    return {
+      success: false,
+      error: err instanceof Error ? err.message : "Unknown error", // Ensure error is string
+    };
   }
 }
