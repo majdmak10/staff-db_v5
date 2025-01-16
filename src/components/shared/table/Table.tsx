@@ -15,9 +15,10 @@ interface TableProps {
   columns: Column[];
   data: Array<{ [key: string]: string | JSX.Element }>;
   deleteAction: (formData: FormData) => Promise<DeleteActionResult>;
+  type: "staff" | "user";
 }
 
-const Table: React.FC<TableProps> = ({ columns, data, deleteAction }) => {
+const Table: React.FC<TableProps> = ({ columns, data, deleteAction, type }) => {
   const [visibleColumns, setVisibleColumns] = useState<string[]>(
     columns.map((col) => col.key)
   );
@@ -97,24 +98,6 @@ const Table: React.FC<TableProps> = ({ columns, data, deleteAction }) => {
     }
   };
 
-  // Get the IDs of selected rows
-  const getSelectedIds = (): string[] => {
-    return selectedRows
-      .map((index) => {
-        const actionsColumn = filteredData[index].actions as JSX.Element;
-        if (!actionsColumn?.props?.children?.[0]?.props?.href) {
-          return "";
-        }
-        const href = actionsColumn.props.children[0].props.href;
-        return href.split("/").pop() || "";
-      })
-      .filter(Boolean); // Remove any empty strings
-  };
-
-  const handleDeleteComplete = () => {
-    setSelectedRows([]);
-  };
-
   const filteredColumns = columns.filter((col) =>
     visibleColumns.includes(col.key)
   );
@@ -127,12 +110,17 @@ const Table: React.FC<TableProps> = ({ columns, data, deleteAction }) => {
           visibleColumns={visibleColumns}
           data={filteredData}
           selectedRows={selectedRows}
-          selectedIds={getSelectedIds()}
-          deleteAction={deleteAction}
-          onDeleteComplete={handleDeleteComplete}
           onColumnChange={handleVisibleColumnsChange}
           onFilterApply={handleFilterApply}
           onFilterClear={handleFilterClear}
+          deleteAction={deleteAction}
+          selectedIds={selectedRows
+            .map((rowIndex) => {
+              const idValue = filteredData[rowIndex]?.id;
+              return typeof idValue === "string" ? idValue : null; // Ensure IDs are strings
+            })
+            .filter((id): id is string => !!id)} // Remove null or undefined values
+          type={type}
         />
       </div>
 

@@ -69,7 +69,9 @@ const DeleteButton: React.FC<DeleteButtonProps> = ({
 
       <ConfirmationModal
         isOpen={isModalOpen}
-        message={`Are you sure you want to delete this ${type}?`}
+        message={`Are you sure you want to delete this ${
+          type === "user" ? "admin" : "staff"
+        }?`}
         onConfirm={handleDelete}
         onCancel={() => setModalOpen(false)}
       />

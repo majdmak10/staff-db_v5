@@ -1,74 +1,80 @@
+import React, { useState } from "react";
+import ConfirmationModal from "@/components/shared/buttons/ConfirmModal";
 import Image from "next/image";
-import { useTransition } from "react";
-import { DeleteActionResult } from "@/lib/actions";
+import { useRouter } from "next/navigation";
+import { DeleteActionResult } from "@/lib/actions"; // Adjust the import path as needed
 
 interface DeleteSelectedButtonProps {
-  show: boolean;
   selectedIds: string[];
+  type: "staff" | "user";
   deleteAction: (formData: FormData) => Promise<DeleteActionResult>;
-  onDeleteComplete?: () => void;
+  show: boolean;
 }
 
 const DeleteSelectedButton: React.FC<DeleteSelectedButtonProps> = ({
-  show,
   selectedIds,
+  type,
   deleteAction,
-  onDeleteComplete,
+  show,
 }) => {
-  const [isPending, startTransition] = useTransition();
+  const [isModalOpen, setModalOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const router = useRouter();
 
-  if (!show) return null;
+  if (!show || selectedIds.length === 0) return null;
 
-  const handleDelete = () => {
-    if (
-      !confirm(
-        `Are you sure you want to delete ${selectedIds.length} selected items?`
-      )
-    ) {
-      return;
-    }
+  const handleDelete = async () => {
+    try {
+      setIsDeleting(true);
+      const formData = new FormData();
+      formData.append("type", type);
+      formData.append("ids", JSON.stringify(selectedIds)); // Sending selected IDs as a JSON array
 
-    startTransition(async () => {
-      try {
-        // Delete each selected item
-        const results = await Promise.all(
-          selectedIds.map(async (id) => {
-            const formData = new FormData();
-            formData.append("id", id);
-            return deleteAction(formData);
-          })
-        );
+      const result = await deleteAction(formData);
 
-        // Check if all deletions were successful
-        const allSuccessful = results.every((result) => result.success);
-
-        if (allSuccessful) {
-          onDeleteComplete?.();
-        } else {
-          console.error("Some items failed to delete");
-          alert("Some items could not be deleted. Please try again.");
+      if (result.success) {
+        router.refresh(); // Ensures the current page's data is reloaded
+        if (type === "user") {
+          window.location.href = "/dashboard/admins";
+        } else if (type === "staff") {
+          window.location.href = "/dashboard/staff";
         }
-      } catch (error) {
-        console.error("Error deleting items:", error);
-        alert("An error occurred while deleting items. Please try again.");
+      } else {
+        console.error("Failed to delete", result.error);
       }
-    });
+    } catch (error) {
+      console.error("Error:", error);
+    } finally {
+      setIsDeleting(false);
+      setModalOpen(false);
+    }
   };
 
   return (
-    <button
-      onClick={handleDelete}
-      disabled={isPending}
-      className="p-1 hover:rounded-full hover:bg-red-200 transition-colors duration-200 disabled:opacity-50"
-      aria-label="Delete selected items"
-    >
-      <Image
-        src="/table_icons/delete.png"
-        alt="Delete"
-        width={20}
-        height={20}
+    <>
+      <button
+        onClick={() => setModalOpen(true)}
+        className="p-1 hover:rounded-full hover:bg-red-200"
+        aria-label="Delete Selected"
+        disabled={isDeleting}
+      >
+        <Image
+          src="/table_icons/delete.png"
+          alt="Delete Selected"
+          width={20}
+          height={20}
+        />
+      </button>
+
+      <ConfirmationModal
+        isOpen={isModalOpen}
+        message={`Are you sure you want to delete the selected ${
+          selectedIds.length
+        } ${type === "user" ? "admin(s)" : "staff"}?`}
+        onConfirm={handleDelete}
+        onCancel={() => setModalOpen(false)}
       />
-    </button>
+    </>
   );
 };
 

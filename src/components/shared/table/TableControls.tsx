@@ -20,14 +20,14 @@ interface TableControlsProps {
   visibleColumns: string[];
   data: Array<{ [key: string]: string | JSX.Element }>;
   selectedRows?: number[];
-  selectedIds?: string[];
-  deleteAction?: (formData: FormData) => Promise<DeleteActionResult>;
-  onDeleteComplete?: () => void;
   onColumnChange: (updatedColumns: string[]) => void;
   onFilterApply: (
     filters: { column: string; operator: string; value: string }[]
   ) => void;
   onFilterClear: () => void;
+  deleteAction: (formData: FormData) => Promise<DeleteActionResult>;
+  selectedIds: string[];
+  type: "staff" | "user";
 }
 
 const TableControls: React.FC<TableControlsProps> = ({
@@ -35,12 +35,12 @@ const TableControls: React.FC<TableControlsProps> = ({
   visibleColumns,
   data,
   selectedRows,
-  selectedIds,
-  deleteAction,
-  onDeleteComplete,
   onColumnChange,
   onFilterApply,
   onFilterClear,
+  deleteAction,
+  selectedIds,
+  type,
 }) => {
   const [showColumnSelector, setShowColumnSelector] = useState(false);
   const [showFilter, setShowFilter] = useState(false);
@@ -151,12 +151,12 @@ const TableControls: React.FC<TableControlsProps> = ({
         {/* Add selection count if rows are selected */}
         <SelectedRows count={selectedRows?.length || 0} />
 
-        {/*Add delete selected rows*/}
+        {/* Add delete selected rows */}
         <DeleteSelectedButton
-          show={(selectedRows?.length || 0) > 0}
-          selectedIds={selectedIds || []}
-          deleteAction={deleteAction!}
-          onDeleteComplete={onDeleteComplete}
+          selectedIds={selectedIds}
+          type={type}
+          deleteAction={deleteAction}
+          show={!!selectedIds.length}
         />
       </div>
     </div>

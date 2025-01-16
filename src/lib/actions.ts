@@ -389,30 +389,41 @@ export async function deleteStaff(
   formData: FormData
 ): Promise<DeleteActionResult> {
   "use server";
-  const { id } = Object.fromEntries(formData) as Record<string, string>;
+  const { ids } = Object.fromEntries(formData) as Record<string, string>;
 
   try {
-    await connectToDB();
-
-    // Find the user to get the profile picture path
-    const staff = await Staff.findById(id);
-
-    if (staff?.profilePicture) {
-      const profilePicturePath = path.join(
-        process.cwd(),
-        "public",
-        staff.profilePicture
-      );
-
-      try {
-        await fs.unlink(profilePicturePath);
-      } catch (fileError) {
-        console.error("Failed to delete profile picture:", fileError);
-      }
+    const idArray = JSON.parse(ids); // Parse the JSON array of IDs
+    if (!Array.isArray(idArray)) {
+      throw new Error("Invalid ID format");
     }
 
-    // Delete the staff from the database
-    await Staff.findByIdAndDelete(id);
+    await connectToDB();
+
+    // Loop through each ID to handle deletion
+    for (const id of idArray) {
+      // Find the staff member to get the profile picture path
+      const staff = await Staff.findById(id);
+
+      if (staff?.profilePicture) {
+        const profilePicturePath = path.join(
+          process.cwd(),
+          "public",
+          staff.profilePicture
+        );
+
+        try {
+          await fs.unlink(profilePicturePath);
+        } catch (fileError) {
+          console.error(
+            `Failed to delete profile picture for ID ${id}:`,
+            fileError
+          );
+        }
+      }
+
+      // Delete the staff from the database
+      await Staff.findByIdAndDelete(id);
+    }
 
     return { success: true };
   } catch (err) {
@@ -621,34 +632,45 @@ export async function deleteUser(
   formData: FormData
 ): Promise<DeleteActionResult> {
   "use server";
-  const { id } = Object.fromEntries(formData) as Record<string, string>;
+  const { ids } = Object.fromEntries(formData) as Record<string, string>;
 
   try {
-    await connectToDB();
-
-    // Find the user to get the profile picture path
-    const user = await User.findById(id);
-
-    if (user?.profilePicture) {
-      const profilePicturePath = path.join(
-        process.cwd(),
-        "public",
-        user.profilePicture
-      );
-
-      try {
-        await fs.unlink(profilePicturePath);
-      } catch (fileError) {
-        console.error("Failed to delete profile picture:", fileError);
-      }
+    const idArray = JSON.parse(ids); // Parse the JSON array of IDs
+    if (!Array.isArray(idArray)) {
+      throw new Error("Invalid ID format");
     }
 
-    // Delete the user from the database
-    await User.findByIdAndDelete(id);
+    await connectToDB();
+
+    // Loop through each ID to handle deletion
+    for (const id of idArray) {
+      // Find the admin to get the profile picture path
+      const user = await User.findById(id);
+
+      if (user?.profilePicture) {
+        const profilePicturePath = path.join(
+          process.cwd(),
+          "public",
+          user.profilePicture
+        );
+
+        try {
+          await fs.unlink(profilePicturePath);
+        } catch (fileError) {
+          console.error(
+            `Failed to delete profile picture for ID ${id}:`,
+            fileError
+          );
+        }
+      }
+
+      // Delete the admin from the database
+      await User.findByIdAndDelete(id);
+    }
 
     return { success: true };
   } catch (err) {
-    console.error("Failed to delete user:", err);
+    console.error("Failed to delete admin:", err);
     return { success: false, error: err };
   }
 }

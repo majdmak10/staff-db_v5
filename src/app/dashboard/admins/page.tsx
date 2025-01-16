@@ -28,7 +28,7 @@ const AdminPage = async () => {
   ];
 
   const data = user.map((user) => ({
-    // id: user.id,
+    id: user.id,
     checkbox: <input type="checkbox" aria-label="Select row" />, // Row checkbox
     profilePicture: (
       <Link href={`/dashboard/admins/${user.id}`}>
@@ -88,7 +88,12 @@ const AdminPage = async () => {
           <AddButton href="/dashboard/admins/add" />
         </div>
         <div className="flex flex-col items-center justify-center bg-white rounded-lg p-4">
-          <Table columns={columns} data={data} />
+          <Table
+            columns={columns}
+            data={data}
+            deleteAction={deleteUser}
+            type="user"
+          />
         </div>
       </div>
     </Suspense>
