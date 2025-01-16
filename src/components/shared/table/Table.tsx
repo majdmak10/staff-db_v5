@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import clsx from "clsx";
 import TableControls from "./TableControls";
+import { DeleteActionResult } from "@/lib/actions";
 
 interface Column {
   key: string;
@@ -13,9 +14,10 @@ interface Column {
 interface TableProps {
   columns: Column[];
   data: Array<{ [key: string]: string | JSX.Element }>;
+  deleteAction: (formData: FormData) => Promise<DeleteActionResult>;
 }
 
-const Table: React.FC<TableProps> = ({ columns, data }) => {
+const Table: React.FC<TableProps> = ({ columns, data, deleteAction }) => {
   const [visibleColumns, setVisibleColumns] = useState<string[]>(
     columns.map((col) => col.key)
   );
@@ -95,6 +97,24 @@ const Table: React.FC<TableProps> = ({ columns, data }) => {
     }
   };
 
+  // Get the IDs of selected rows
+  const getSelectedIds = (): string[] => {
+    return selectedRows
+      .map((index) => {
+        const actionsColumn = filteredData[index].actions as JSX.Element;
+        if (!actionsColumn?.props?.children?.[0]?.props?.href) {
+          return "";
+        }
+        const href = actionsColumn.props.children[0].props.href;
+        return href.split("/").pop() || "";
+      })
+      .filter(Boolean); // Remove any empty strings
+  };
+
+  const handleDeleteComplete = () => {
+    setSelectedRows([]);
+  };
+
   const filteredColumns = columns.filter((col) =>
     visibleColumns.includes(col.key)
   );
@@ -107,6 +127,9 @@ const Table: React.FC<TableProps> = ({ columns, data }) => {
           visibleColumns={visibleColumns}
           data={filteredData}
           selectedRows={selectedRows}
+          selectedIds={getSelectedIds()}
+          deleteAction={deleteAction}
+          onDeleteComplete={handleDeleteComplete}
           onColumnChange={handleVisibleColumnsChange}
           onFilterApply={handleFilterApply}
           onFilterClear={handleFilterClear}

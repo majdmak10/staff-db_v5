@@ -109,7 +109,7 @@ const StaffPage = async () => {
         <AddButton href="/dashboard/staff/add" />
       </div>
       <div className="flex flex-col items-center justify-center bg-white rounded-lg p-4 w-full">
-        <Table columns={staffColumns} data={data} />
+        <Table columns={staffColumns} data={data} deleteAction={deleteStaff} />
       </div>
     </div>
   );

@@ -7,6 +7,7 @@ import TableFilter from "./TableFilter";
 import TableExport from "./TableExport";
 import SelectedRows from "./SelectedRows";
 import DeleteSelectedButton from "../buttons/DeleteSelectedButton";
+import { DeleteActionResult } from "@/lib/actions";
 
 interface Column {
   key: string;
@@ -19,6 +20,9 @@ interface TableControlsProps {
   visibleColumns: string[];
   data: Array<{ [key: string]: string | JSX.Element }>;
   selectedRows?: number[];
+  selectedIds?: string[];
+  deleteAction?: (formData: FormData) => Promise<DeleteActionResult>;
+  onDeleteComplete?: () => void;
   onColumnChange: (updatedColumns: string[]) => void;
   onFilterApply: (
     filters: { column: string; operator: string; value: string }[]
@@ -31,6 +35,9 @@ const TableControls: React.FC<TableControlsProps> = ({
   visibleColumns,
   data,
   selectedRows,
+  selectedIds,
+  deleteAction,
+  onDeleteComplete,
   onColumnChange,
   onFilterApply,
   onFilterClear,
@@ -145,7 +152,12 @@ const TableControls: React.FC<TableControlsProps> = ({
         <SelectedRows count={selectedRows?.length || 0} />
 
         {/*Add delete selected rows*/}
-        <DeleteSelectedButton show={(selectedRows?.length || 0) > 0} />
+        <DeleteSelectedButton
+          show={(selectedRows?.length || 0) > 0}
+          selectedIds={selectedIds || []}
+          deleteAction={deleteAction!}
+          onDeleteComplete={onDeleteComplete}
+        />
       </div>
     </div>
   );
