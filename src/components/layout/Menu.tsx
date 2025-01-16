@@ -138,7 +138,7 @@ const Menu = () => {
             return (
               <div
                 key={item.label}
-                className="relative flex flex-col items-center lg:items-start"
+                className="relative flex flex-col items-center lg:items-start z-50"
                 onMouseEnter={() => !isActive && setHoveredItem(uniqueKey)}
                 onMouseLeave={() => setHoveredItem(null)}
               >

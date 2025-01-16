@@ -18,7 +18,6 @@ const StaffPage = async () => {
   const staff = await getStaff();
 
   const data = staff.map((member) => ({
-    id: member.id,
     checkbox: (
       <input
         type="checkbox"

@@ -3,7 +3,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import clsx from "clsx";
 import TableControls from "./TableControls";
-import { deleteStaff } from "@/lib/actions";
 
 interface Column {
   key: string;
@@ -96,28 +95,6 @@ const Table: React.FC<TableProps> = ({ columns, data }) => {
     }
   };
 
-  const handleRowsDeleted = () => {
-    setFilteredData((prevData) =>
-      prevData.filter((_, index) => !selectedRows.includes(index))
-    );
-    setSelectedRows([]);
-  };
-
-  const handleDeleteAction = async (
-    formData: FormData
-  ): Promise<{ success: boolean; error?: string }> => {
-    try {
-      const result = await deleteStaff(formData);
-      return result; // This now aligns with the expected type
-    } catch (error) {
-      console.error("Error deleting staff:", error);
-      return {
-        success: false,
-        error: error instanceof Error ? error.message : "Unknown error",
-      };
-    }
-  };
-
   const filteredColumns = columns.filter((col) =>
     visibleColumns.includes(col.key)
   );
@@ -133,8 +110,6 @@ const Table: React.FC<TableProps> = ({ columns, data }) => {
           onColumnChange={handleVisibleColumnsChange}
           onFilterApply={handleFilterApply}
           onFilterClear={handleFilterClear}
-          deleteAction={handleDeleteAction} // Matches updated TableControlsProps
-          onRowsDeleted={handleRowsDeleted}
         />
       </div>
 
@@ -149,7 +124,7 @@ const Table: React.FC<TableProps> = ({ columns, data }) => {
               }
             />
           ) : (
-            <table className="my-2 w-full min-w-full table-fixed">
+            <table className="w-full min-w-full table-fixed">
               <thead>
                 <tr className="text-gray-600 text-sm">
                   {filteredColumns.map((column) => (
