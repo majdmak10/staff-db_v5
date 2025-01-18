@@ -4,6 +4,7 @@ import React, { useState, useRef, useEffect } from "react";
 import clsx from "clsx";
 import TableControls from "./TableControls";
 import { DeleteActionResult } from "@/lib/actions";
+import { useSort } from "@/hooks/useSort";
 
 interface Column {
   key: string;
@@ -33,6 +34,13 @@ const Table: React.FC<TableProps> = ({
   const [selectedRows, setSelectedRows] = useState<number[]>([]);
   const [searchValue, setSearchValue] = useState<string>("");
   const headerCheckboxRef = useRef<HTMLInputElement>(null);
+  const disableSortingFor = ["checkbox", "profilePicture", "actions"]; // Keys of columns to disable sorting
+
+  const { sortedData, sortState, handleSort } = useSort<(typeof data)[0]>(
+    filteredData,
+    null,
+    disableSortingFor
+  );
 
   useEffect(() => {
     // Update header checkbox state
@@ -170,8 +178,21 @@ const Table: React.FC<TableProps> = ({
                   {filteredColumns.map((column) => (
                     <th
                       key={column.key}
+                      onClick={() => {
+                        if (!disableSortingFor.includes(column.key)) {
+                          handleSort(column.key);
+                        }
+                      }}
                       className={clsx(
                         "group p-3 border-b border-gray-200 text-gray-600 font-semibold text-left items-center sticky top-0 tracking-wider",
+                        {
+                          "cursor-pointer": !disableSortingFor.includes(
+                            column.key
+                          ),
+                          "cursor-default": disableSortingFor.includes(
+                            column.key
+                          ),
+                        },
                         column.width && `w-[${column.width}]`
                       )}
                     >
@@ -185,19 +206,29 @@ const Table: React.FC<TableProps> = ({
                           className="w-4 h-4 accent-mBlue mt-1"
                         />
                       ) : (
-                        <>
+                        <div className="flex items-center">
                           <span>{column.label}</span>
-                          <span className="invisible group-hover:visible ml-2">
-                            ↕
-                          </span>
-                        </>
+                          {!disableSortingFor.includes(column.key) && (
+                            <>
+                              {sortState.column === column.key ? (
+                                <span className="ml-2">
+                                  {sortState.direction === "asc" ? "↑" : "↓"}
+                                </span>
+                              ) : (
+                                <span className="ml-2 invisible group-hover:visible">
+                                  ↕
+                                </span>
+                              )}
+                            </>
+                          )}
+                        </div>
                       )}
                     </th>
                   ))}
                 </tr>
               </thead>
               <tbody className="bg-white">
-                {filteredData.map((row, rowIndex) => (
+                {sortedData.map((row, rowIndex) => (
                   <tr
                     key={rowIndex}
                     className="group hover:bg-gray-50 transition-colors duration-150 text-sm items-center"

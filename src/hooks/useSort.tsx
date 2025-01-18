@@ -1,41 +1,65 @@
 import { useState, useMemo } from "react";
+import React, { ReactElement } from "react";
 
-interface UseSortProps {
-  initialData: Array<{ [key: string]: string | JSX.Element }>;
-  defaultSortKey?: string;
+interface SortState<T> {
+  column: keyof T | null;
+  direction: "asc" | "desc" | null;
 }
 
-const useSort = ({ initialData, defaultSortKey }: UseSortProps) => {
-  const [sortKey, setSortKey] = useState<string | null>(defaultSortKey || null);
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("asc");
+export const useSort = <T extends object>(
+  data: T[],
+  initialColumn: keyof T | null = null,
+  disableSortingFor: Array<keyof T> = []
+) => {
+  const [sortState, setSortState] = useState<SortState<T>>({
+    column: initialColumn,
+    direction: null,
+  });
 
   const sortedData = useMemo(() => {
-    if (!sortKey) return initialData;
+    if (!sortState.column || !sortState.direction) return data;
 
-    return [...initialData].sort((a, b) => {
-      const aValue =
-        typeof a[sortKey] === "string" ? a[sortKey]?.toString() : "";
-      const bValue =
-        typeof b[sortKey] === "string" ? b[sortKey]?.toString() : "";
+    const columnKey = sortState.column;
 
-      if (aValue < bValue) return sortDirection === "asc" ? -1 : 1;
-      if (aValue > bValue) return sortDirection === "asc" ? 1 : -1;
+    const getTextValue = (value: unknown): string => {
+      if (typeof value === "string") return value.toLowerCase();
+      if (
+        React.isValidElement(value) &&
+        (value as ReactElement<{ children?: string }>).props.children &&
+        typeof (value as ReactElement<{ children?: string }>).props.children ===
+          "string"
+      ) {
+        return (
+          value as ReactElement<{ children: string }>
+        ).props.children.toLowerCase();
+      }
+      return ""; // Fallback for unsupported types
+    };
+
+    return [...data].sort((a, b) => {
+      const aValue = getTextValue(a[columnKey]);
+      const bValue = getTextValue(b[columnKey]);
+
+      if (aValue < bValue) return sortState.direction === "asc" ? -1 : 1;
+      if (aValue > bValue) return sortState.direction === "asc" ? 1 : -1;
       return 0;
     });
-  }, [initialData, sortKey, sortDirection]);
+  }, [data, sortState]);
 
-  const handleSort = (key: string) => {
-    if (sortKey === key) {
-      // Toggle sort direction
-      setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"));
-    } else {
-      // Set new sort key and default direction
-      setSortKey(key);
-      setSortDirection("asc");
+  const handleSort = (column: keyof T) => {
+    if (disableSortingFor.includes(column)) {
+      return; // Skip sorting for disabled columns
     }
+    setSortState((prev) => ({
+      column,
+      direction:
+        prev.column === column
+          ? prev.direction === "asc"
+            ? "desc"
+            : "asc"
+          : "asc",
+    }));
   };
 
-  return { sortedData, sortKey, sortDirection, handleSort };
+  return { sortedData, sortState, handleSort };
 };
-
-export default useSort;
