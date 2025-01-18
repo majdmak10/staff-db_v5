@@ -635,17 +635,26 @@ export async function deleteUser(
   const { ids } = Object.fromEntries(formData) as Record<string, string>;
 
   try {
+    if (!ids) {
+      throw new Error("IDs are missing in the form data.");
+    }
+
     const idArray = JSON.parse(ids); // Parse the JSON array of IDs
-    if (!Array.isArray(idArray)) {
-      throw new Error("Invalid ID format");
+    if (!Array.isArray(idArray) || idArray.length === 0) {
+      throw new Error("Invalid or empty ID array.");
     }
 
     await connectToDB();
 
-    // Loop through each ID to handle deletion
     for (const id of idArray) {
-      // Find the admin to get the profile picture path
       const user = await User.findById(id);
+
+      if (user?.email === "makdessi@unhcr.org") {
+        return {
+          success: false,
+          error: "This admin cannot be deleted.",
+        };
+      }
 
       if (user?.profilePicture) {
         const profilePicturePath = path.join(
@@ -664,13 +673,12 @@ export async function deleteUser(
         }
       }
 
-      // Delete the admin from the database
       await User.findByIdAndDelete(id);
     }
 
     return { success: true };
   } catch (err) {
-    console.error("Failed to delete admin:", err);
-    return { success: false, error: err };
+    console.error("Failed to delete user:", err);
+    return { success: false, error: err instanceof Error ? err.message : err };
   }
 }

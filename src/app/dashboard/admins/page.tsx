@@ -93,6 +93,7 @@ const AdminPage = async () => {
             data={data}
             deleteAction={deleteUser}
             type="user"
+            placeholder="Search for an admin"
           />
         </div>
       </div>

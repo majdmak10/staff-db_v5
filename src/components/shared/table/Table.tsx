@@ -16,14 +16,22 @@ interface TableProps {
   data: Array<{ [key: string]: string | JSX.Element }>;
   deleteAction: (formData: FormData) => Promise<DeleteActionResult>;
   type: "staff" | "user";
+  placeholder?: string;
 }
 
-const Table: React.FC<TableProps> = ({ columns, data, deleteAction, type }) => {
+const Table: React.FC<TableProps> = ({
+  columns,
+  data,
+  deleteAction,
+  type,
+  placeholder = "Search for a staff", // Default value for placeholder
+}) => {
   const [visibleColumns, setVisibleColumns] = useState<string[]>(
     columns.map((col) => col.key)
   );
   const [filteredData, setFilteredData] = useState(data);
   const [selectedRows, setSelectedRows] = useState<number[]>([]);
+  const [searchValue, setSearchValue] = useState<string>("");
   const headerCheckboxRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -102,6 +110,23 @@ const Table: React.FC<TableProps> = ({ columns, data, deleteAction, type }) => {
     visibleColumns.includes(col.key)
   );
 
+  const handleSearch = (value: string) => {
+    setSearchValue(value); // Update search state
+    const newData = data.filter((row) => {
+      return Object.values(row).some((cellValue) => {
+        const cellText =
+          typeof cellValue === "string"
+            ? cellValue
+            : typeof cellValue === "object" && cellValue?.props?.children
+            ? String(cellValue.props.children)
+            : "";
+        return cellText.toLowerCase().includes(value.toLowerCase());
+      });
+    });
+    setFilteredData(newData);
+    setSelectedRows([]); // Clear selection when search changes
+  };
+
   return (
     <div className="w-full">
       <div className="sticky top-0 bg-white z-10 py-2">
@@ -121,6 +146,8 @@ const Table: React.FC<TableProps> = ({ columns, data, deleteAction, type }) => {
             })
             .filter((id): id is string => !!id)} // Remove null or undefined values
           type={type}
+          onSearch={handleSearch} // Pass search handler
+          placeholder={placeholder}
         />
       </div>
 
@@ -131,7 +158,9 @@ const Table: React.FC<TableProps> = ({ columns, data, deleteAction, type }) => {
               message={
                 visibleColumns.length === 0
                   ? "No columns to display. Please select columns to show."
-                  : "No results found. Please check the filter and try again."
+                  : searchValue
+                  ? "No results found. Please try again with new search input." // Message for no search results
+                  : "No results found. Please check the filter and try again." // Message for no filter results
               }
             />
           ) : (

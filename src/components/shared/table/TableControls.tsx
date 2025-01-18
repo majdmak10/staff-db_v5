@@ -6,6 +6,7 @@ import TableColumnsSelection from "./TableColumnsSelection";
 import TableFilter from "./TableFilter";
 import TableExport from "./TableExport";
 import SelectedRows from "./SelectedRows";
+import TableSearch from "./TableSearch";
 import DeleteSelectedButton from "../buttons/DeleteSelectedButton";
 import { DeleteActionResult } from "@/lib/actions";
 
@@ -28,6 +29,8 @@ interface TableControlsProps {
   deleteAction: (formData: FormData) => Promise<DeleteActionResult>;
   selectedIds: string[];
   type: "staff" | "user";
+  onSearch: (value: string) => void;
+  placeholder?: string;
 }
 
 const TableControls: React.FC<TableControlsProps> = ({
@@ -41,6 +44,8 @@ const TableControls: React.FC<TableControlsProps> = ({
   deleteAction,
   selectedIds,
   type,
+  onSearch, // Receive search handler
+  placeholder = "Search for a staff", // Default value
 }) => {
   const [showColumnSelector, setShowColumnSelector] = useState(false);
   const [showFilter, setShowFilter] = useState(false);
@@ -66,98 +71,104 @@ const TableControls: React.FC<TableControlsProps> = ({
   );
 
   return (
-    <div className="flex flex-col justify-start gap-3 md:flex-row md:justify-between w-full md:w-auto">
-      <div className="relative flex items-center gap-2 w-full md:w-auto">
-        {/* Columns selection */}
-        <div className="relative flex items-center gap-2">
-          <button
-            className="w-7 h-7 flex items-center justify-center rounded-full bg-mYellow"
-            title="Show/Hide Columns"
-            aria-label="Show/Hide Columns"
-            onClick={() => setShowColumnSelector((prev) => !prev)}
-          >
-            <Image
-              src="/table_icons/columns.png"
-              alt="Columns"
-              width={14}
-              height={14}
-            />
-          </button>
-          <span className="text-sm font-medium text-gray-600">Columns</span>
-          {showColumnSelector && (
-            <TableColumnsSelection
-              columns={columns}
-              visibleColumns={visibleColumns}
-              onChange={onColumnChange}
-              onClose={() => setShowColumnSelector(false)}
-            />
-          )}
+    <div className="flex flex-col justify-center gap-4 md:flex-row md:justify-between w-full md:w-auto">
+      <div className="flex justify-between items-center gap-6 w-full md:w-auto">
+        <div className="relative flex justify-start items-center gap-2 w-full md:w-auto">
+          {/* Columns selection */}
+          <div className="relative flex items-center gap-2">
+            <button
+              className="w-7 h-7 flex items-center justify-center rounded-full bg-mYellow"
+              title="Show/Hide Columns"
+              aria-label="Show/Hide Columns"
+              onClick={() => setShowColumnSelector((prev) => !prev)}
+            >
+              <Image
+                src="/table_icons/columns.png"
+                alt="Columns"
+                width={14}
+                height={14}
+              />
+            </button>
+            <span className="text-sm font-medium text-gray-600">Columns</span>
+            {showColumnSelector && (
+              <TableColumnsSelection
+                columns={columns}
+                visibleColumns={visibleColumns}
+                onChange={onColumnChange}
+                onClose={() => setShowColumnSelector(false)}
+              />
+            )}
+          </div>
+
+          {/* Filter */}
+          <div className="relative flex items-center gap-2" ref={filterRef}>
+            <button
+              className="w-7 h-7 flex items-center justify-center rounded-full bg-mYellow"
+              title="Filter Data"
+              aria-label="Filter Data"
+              onClick={() => setShowFilter((prev) => !prev)}
+            >
+              <Image
+                src="/table_icons/filter.png"
+                alt="Filter"
+                width={14}
+                height={14}
+              />
+            </button>
+            <span className="text-sm font-medium text-gray-600">Filter</span>
+            {showFilter && (
+              <TableFilter
+                columns={filteredColumns}
+                onApply={onFilterApply}
+                onClear={onFilterClear}
+              />
+            )}
+          </div>
+
+          {/* Export */}
+          <div className="relative flex items-center gap-2" ref={exportRef}>
+            <button
+              className="w-7 h-7 flex items-center justify-center rounded-full bg-mYellow"
+              title="Export Data"
+              aria-label="Export Data"
+              onClick={() => setShowExport((prev) => !prev)}
+            >
+              <Image
+                src="/table_icons/export.png"
+                alt="Export"
+                width={14}
+                height={14}
+              />
+            </button>
+            <span className="text-sm font-medium text-gray-600">Export</span>
+            {showExport && (
+              <TableExport
+                columns={columns}
+                visibleColumns={visibleColumns}
+                data={data}
+                selectedRows={selectedRows}
+                onClose={() => setShowExport(false)}
+              />
+            )}
+          </div>
         </div>
 
-        {/* Filter */}
-        <div className="relative flex items-center gap-2" ref={filterRef}>
-          <button
-            className="w-7 h-7 flex items-center justify-center rounded-full bg-mYellow"
-            title="Filter Data"
-            aria-label="Filter Data"
-            onClick={() => setShowFilter((prev) => !prev)}
-          >
-            <Image
-              src="/table_icons/filter.png"
-              alt="Filter"
-              width={14}
-              height={14}
-            />
-          </button>
-          <span className="text-sm font-medium text-gray-600">Filter</span>
-          {showFilter && (
-            <TableFilter
-              columns={filteredColumns}
-              onApply={onFilterApply}
-              onClear={onFilterClear}
-            />
-          )}
-        </div>
+        <div className="flex justify-end items-center gap-1">
+          {/* Add selection count if rows are selected */}
+          <SelectedRows count={selectedRows?.length || 0} />
 
-        {/* Export */}
-        <div className="relative flex items-center gap-2" ref={exportRef}>
-          <button
-            className="w-7 h-7 flex items-center justify-center rounded-full bg-mYellow"
-            title="Export Data"
-            aria-label="Export Data"
-            onClick={() => setShowExport((prev) => !prev)}
-          >
-            <Image
-              src="/table_icons/export.png"
-              alt="Export"
-              width={14}
-              height={14}
-            />
-          </button>
-          <span className="text-sm font-medium text-gray-600">Export</span>
-          {showExport && (
-            <TableExport
-              columns={columns}
-              visibleColumns={visibleColumns}
-              data={data}
-              selectedRows={selectedRows}
-              onClose={() => setShowExport(false)}
-            />
-          )}
+          {/* Add delete selected rows */}
+          <DeleteSelectedButton
+            selectedIds={selectedIds}
+            type={type}
+            deleteAction={deleteAction}
+            show={!!selectedIds.length}
+          />
         </div>
       </div>
 
-      <div className="flex justify-end items-center gap-2">
-        {/* Add selection count if rows are selected */}
-        <SelectedRows count={selectedRows?.length || 0} />
-
-        {/* Add delete selected rows */}
-        <DeleteSelectedButton
-          selectedIds={selectedIds}
-          type={type}
-          deleteAction={deleteAction}
-          show={!!selectedIds.length}
-        />
+      <div className="w-full md:w-auto">
+        <TableSearch onSearch={onSearch} placeholder={placeholder} />
       </div>
     </div>
   );
