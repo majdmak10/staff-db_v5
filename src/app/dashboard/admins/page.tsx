@@ -9,36 +9,25 @@ import { getUsers } from "@/lib/data";
 import { deleteUser } from "@/lib/actions";
 import Table from "@/components/shared/table/Table";
 import { Suspense } from "react";
+import adminsColumns from "@/constants/columns/adminsColumns";
+import { getProfilePicture } from "@/utils/adminUtils";
 
 const AdminPage = async () => {
   const user = await getUsers();
 
-  const columns = [
-    {
-      key: "checkbox",
-      label: <input type="checkbox" aria-label="Select all rows" />,
-      width: "50px",
-    },
-    { key: "profilePicture", label: "Picture", width: "100px" },
-    { key: "fullName", label: "Full Name", width: "200px" },
-    { key: "position", label: "Position", width: "200px" },
-    { key: "email", label: "Email", width: "250px" },
-    { key: "role", label: "Role", width: "150px" },
-    { key: "actions", label: "Actions", width: "150px" },
-  ];
-
   const data = user.map((user) => ({
     id: user.id,
-    checkbox: <input type="checkbox" aria-label="Select row" />, // Row checkbox
+    checkbox: (
+      <input
+        type="checkbox"
+        aria-label="Select row"
+        className="w-4 h-4 accent-mBlue mt-1"
+      />
+    ), // Row checkbox
     profilePicture: (
       <Link href={`/dashboard/admins/${user.id}`}>
         <Image
-          src={
-            user.profilePicture ||
-            (user.sex === "male"
-              ? "/avatars/noProfilePicture_m.png"
-              : "/avatars/noProfilePicture_f.png")
-          }
+          src={getProfilePicture(user.profilePicture, user.sex)}
           alt={`${user.fullName}'s Profile Picture`}
           width={50}
           height={50}
@@ -89,7 +78,7 @@ const AdminPage = async () => {
         </div>
         <div className="flex flex-col items-center justify-center bg-white rounded-lg p-4">
           <Table
-            columns={columns}
+            columns={adminsColumns}
             data={data}
             deleteAction={deleteUser}
             type="user"
