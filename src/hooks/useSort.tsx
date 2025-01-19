@@ -46,10 +46,17 @@ export const useSort = <T extends object>(
     });
   }, [data, sortState]);
 
-  const handleSort = (column: keyof T) => {
+  const handleSort = (column: keyof T | null) => {
+    if (column === null) {
+      // Reset sorting
+      setSortState({ column: null, direction: null });
+      return;
+    }
+
     if (disableSortingFor.includes(column)) {
       return; // Skip sorting for disabled columns
     }
+
     setSortState((prev) => ({
       column,
       direction:
