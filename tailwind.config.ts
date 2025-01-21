@@ -28,6 +28,26 @@ export default {
   ],
   theme: {
     extend: {
+      width: {
+        "50px": "50px",
+        "100px": "100px",
+        "110px": "110px",
+        "120px": "120px",
+        "130px": "130px",
+        "140px": "140px",
+        "150px": "150px",
+        "160px": "160px",
+        "170px": "170px",
+        "180px": "180px",
+        "190px": "190px",
+        "200px": "200px",
+        "220px": "220px",
+        "250px": "250px",
+        "300px": "300px",
+        "350px": "350px",
+        "400px": "400px",
+        "500px": "500px",
+      },
       colors: {
         mBodyBg: "#f0f2f5",
         mBlue: "#007fff",

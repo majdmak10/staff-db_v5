@@ -16,12 +16,30 @@ body {
   border-color: #007fff; /* changes the checkbox border color */
 }
 
-/* Custom scrollbar hide class */
-.hide-scrollbar::-webkit-scrollbar {
-  display: none;
+/* Add this to your global styles or module */
+.header {
+  padding: 0.75rem;
+  border-bottom: 1px solid #e5e7eb;
+  /* Tailwind's gray-200 */
+  font-weight: 600;
+  text-align: left;
+  position: relative;
 }
 
-.hide-scrollbar {
-  -ms-overflow-style: none; /* IE and Edge */
-  scrollbar-width: none; /* Firefox */
+.resizable {
+  cursor: col-resize;
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 8px;
+}
+
+.hoverable {
+  transition: border-color 0.2s ease-in-out;
+}
+
+.hoverable:hover {
+  border-right: 1px solid #d1d5db;
+  /* Tailwind's gray-300 */
 }

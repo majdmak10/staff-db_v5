@@ -13,6 +13,7 @@ import { useSort } from "@/hooks/useSort";
 import TableHeader from "./TableHeader";
 import TableBody from "./TableBody";
 import EmptyState from "./EmptyState";
+import { useColumnResize } from "@/hooks/useColumnResize";
 
 export interface Column {
   key: string;
@@ -49,6 +50,14 @@ const Table: React.FC<TableProps> = ({
     () => columns.filter((col) => visibleColumns.includes(col.key)),
     [columns, visibleColumns]
   );
+
+  const initialColumnWidths = columns.reduce(
+    (acc, col) => ({ ...acc, [col.key]: 150 }), // Set default widths for all columns
+    {}
+  );
+
+  const { columnWidths, startResizing, resetWidths } =
+    useColumnResize(initialColumnWidths);
 
   const filteredData = useMemo(() => {
     return data.filter((row) => {
@@ -144,6 +153,7 @@ const Table: React.FC<TableProps> = ({
     setSelectedRows([]);
     setVisibleColumns(columns.map((col) => col.key)); // Show all columns
     handleSort(null); // Reset sorting
+    resetWidths(); // Reset column widths
   };
 
   const isResetVisible = useMemo(() => {
@@ -196,6 +206,8 @@ const Table: React.FC<TableProps> = ({
             <table className="w-full table-fixed">
               <TableHeader
                 columns={filteredColumns}
+                columnWidths={columnWidths}
+                startResizing={startResizing}
                 sortState={sortState}
                 handleSort={handleSort}
                 headerCheckboxRef={headerCheckboxRef}
