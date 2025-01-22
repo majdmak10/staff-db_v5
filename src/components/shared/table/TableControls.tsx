@@ -9,6 +9,7 @@ import SelectedRows from "./SelectedRows";
 import TableSearch from "./TableSearch";
 import DeleteSelectedButton from "../buttons/DeleteSelectedButton";
 import { DeleteActionResult } from "@/lib/actions";
+import ResetButton from "../buttons/ResetButton";
 
 interface Column {
   key: string;
@@ -31,6 +32,8 @@ interface TableControlsProps {
   type: "staff" | "user";
   onSearch: (value: string) => void;
   placeholder?: string;
+  onReset: () => void;
+  isResetVisible: boolean; // New prop to control ResetButton visibility
 }
 
 const TableControls: React.FC<TableControlsProps> = ({
@@ -46,6 +49,8 @@ const TableControls: React.FC<TableControlsProps> = ({
   type,
   onSearch, // Receive search handler
   placeholder = "Search for a staff", // Default value
+  onReset, // Destructure reset handler
+  isResetVisible, // Destructure visibility prop
 }) => {
   const [showColumnSelector, setShowColumnSelector] = useState(false);
   const [showFilter, setShowFilter] = useState(false);
@@ -165,6 +170,10 @@ const TableControls: React.FC<TableControlsProps> = ({
             show={!!selectedIds.length}
           />
         </div>
+      </div>
+
+      <div className="flex items-center gap-4">
+        {isResetVisible && <ResetButton onReset={onReset} />}
       </div>
 
       <div className="w-full md:w-auto">

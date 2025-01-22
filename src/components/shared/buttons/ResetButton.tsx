@@ -1,15 +1,17 @@
+"use client";
+
+import React from "react";
+
 interface ResetButtonProps {
-  onClick: () => void; // Function to call on reset
-  show: boolean; // Whether to show the button
+  onReset: () => void;
 }
 
-const ResetButton: React.FC<ResetButtonProps> = ({ onClick, show }) => {
-  if (!show) return null; // Don't render the button if not shown
-
+const ResetButton: React.FC<ResetButtonProps> = ({ onReset }) => {
   return (
     <button
-      onClick={onClick}
-      className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition"
+      onClick={onReset}
+      className="px-2 py-1 bg-mGreenLight hover:bg-mGreen transition text-white rounded-full text-xs md:text-[13px] "
+      title="Reset all filters and selections"
     >
       Reset
     </button>

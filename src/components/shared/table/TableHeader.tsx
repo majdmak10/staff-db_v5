@@ -45,13 +45,13 @@ const TableHeader: React.FC<TableHeaderProps> = ({
           <th
             key={column.key}
             className={clsx(
-              "group p-3 border-b border-gray-200 font-semibold text-left relative",
+              "group p-3 border-b border-gray-200 text-gray-600 font-semibold text-sm text-left items-center sticky top-0 tracking-wide",
               getWidthClass(columnWidths[column.key]),
               {
                 "cursor-pointer": !disableSortingFor.includes(column.key),
                 "cursor-default": disableSortingFor.includes(column.key),
                 "bg-blue-50 text-blue-600": sortState?.column === column.key,
-                "hover:border-r hover:border-gray-300": true, // Add hover border
+                "hover:border-r": true, // Add hover border
               }
             )}
             onClick={() => {
@@ -66,7 +66,7 @@ const TableHeader: React.FC<TableHeaderProps> = ({
                   type="checkbox"
                   ref={headerCheckboxRef}
                   onChange={handleSelectAll}
-                  className="w-4 h-4"
+                  className="w-4 h-4 accent-mBlue mt-1"
                 />
               ) : (
                 <>

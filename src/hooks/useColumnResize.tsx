@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 
 interface ColumnResizeState {
   [key: string]: number; // Column key mapped to its width
@@ -7,10 +7,13 @@ interface ColumnResizeState {
 export const useColumnResize = (initialWidths: ColumnResizeState = {}) => {
   const [columnWidths, setColumnWidths] =
     useState<ColumnResizeState>(initialWidths);
+  const [isResizing, setIsResizing] = useState(false); // Track resizing state
 
   const handleMouseDown = useCallback(
     (columnKey: string, startX: number) => {
       const initialWidth = columnWidths[columnKey] || 150; // Default width
+      setIsResizing(true); // Start resizing
+
       const handleMouseMove = (event: MouseEvent) => {
         const deltaX = event.clientX - startX;
         setColumnWidths((prevWidths) => ({
@@ -20,6 +23,7 @@ export const useColumnResize = (initialWidths: ColumnResizeState = {}) => {
       };
 
       const handleMouseUp = () => {
+        setIsResizing(false); // End resizing
         document.removeEventListener("mousemove", handleMouseMove);
         document.removeEventListener("mouseup", handleMouseUp);
       };
@@ -34,9 +38,18 @@ export const useColumnResize = (initialWidths: ColumnResizeState = {}) => {
     setColumnWidths(initialWidths);
   }, [initialWidths]);
 
+  // Check if column widths have been modified
+  const isWidthModified = useMemo(() => {
+    return Object.keys(initialWidths).some(
+      (key) => columnWidths[key] !== initialWidths[key]
+    );
+  }, [columnWidths, initialWidths]);
+
   return {
     columnWidths,
     startResizing: handleMouseDown,
-    resetWidths, // Add the reset function
+    resetWidths,
+    isResizing, // Return resizing state
+    isWidthModified,
   };
 };

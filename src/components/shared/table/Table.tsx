@@ -9,11 +9,12 @@ import React, {
 } from "react";
 import TableControls from "./TableControls";
 import { DeleteActionResult } from "@/lib/actions";
-import { useSort } from "@/hooks/useSort";
 import TableHeader from "./TableHeader";
 import TableBody from "./TableBody";
 import EmptyState from "./EmptyState";
 import { useColumnResize } from "@/hooks/useColumnResize";
+import { useSort } from "@/hooks/useSort";
+import staffColumns from "@/constants/columns/staffColumns";
 
 export interface Column {
   key: string;
@@ -51,13 +52,18 @@ const Table: React.FC<TableProps> = ({
     [columns, visibleColumns]
   );
 
-  const initialColumnWidths = columns.reduce(
-    (acc, col) => ({ ...acc, [col.key]: 150 }), // Set default widths for all columns
-    {}
-  );
+  const initialColumnWidths = staffColumns.reduce((acc, col) => {
+    acc[col.key] = parseInt(col.width.replace("px", ""), 10);
+    return acc;
+  }, {} as { [key: string]: number });
 
-  const { columnWidths, startResizing, resetWidths } =
-    useColumnResize(initialColumnWidths);
+  const {
+    columnWidths,
+    startResizing,
+    resetWidths,
+    isResizing,
+    isWidthModified,
+  } = useColumnResize(initialColumnWidths);
 
   const filteredData = useMemo(() => {
     return data.filter((row) => {
@@ -147,10 +153,19 @@ const Table: React.FC<TableProps> = ({
     );
   }, []);
 
+  const handleSortWrapper = useCallback(
+    (columnKey: string) => {
+      if (!isResizing) {
+        handleSort(columnKey); // Only sort if not resizing
+      }
+    },
+    [isResizing, handleSort]
+  );
+
   const handleReset = () => {
-    setFilters([]);
-    setSearchValue("");
-    setSelectedRows([]);
+    setFilters([]); // Clear filters
+    setSearchValue(""); // Clear search input
+    setSelectedRows([]); // Deselect all rows
     setVisibleColumns(columns.map((col) => col.key)); // Show all columns
     handleSort(null); // Reset sorting
     resetWidths(); // Reset column widths
@@ -158,39 +173,35 @@ const Table: React.FC<TableProps> = ({
 
   const isResetVisible = useMemo(() => {
     return (
-      filters.length > 0 || searchValue !== "" || sortState.column !== null
+      filters.length > 0 || // Filters applied
+      searchValue !== "" || // Search term entered
+      sortState.column !== null || // Sorting applied
+      selectedRows.length > 0 || // Rows selected
+      isWidthModified // Column widths modified
     );
-  }, [filters, searchValue, sortState]);
+  }, [filters, searchValue, sortState, selectedRows, isWidthModified]);
 
   return (
     <div className="w-full">
-      <div className="sticky top-0 bg-white z-10 py-2">
-        <div className="flex justify-between items-center">
-          <TableControls
-            columns={columns}
-            visibleColumns={visibleColumns}
-            data={filteredData}
-            selectedRows={selectedRows}
-            onColumnChange={handleVisibleColumnsChange}
-            onFilterApply={handleFilterApply}
-            onFilterClear={handleFilterClear}
-            deleteAction={deleteAction}
-            selectedIds={selectedRows
-              .map((index) => filteredData[index]?.id)
-              .filter((id): id is string => !!id)}
-            type={type}
-            onSearch={handleSearch}
-            placeholder={placeholder}
-          />
-          {isResetVisible && (
-            <button
-              onClick={handleReset}
-              className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition"
-            >
-              Reset
-            </button>
-          )}
-        </div>
+      <div className="flex items-center sticky top-0 bg-white z-10 py-2">
+        <TableControls
+          columns={columns}
+          visibleColumns={visibleColumns}
+          data={filteredData}
+          selectedRows={selectedRows}
+          onColumnChange={handleVisibleColumnsChange}
+          onFilterApply={handleFilterApply}
+          onFilterClear={handleFilterClear}
+          deleteAction={deleteAction}
+          selectedIds={selectedRows
+            .map((index) => filteredData[index]?.id)
+            .filter((id): id is string => !!id)}
+          type={type}
+          onSearch={handleSearch}
+          placeholder={placeholder}
+          onReset={handleReset}
+          isResetVisible={isResetVisible} // Pass visibility state
+        />
       </div>
 
       <div className="relative">
@@ -209,7 +220,7 @@ const Table: React.FC<TableProps> = ({
                 columnWidths={columnWidths}
                 startResizing={startResizing}
                 sortState={sortState}
-                handleSort={handleSort}
+                handleSort={handleSortWrapper} // Use wrapper to prevent sorting during resizing
                 headerCheckboxRef={headerCheckboxRef}
                 handleSelectAll={handleSelectAll}
                 disableSortingFor={["checkbox", "profilePicture", "actions"]}

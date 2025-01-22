@@ -21,7 +21,7 @@ const TableBody: React.FC<TableBodyProps> = ({
         <tr
           key={rowIndex}
           className={clsx(
-            "group hover:bg-gray-100 transition duration-150",
+            "group hover:bg-gray-100 transition duration-150 text-sm items-center",
             selectedRows.includes(rowIndex) && "bg-blue-50"
           )}
           tabIndex={0} // Make the row focusable
@@ -36,7 +36,7 @@ const TableBody: React.FC<TableBodyProps> = ({
           {columns.map((column) => (
             <td
               key={column.key}
-              className="p-3 border-b border-gray-200"
+              className={clsx("px-3 py-1 border-b border-gray-200")}
               tabIndex={-1} // Cells are focusable but not tabbable
             >
               {column.key === "checkbox" ? (
@@ -45,10 +45,11 @@ const TableBody: React.FC<TableBodyProps> = ({
                   type="checkbox"
                   checked={selectedRows.includes(rowIndex)}
                   onChange={() => handleRowSelect(rowIndex)}
-                  className="w-4 h-4"
+                  onClick={(e) => e.stopPropagation()} // Prevent row click
+                  className="w-4 h-4 accent-mBlue"
                 />
               ) : (
-                <div>
+                <div className="max-w-full truncate">
                   {row[column.key] ?? (
                     <span className="text-gray-400">N/A</span>
                   )}
