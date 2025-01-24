@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import ConfirmationModal from "@/components/shared/buttons/ConfirmModal";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { DeleteActionResult } from "@/lib/actions";
 
@@ -62,17 +61,18 @@ const DeleteSelectedButton: React.FC<DeleteSelectedButtonProps> = ({
     <>
       <button
         onClick={() => setModalOpen(true)}
-        className="p-1 hover:rounded-full hover:bg-red-200"
+        className="px-2 py-1 rounded-full bg-mRed hover:bg-red-300 text-white text-xs md:text-[13px]"
         aria-label="Delete Selected"
         disabled={isDeleting}
       >
-        <Image
+        {/* <Image
           src="/table_icons/delete.png"
           alt="Delete Selected"
           width={36}
           height={36}
           className="md:w-5 md:h-5"
-        />
+        /> */}
+        Delete selected
       </button>
 
       <ConfirmationModal

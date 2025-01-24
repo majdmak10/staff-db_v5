@@ -76,7 +76,7 @@ const TableControls: React.FC<TableControlsProps> = ({
   );
 
   return (
-    <div className="flex flex-col justify-center gap-4 md:flex-row md:justify-between w-full md:w-auto">
+    <div className="flex flex-col justify-center gap-4 md:flex-row md:justify-between w-full">
       <div className="flex justify-between items-center gap-6 w-full md:w-auto">
         <div className="relative flex justify-start items-center gap-2 w-full md:w-auto">
           {/* Columns selection */}
@@ -157,22 +157,21 @@ const TableControls: React.FC<TableControlsProps> = ({
             )}
           </div>
         </div>
-
-        <div className="flex justify-end items-center gap-1">
-          {/* Add selection count if rows are selected */}
-          <SelectedRows count={selectedRows?.length || 0} />
-
-          {/* Add delete selected rows */}
-          <DeleteSelectedButton
-            selectedIds={selectedIds}
-            type={type}
-            deleteAction={deleteAction}
-            show={!!selectedIds.length}
-          />
-        </div>
       </div>
 
-      <div className="flex items-center gap-4">
+      <div className="flex justify-end items-center gap-1">
+        {/* Add selection count if rows are selected */}
+        <SelectedRows count={selectedRows?.length || 0} />
+
+        {/* Add delete selected rows */}
+        <DeleteSelectedButton
+          selectedIds={selectedIds}
+          type={type}
+          deleteAction={deleteAction}
+          show={!!selectedIds.length}
+        />
+
+        {/* Add delete selected rows */}
         {isResetVisible && <ResetButton onReset={onReset} />}
       </div>
 
