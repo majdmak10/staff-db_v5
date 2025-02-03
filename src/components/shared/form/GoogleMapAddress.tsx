@@ -1,16 +1,32 @@
 "use client";
+
 import React, { useCallback, useState } from "react";
 import { GoogleMap, Marker, useLoadScript } from "@react-google-maps/api";
 
 interface GoogleMapAddressProps {
-  onAddressSelect: (lat: number, lng: number) => void;
+  onAddressSelect: (lat: string, lng: string) => void; // DMS-formatted latitude/longitude
 }
+
+const convertToDMSWithDirection = (
+  decimal: number,
+  isLatitude: boolean
+): string => {
+  const degrees = Math.floor(Math.abs(decimal));
+  const minutesDecimal = (Math.abs(decimal) - degrees) * 60;
+  const minutes = Math.floor(minutesDecimal);
+  const seconds = ((minutesDecimal - minutes) * 60).toFixed(2);
+
+  const direction =
+    decimal >= 0 ? (isLatitude ? "N" : "E") : isLatitude ? "S" : "W";
+
+  return `${degrees}°${minutes}'${seconds}"${direction}`;
+};
 
 const GoogleMapAddress: React.FC<GoogleMapAddressProps> = ({
   onAddressSelect,
 }) => {
   const { isLoaded } = useLoadScript({
-    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "", // Make sure your API key is here
+    googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY || "",
   });
 
   const [selectedPosition, setSelectedPosition] = useState<{
@@ -24,26 +40,26 @@ const GoogleMapAddress: React.FC<GoogleMapAddressProps> = ({
         const lat = event.latLng.lat();
         const lng = event.latLng.lng();
         setSelectedPosition({ lat, lng });
-        onAddressSelect(lat, lng);
+
+        // Convert to DMS with direction and pass to the parent component
+        onAddressSelect(
+          convertToDMSWithDirection(lat, true), // Latitude
+          convertToDMSWithDirection(lng, false) // Longitude
+        );
       }
     },
     [onAddressSelect]
   );
 
   if (!isLoaded) {
-    return <div>Loading Google Maps...</div>;
+    return <div>Loading...</div>;
   }
 
   return (
     <GoogleMap
+      mapContainerClassName="w-full h-[300px] md:h-full md:col-span-2 rounded-lg border border-gray-300"
       zoom={10}
-      center={{ lat: 36.2021, lng: 37.1343 }} // Default center on Aleppo
-      mapContainerStyle={{
-        width: "100%",
-        height: "400px",
-        marginTop: "6px",
-        borderRadius: 10,
-      }} // Set size of the map
+      center={{ lat: 36.2021, lng: 37.1343 }}
       onClick={onMapClick}
     >
       {selectedPosition && <Marker position={selectedPosition} />}

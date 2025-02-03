@@ -35,6 +35,8 @@ const staffColumns = [
   { key: "insideDs", label: "Inside DS", width: "120px" },
   { key: "outsideDs", label: "Outside DS", width: "130px" },
   { key: "address", label: "Address", width: "250px" },
+  { key: "latitude", label: "Latitude", width: "120px" },
+  { key: "longitude", label: "Longitude", width: "120px" },
   { key: "actions", label: "Actions", width: "120px" },
 ];
 

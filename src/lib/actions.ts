@@ -71,6 +71,17 @@ export const addStaff = async (formData: FormData): Promise<void> => {
   try {
     await connectToDB();
 
+    // Check for duplicate emails
+    const existingStaffWithUnhcrEmail = await Staff.findOne({ unhcrEmail });
+    if (existingStaffWithUnhcrEmail) {
+      throw new Error("UNHCR email already exists");
+    }
+
+    const existingStaffWithPrivateEmail = await Staff.findOne({ privateEmail });
+    if (existingStaffWithPrivateEmail) {
+      throw new Error("Private email already exists");
+    }
+
     // Handle profile picture upload
     let profilePicturePath = "";
     if (profilePictureFile && profilePictureFile.size > 0) {
@@ -441,6 +452,12 @@ export const addUser = async (formData: FormData): Promise<void> => {
 
   try {
     await connectToDB();
+
+    // Check for duplicate email
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      throw new Error("Email already exists");
+    }
 
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);

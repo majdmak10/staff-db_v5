@@ -8,9 +8,12 @@ import InputField from "@/components/shared/form/InputField";
 import SelectField from "@/components/shared/form/SelectField";
 import UploadPicture from "@/components/shared/form/UploadPicture";
 import { addStaff } from "@/lib/actions";
+import GoogleMapAddress from "@/components/shared/form/GoogleMapAddress";
 
 const AddStaff = () => {
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [latitude, setLatitude] = useState<string>("");
+  const [longitude, setLongitude] = useState<string>("");
   const router = useRouter();
 
   const validateForm = (formData: FormData) => {
@@ -31,6 +34,12 @@ const AddStaff = () => {
 
     return newErrors;
   };
+
+  const handleAddressSelect = (latDMS: string, lngDMS: string) => {
+    setLatitude(latDMS);
+    setLongitude(lngDMS);
+  };
+
   const handleSubmit = async (formData: FormData) => {
     const validationErrors = validateForm(formData);
 
@@ -47,7 +56,22 @@ const AddStaff = () => {
     } catch (error) {
       // Handle any submission errors
       console.error("Submission error:", error);
-      setErrors({ submit: "Failed to add staff. Please try again." });
+
+      // Narrow down the type of `error`
+      if (error instanceof Error) {
+        if (error.message === "UNHCR email already exists") {
+          setErrors({ unhcrEmail: "UNHCR email already exists" });
+        } else if (error.message === "Private email already exists") {
+          setErrors({ privateEmail: "Private email already exists" });
+        } else {
+          setErrors({ submit: "Failed to add staff. Please try again." });
+        }
+      } else {
+        // Handle cases where `error` is not an Error object
+        setErrors({
+          submit: "An unexpected error occurred. Please try again.",
+        });
+      }
     }
   };
 
@@ -187,6 +211,7 @@ const AddStaff = () => {
             name="unhcrEmail"
             placeholder="Enter UNHCR email"
             type="email"
+            error={errors.unhcrEmail}
           />
           <InputField
             label="Private Email"
@@ -194,6 +219,7 @@ const AddStaff = () => {
             name="privateEmail"
             placeholder="Enter private email"
             type="email"
+            error={errors.privateEmail}
           />
           <InputField
             label="Mobile Syriatel"
@@ -441,14 +467,23 @@ const AddStaff = () => {
               label="Latitude"
               id="latitude"
               name="latitude"
-              placeholder="Enter latitude"
+              placeholder="Latitude"
+              value={latitude}
+              readOnly
             />
             <InputField
               label="Longitude"
               id="longitude"
               name="longitude"
-              placeholder="Enter longitude"
+              placeholder="Longitude"
+              value={longitude}
+              readOnly
             />
+          </div>
+
+          {/* Google Map */}
+          <div className="w-full h-[300px] md:h-full md:col-span-2">
+            <GoogleMapAddress onAddressSelect={handleAddressSelect} />
           </div>
         </div>
 

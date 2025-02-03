@@ -15,6 +15,7 @@ import EmptyState from "./EmptyState";
 import { useColumnResize } from "@/hooks/useColumnResize";
 import { useSort } from "@/hooks/useSort";
 import staffColumns from "@/constants/columns/staffColumns";
+import Pagination from "./Pagination"; // Import the Pagination component
 
 export interface Column {
   key: string;
@@ -45,6 +46,8 @@ const Table: React.FC<TableProps> = ({
   const [filters, setFilters] = useState<
     { column: string; operator: string; value: string }[]
   >([]);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [staffPerPage, setStaffPerPage] = useState<number>(10); // Default rows per page
   const headerCheckboxRef = useRef<HTMLInputElement>(null);
 
   const filteredColumns = useMemo(
@@ -103,6 +106,14 @@ const Table: React.FC<TableProps> = ({
   }, [data, filters, searchValue]);
 
   const { sortedData, sortState, handleSort } = useSort(filteredData, null);
+
+  // Pagination logic
+  const totalPages = Math.ceil(sortedData.length / staffPerPage);
+  const paginatedData = useMemo(() => {
+    const startIndex = (currentPage - 1) * staffPerPage;
+    const endIndex = startIndex + staffPerPage;
+    return sortedData.slice(startIndex, endIndex);
+  }, [sortedData, currentPage, staffPerPage]);
 
   const handleSelectAll = useCallback(() => {
     if (selectedRows.length === filteredData.length) {
@@ -169,6 +180,7 @@ const Table: React.FC<TableProps> = ({
     setVisibleColumns(columns.map((col) => col.key)); // Show all columns
     handleSort(null); // Reset sorting
     resetWidths(); // Reset column widths
+    setCurrentPage(1); // Reset to the first page
   };
 
   const isResetVisible = useMemo(() => {
@@ -226,7 +238,7 @@ const Table: React.FC<TableProps> = ({
                 disableSortingFor={["checkbox", "profilePicture", "actions"]}
               />
               <TableBody
-                data={sortedData}
+                data={paginatedData} // Use paginatedData instead of sortedData
                 columns={filteredColumns}
                 selectedRows={selectedRows}
                 handleRowSelect={handleRowSelect}
@@ -235,6 +247,15 @@ const Table: React.FC<TableProps> = ({
           )}
         </div>
       </div>
+
+      {/* Pagination */}
+      <Pagination
+        currentPage={currentPage}
+        totalPages={totalPages}
+        setCurrentPage={setCurrentPage}
+        staffPerPage={staffPerPage}
+        setStaffPerPage={setStaffPerPage}
+      />
     </div>
   );
 };

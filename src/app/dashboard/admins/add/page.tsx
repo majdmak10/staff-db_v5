@@ -107,7 +107,20 @@ const AddAdmin: React.FC = () => {
     } catch (error) {
       // Handle any submission errors
       console.error("Submission error:", error);
-      setErrors({ submit: "Failed to add admin. Please try again." });
+
+      // Narrow down the type of `error`
+      if (error instanceof Error) {
+        if (error.message === "Email already exists") {
+          setErrors({ email: "Email already exists" });
+        } else {
+          setErrors({ submit: "Failed to add admin. Please try again." });
+        }
+      } else {
+        // Handle cases where `error` is not an Error object
+        setErrors({
+          submit: "An unexpected error occurred. Please try again.",
+        });
+      }
     }
   };
 
