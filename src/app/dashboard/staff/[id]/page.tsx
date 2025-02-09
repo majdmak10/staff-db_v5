@@ -35,7 +35,7 @@ const StaffProfile = async ({ params }: { params: { id: string } }) => {
           <DeleteButton id={staff.id} type="staff" deleteAction={deleteStaff} />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3">
-          <div className="flex flex-col justify-center items-center gap-2 p-4 w-full border-r-[1px] border-[#eaeaea]">
+          <div className="flex flex-col items-center gap-2 p-4 w-full border-r-[1px] border-[#eaeaea]">
             <Image
               src={
                 staff.profilePicture ||
@@ -76,58 +76,143 @@ const StaffProfile = async ({ params }: { params: { id: string } }) => {
             </div>
           </div>
           <div className="flex flex-col gap-2 p-4 w-full border-r-[1px] border-[#eaeaea]">
-            <span className="font-normal">Date of Birth: </span>
-            <span className="font-normal">Sex: {staff.sex}</span>
-            <span className="font-normal">
-              Nationality: {staff.nationality}
-            </span>
-            <span className="font-normal">
-              Employment Type: {staff.employmentType}
-            </span>
-            <span className="font-normal">Blood Type: {staff.bloodType}</span>
-            <span className="font-normal">Dependents: {staff.dependents}</span>
-            <span className="font-normal">UNHCR Email: {staff.unhcrEmail}</span>
-            <span className="font-normal">
-              Private Email: {staff.privateEmail}
-            </span>
-            <span className="font-normal">
-              Mobile (Syriatel): {staff.mobileSyriatel}
-            </span>
-            <span className="font-normal">Mobile (MTN): {staff.mobileMtn}</span>
-            <span className="font-normal">Home Phone: {staff.homePhone}</span>
-            <span className="font-normal">
-              Office Extension: {staff.extension}
-            </span>
-            <span className="font-normal">Radio Sign: {staff.radio}</span>
-            <span className="font-normal">Emergency Contact:</span>
+            <p>
+              <span className="font-bold">Date of Birth: </span>
+              <span className="font-normal">
+                Date of Birth:{" "}
+                {staff.dateOfBirth?.toLocaleDateString("en-GB", {
+                  day: "numeric",
+                  month: "long",
+                  year: "numeric",
+                })}
+              </span>
+            </p>
+            <p>
+              <span className="font-bold">Sex: </span>
+              <span className="font-normal">{staff.sex}</span>
+            </p>
+            <p>
+              <span className="font-bold">Nationality: </span>
+              <span className="font-normal">{staff.nationality}</span>
+            </p>
+            <p>
+              <span className="font-bold">Employment Type: </span>
+              <span className="font-normal">{staff.employmentType}</span>
+            </p>
+            <p>
+              <span className="font-bold">Blood Type: </span>
+              <span className="font-normal">{staff.bloodType}</span>
+            </p>
+            <p>
+              <span className="font-bold">Dependents: </span>
+              <span className="font-normal">{staff.dependents}</span>
+            </p>
+            <p>
+              <span className="font-bold">UNHCR Email: </span>
+              <span className="font-normal">{staff.unhcrEmail}</span>
+            </p>
+            <p>
+              <span className="font-bold">Private Email: </span>
+              <span className="font-normal">{staff.privateEmail}</span>
+            </p>
+            <p>
+              <span className="font-bold">Mobile (Syriatel): </span>
+              <span className="font-normal">{staff.mobileSyriatel}</span>
+            </p>
+            <p>
+              <span className="font-bold">Mobile (MTN): </span>
+              <span className="font-normal">{staff.mobileMtn}</span>
+            </p>
+            <p>
+              <span className="font-bold">Home Phone: </span>
+              <span className="font-normal">{staff.homePhone}</span>
+            </p>
+            <p>
+              <span className="font-bold">Office Extension: </span>
+              <span className="font-normal">{staff.extension}</span>
+            </p>
+            <p>
+              <span className="font-bold">Radio Sign: </span>
+              <span className="font-normal">{staff.radio}</span>
+            </p>
+            <p>
+              <span className="font-semibold">Emergency Contact: </span>
+              <span className="font-normal">
+                {staff.emergencyContact
+                  ? staff.emergencyContact.fullName
+                  : "N/A"}
+                {", "}
+                {staff.emergencyContact
+                  ? staff.emergencyContact.relationship
+                  : "N/A"}
+                {", "}
+                {staff.emergencyContact ? staff.emergencyContact.mobile : "N/A"}
+              </span>
+            </p>
+          </div>
+          <div className="flex flex-col gap-2 p-4 w-full border-r-[1px] border-[#eaeaea]">
             <span className="font-normal">
               Contract Type: {staff.contractType}
             </span>
-            <span className="font-normal">Contract Start Date:</span>
-            <span className="font-normal">Contract End date: </span>
-          </div>
-          <div className="flex flex-col gap-2 p-4 w-full border-r-[1px] border-[#eaeaea]">
+            <span className="font-normal">
+              Contract Start Date:{" "}
+              {staff.contractStartDate?.toLocaleDateString("en-GB", {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              })}
+            </span>
+            <span className="font-normal">
+              Contract End date:{" "}
+              {staff.contractStartDate?.toLocaleDateString("en-GB", {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              })}
+            </span>
             <span className="font-normal">
               National ID Number: {staff.nationalIdNumber}
             </span>
             <span className="font-normal">
               National Passport Number: {staff.passportNumber}
             </span>
-            <span className="font-normal">Passport Expiry Date: </span>
-            <span className="font-normal">UNLP Number: {staff.unlpNumber}</span>
-            <span className="font-normal">UNLP Expiry Date:</span>
             <span className="font-normal">
-              Critical Staff: {staff.criticalStaff}
+              Passport Expiry Date:{" "}
+              {staff.contractStartDate?.toLocaleDateString("en-GB", {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              })}
+            </span>
+            <span className="font-normal">UNLP Number: {staff.unlpNumber}</span>
+            <span className="font-normal">
+              UNLP Expiry Date:{" "}
+              {staff.contractStartDate?.toLocaleDateString("en-GB", {
+                day: "numeric",
+                month: "long",
+                year: "numeric",
+              })}
+            </span>
+            <span className="font-normal">
+              Critical Staff: {staff.criticalStaff ? "Yes" : "No"}
             </span>
             <span className="font-normal">Warden: {staff.warden}</span>
-            <span className="font-normal">Floor l: {staff.floorMarshal}</span>
-            <span className="font-normal">ETB: {staff.etb}</span>
-            <span className="font-normal">IFAK: {staff.ifak}</span>
             <span className="font-normal">
-              Advanced Driving: {staff.advancedDriving}
+              Floor Marshal: {staff.floorMarshal}
             </span>
-            <span className="font-normal">Inside DS: {staff.insideDs}</span>
-            <span className="font-normal">Outside DS: {staff.outsideDs}</span>
+            <span className="font-normal">ETB: {staff.etb ? "Yes" : "No"}</span>
+            <span className="font-normal">
+              IFAK: {staff.ifak ? "Yes" : "No"}
+            </span>
+            <span className="font-normal">
+              Advanced Driving: {staff.advancedDriving ? "Yes" : "No"}
+            </span>
+            <span className="font-normal">
+              Inside DS: {staff.insideDs ? "Yes" : "No"}
+            </span>
+            <span className="font-normal">
+              Outside DS: {staff.outsideDs ? "Yes" : "No"}
+            </span>
           </div>
         </div>
         <div>Address</div>
