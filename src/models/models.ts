@@ -48,7 +48,7 @@ export interface IStaff extends Document {
   unlpExpiryDate?: Date;
   criticalStaff?: boolean;
   warden?: string;
-  floorMarshal?: boolean;
+  floorMarshal?: string;
   etb?: boolean;
   ifak?: boolean;
   advancedDriving?: boolean;
@@ -106,7 +106,7 @@ const StaffSchema = new Schema(
     unlpExpiryDate: { type: Date },
     criticalStaff: { type: Boolean, default: true },
     warden: { type: String },
-    floorMarshal: { type: Boolean, default: true },
+    floorMarshal: { type: String },
     etb: { type: Boolean, default: true },
     ifak: { type: Boolean, default: true },
     advancedDriving: { type: Boolean, default: true },

@@ -19,7 +19,7 @@ const AdminProfile = async ({ params }: { params: { id: string } }) => {
         items={[
           { label: "Dashboard", href: "/dashboard" },
           { label: "All Admins", href: "/dashboard/admins" },
-          { label: "Add New Admin", href: `/dashboard/admins/${user.id}` },
+          { label: `${user.fullName}`, href: `/dashboard/admins/${user.id}` },
         ]}
       />
       <div className="flex flex-col gap-3 bg-white rounded-lg w-full p-4">

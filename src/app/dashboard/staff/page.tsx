@@ -68,15 +68,15 @@ const StaffPage = async () => {
     unlpExpiryDate: formatDate(member.unlpExpiryDate),
     criticalStaff: formatBoolean(member.criticalStaff),
     warden: member.warden || "N/A",
-    floorMarshal: formatBoolean(member.floorMarshal),
+    floorMarshal: member.floorMarshal || "N/A",
     etb: formatBoolean(member.etb),
     ifak: formatBoolean(member.ifak),
     advancedDriving: formatBoolean(member.advancedDriving),
     insideDs: formatBoolean(member.insideDs),
     outsideDs: formatBoolean(member.outsideDs),
     address: formatAddress(member.address),
-    latitude: member.address.latitude || "N/A",
-    longitude: member.address.longitude || "N/A",
+    latitude: member.address?.latitude || "N/A",
+    longitude: member.address?.longitude || "N/A",
     actions: (
       <div className="flex gap-2 justify-start items-center">
         <Link href={`/dashboard/staff/${member.id}`}>

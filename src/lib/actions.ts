@@ -173,12 +173,7 @@ export const addStaff = async (formData: FormData): Promise<void> => {
           ? false
           : null, // Use null for "N/A"
       warden: warden || "N/A",
-      floorMarshal:
-        floorMarshal === "true"
-          ? true
-          : floorMarshal === "false"
-          ? false
-          : null,
+      floorMarshal: floorMarshal || "N/A",
       etb: etb === "true" ? true : etb === "false" ? false : null,
       ifak: ifak === "true" ? true : ifak === "false" ? false : null,
       advancedDriving:
@@ -342,12 +337,7 @@ export const updateStaff = async (formData: FormData): Promise<void> => {
           ? false
           : staff.criticalStaff,
       warden: formData.get("warden") || staff.warden,
-      floorMarshal:
-        formData.get("floorMarshal") === "true"
-          ? true
-          : formData.get("floorMarshal") === "false"
-          ? false
-          : staff.floorMarshal,
+      floorMarshal: formData.get("floorMarshal") || staff.floorMarshal,
       etb:
         formData.get("etb") === "true"
           ? true

@@ -370,8 +370,9 @@ const AddStaff = () => {
             name="floorMarshal"
             placeholder="Select an option"
             options={[
-              { value: "true", label: "Yes" },
-              { value: "false", label: "No" },
+              { value: "Floor Marshal", label: "Floor Marshal" },
+              { value: "Deputy Floor Marshal", label: "Deputy Floor Marshal" },
+              { value: "None", label: "None" },
             ]}
           />
           <SelectField
