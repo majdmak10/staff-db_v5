@@ -5,9 +5,7 @@ import DeleteButton from "@/components/shared/buttons/DeleteButton";
 import Image from "next/image";
 import Link from "next/link";
 import FormSectionTitle from "@/components/shared/form/FormSectionTitle";
-import ProfileInfo from "@/components/shared/profile/ProfileInfo";
-import StaffProfileMap from "@/components/shared/profile/StaffProfileMap";
-import { convertToDMS } from "@/utils/convertToDMS";
+import ProfileInfo from "@/components/shared/form/ProfileInfo";
 
 const StaffProfile = async ({ params }: { params: { id: string } }) => {
   const staff = await getStaffById(params.id);
@@ -15,13 +13,6 @@ const StaffProfile = async ({ params }: { params: { id: string } }) => {
   if (!staff) {
     return <div>Staff not found</div>;
   }
-
-  const latitude = staff.address?.latitude
-    ? parseFloat(staff.address.latitude)
-    : null;
-  const longitude = staff.address?.longitude
-    ? parseFloat(staff.address.longitude)
-    : null;
 
   return (
     <main className="flex flex-col gap-3">
@@ -34,34 +25,25 @@ const StaffProfile = async ({ params }: { params: { id: string } }) => {
         ]}
       />
       <div className="flex flex-col bg-white rounded-lg w-full p-4">
-        <div className="flex flex-col">
-          <div className="flex justify-between">
-            <FormSectionTitle
-              title="General Information"
-              className="text-mBlue"
+        <div className="flex justify-end p-4 gap-3">
+          <Link href={`/dashboard/staff/${staff.id}/edit`}>
+            <Image
+              src="/table_icons/edit.png"
+              alt="Edit"
+              width={20}
+              height={20}
             />
-            <div className="flex justify-end pr-4 gap-3">
-              <Link href={`/dashboard/staff/${staff.id}/edit`}>
-                <Image
-                  src="/table_icons/edit.png"
-                  alt="Edit"
-                  width={20}
-                  height={20}
-                />
-              </Link>
-              <DeleteButton
-                id={staff.id}
-                type="staff"
-                deleteAction={deleteStaff}
-              />
-            </div>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-4">
-            <div className="flex flex-col justify-center items-center gap-2 p-4 w-full border-r-[1px] border-[#eaeaea] md:col-span-1">
+          </Link>
+          <DeleteButton id={staff.id} type="staff" deleteAction={deleteStaff} />
+        </div>
+        <div className="flex flex-col gap-4">
+          <FormSectionTitle title="General Information" />
+          <div className="grid grid-cols-1 md:grid-cols-3">
+            <div className="flex flex-col items-center gap-2 p-4 w-full border-r-[1px] border-[#eaeaea]">
               <Image
                 src={
                   staff.profilePicture ||
-                  (staff.sex === "Male"
+                  (staff.sex === "male"
                     ? "/avatars/noProfilePicture_m.png"
                     : "/avatars/noProfilePicture_f.png")
                 }
@@ -74,10 +56,9 @@ const StaffProfile = async ({ params }: { params: { id: string } }) => {
               <span className="font-normal text-sm">{staff.position}</span>
               <span className="font-normal text-sm">{staff.unit}</span>
             </div>
-
-            <div className="flex flex-col gap-2 p-4 w-full md:col-span-2">
+            <div className="flex flex-col gap-2 p-4 w-full">
               <ProfileInfo
-                spanTitle="Date of Birth:"
+                spanTitle="Date of Birth: "
                 spanInfo={
                   staff.dateOfBirth
                     ? staff.dateOfBirth.toLocaleDateString("en-GB", {
@@ -88,26 +69,26 @@ const StaffProfile = async ({ params }: { params: { id: string } }) => {
                     : "N/A" // Optional: Fallback in case `dateOfBirth` is undefined
                 }
               />
-              <ProfileInfo spanTitle="Sex:" spanInfo={staff.sex ?? "N/A"} />
+              <ProfileInfo spanTitle="Sex: " spanInfo={staff.sex ?? "N/A"} />
               <ProfileInfo
-                spanTitle="Nationality:"
+                spanTitle="Nationality: "
                 spanInfo={staff.nationality ?? "N/A"}
               />
               <ProfileInfo
-                spanTitle="Employment Type:"
+                spanTitle="Employment Type: "
                 spanInfo={staff.employmentType ?? "N/A"}
               />
               <ProfileInfo
-                spanTitle="Position:"
+                spanTitle="Position: "
                 spanInfo={staff.position ?? "N/A"}
               />
               <ProfileInfo spanTitle="Unit: " spanInfo={staff.unit ?? "N/A"} />
               <ProfileInfo
-                spanTitle="Blood Type:"
+                spanTitle="Blood Type: "
                 spanInfo={staff.bloodType ?? "N/A"}
               />
               <ProfileInfo
-                spanTitle="Dependents:"
+                spanTitle="Dependents: "
                 spanInfo={staff.dependents ?? "N/A"}
               />
             </div>
@@ -115,42 +96,39 @@ const StaffProfile = async ({ params }: { params: { id: string } }) => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-        <div className="flex flex-col bg-white rounded-lg w-full p-4 gap-2">
-          <FormSectionTitle
-            title="Contact Information"
-            className="text-mRed mb-3"
-          />
+      <div className="flex flex-col bg-white rounded-lg w-full p-4">
+        <FormSectionTitle title="Contact  Information" />
+        <div className="flex flex-col gap-2 py-4 w-full">
           <ProfileInfo
-            spanTitle="UNHCR Email:"
+            spanTitle="UNHCR Email: "
             spanInfo={staff.unhcrEmail ?? "N/A"}
           />
           <ProfileInfo
-            spanTitle="Private Email:"
+            spanTitle="Private Email: "
             spanInfo={staff.privateEmail ?? "N/A"}
           />
           <ProfileInfo
-            spanTitle="Mobile (Syriatel):"
+            spanTitle="Mobile (Syriatel): "
             spanInfo={staff.mobileSyriatel ?? "N/A"}
           />
           <ProfileInfo
-            spanTitle="Mobile (MTN):"
+            spanTitle="Mobile (MTN): "
             spanInfo={staff.mobileMtn ?? "N/A"}
           />
           <ProfileInfo
-            spanTitle="Home Phone:"
+            spanTitle="Home Phone: "
             spanInfo={staff.homePhone ?? "N/A"}
           />
           <ProfileInfo
-            spanTitle="Office Extension:"
+            spanTitle="Office Extension: "
             spanInfo={staff.extension ?? "N/A"}
           />
           <ProfileInfo
-            spanTitle="Radio Call:"
+            spanTitle="Radio Call: "
             spanInfo={staff.radio ?? "N/A"}
           />
           <ProfileInfo
-            spanTitle="Emergency Contact:"
+            spanTitle="Emergency Contact: "
             spanInfo={
               staff.emergencyContact
                 ? `${staff.emergencyContact.fullName}, ${staff.emergencyContact.relationship}, ${staff.emergencyContact.mobile}`
@@ -158,17 +136,17 @@ const StaffProfile = async ({ params }: { params: { id: string } }) => {
             }
           />
         </div>
-        <div className="flex flex-col bg-white rounded-lg w-full p-4 gap-2">
-          <FormSectionTitle
-            title="Official Documents Information"
-            className="text-mGreen mb-3"
-          />
+      </div>
+
+      <div className="flex flex-col bg-white rounded-lg w-full p-4">
+        <FormSectionTitle title="Official Documents Information" />
+        <div className="flex flex-col gap-2 py-4 w-full">
           <ProfileInfo
-            spanTitle="Contract Type:"
+            spanTitle="Contract Type: "
             spanInfo={staff.contractType ?? "N/A"}
           />
           <ProfileInfo
-            spanTitle="Contract Start Date:"
+            spanTitle="Contract Start Date: "
             spanInfo={
               staff.contractStartDate
                 ? staff.contractStartDate.toLocaleDateString("en-GB", {
@@ -180,7 +158,7 @@ const StaffProfile = async ({ params }: { params: { id: string } }) => {
             }
           />
           <ProfileInfo
-            spanTitle="Contract End Date:"
+            spanTitle="Contract End Date: "
             spanInfo={
               staff.contractEndDate
                 ? staff.contractEndDate.toLocaleDateString("en-GB", {
@@ -192,11 +170,11 @@ const StaffProfile = async ({ params }: { params: { id: string } }) => {
             }
           />
           <ProfileInfo
-            spanTitle="National ID Number:"
+            spanTitle="National ID Number: "
             spanInfo={staff.nationalIdNumber ?? "N/A"}
           />
           <ProfileInfo
-            spanTitle="National Passport Number:"
+            spanTitle="National Passport Number: "
             spanInfo={staff.passportNumber ?? "N/A"}
           />
           <ProfileInfo
@@ -212,7 +190,7 @@ const StaffProfile = async ({ params }: { params: { id: string } }) => {
             }
           />
           <ProfileInfo
-            spanTitle="UNLP Number:"
+            spanTitle="UNLP Number: "
             spanInfo={staff.unlpNumber ?? "N/A"}
           />
           <ProfileInfo
@@ -228,13 +206,13 @@ const StaffProfile = async ({ params }: { params: { id: string } }) => {
             }
           />
         </div>
-        <div className="flex flex-col bg-white rounded-lg w-full p-4 gap-2">
-          <FormSectionTitle
-            title="Other Information"
-            className="text-mBorderWarning mb-3"
-          />
+      </div>
+
+      <div className="flex flex-col bg-white rounded-lg w-full p-4">
+        <FormSectionTitle title="Other Information" />
+        <div className="flex flex-col gap-2 py-4 w-full">
           <ProfileInfo
-            spanTitle="Critical Staff:"
+            spanTitle="Critical Staff: "
             spanInfo={
               typeof staff.criticalStaff === "boolean"
                 ? staff.criticalStaff
@@ -243,13 +221,13 @@ const StaffProfile = async ({ params }: { params: { id: string } }) => {
                 : staff.criticalStaff ?? "N/A"
             }
           />
-          <ProfileInfo spanTitle="Warden:" spanInfo={staff.warden ?? "N/A"} />
+          <ProfileInfo spanTitle="Warden: " spanInfo={staff.warden ?? "N/A"} />
           <ProfileInfo
-            spanTitle="Floor Marshal:"
+            spanTitle="Floor Marshal: "
             spanInfo={staff.floorMarshal ?? "N/A"}
           />
           <ProfileInfo
-            spanTitle="ETB:"
+            spanTitle="ETB: "
             spanInfo={
               typeof staff.etb === "boolean"
                 ? staff.etb
@@ -259,7 +237,7 @@ const StaffProfile = async ({ params }: { params: { id: string } }) => {
             }
           />
           <ProfileInfo
-            spanTitle="IFAK:"
+            spanTitle="IFAK: "
             spanInfo={
               typeof staff.ifak === "boolean"
                 ? staff.ifak
@@ -269,7 +247,7 @@ const StaffProfile = async ({ params }: { params: { id: string } }) => {
             }
           />
           <ProfileInfo
-            spanTitle="Advanced Driving:"
+            spanTitle="Advanced Driving: "
             spanInfo={
               typeof staff.advancedDriving === "boolean"
                 ? staff.advancedDriving
@@ -279,7 +257,7 @@ const StaffProfile = async ({ params }: { params: { id: string } }) => {
             }
           />
           <ProfileInfo
-            spanTitle="Inside DS:"
+            spanTitle="Inside DS: "
             spanInfo={
               typeof staff.insideDs === "boolean"
                 ? staff.insideDs
@@ -289,7 +267,7 @@ const StaffProfile = async ({ params }: { params: { id: string } }) => {
             }
           />
           <ProfileInfo
-            spanTitle="Outside DS:"
+            spanTitle="Outside DS: "
             spanInfo={
               typeof staff.outsideDs === "boolean"
                 ? staff.outsideDs
@@ -300,46 +278,18 @@ const StaffProfile = async ({ params }: { params: { id: string } }) => {
           />
         </div>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3 bg-white rounded-lg w-full p-4">
-        <div>
-          <FormSectionTitle
-            title="Address Information"
-            className="text-mPurple mb-3"
-          />
 
+      <div className="flex flex-col bg-white rounded-lg w-full p-4">
+        <FormSectionTitle title="Address Information" />
+        <div className="flex flex-col gap-2 py-4 w-full">
           <ProfileInfo
-            spanTitle="Neighborhood:"
-            spanInfo={staff.address?.neighborhood ?? "N/A"}
-          />
-          <ProfileInfo
-            spanTitle="Street:"
-            spanInfo={staff.address?.street ?? "N/A"}
-          />
-          <ProfileInfo
-            spanTitle="Building:"
-            spanInfo={staff.address?.building ?? "N/A"}
-          />
-          <ProfileInfo
-            spanTitle="Floor:"
-            spanInfo={staff.address?.floor ?? "N/A"}
-          />
-          <ProfileInfo
-            spanTitle="Apartment:"
-            spanInfo={staff.address?.apartment ?? "N/A"}
-          />
-          <ProfileInfo
-            spanTitle="Latitude:"
-            spanInfo={latitude !== null ? convertToDMS(latitude, true) : "N/A"}
-          />
-          <ProfileInfo
-            spanTitle="Longitude:"
+            spanTitle="Neighborhood: "
             spanInfo={
-              longitude !== null ? convertToDMS(longitude, false) : "N/A"
+              staff.address
+                ? `${staff.address.neighborhood}, ${staff.address.street}, ${staff.address.building}, ${staff.address.floor}, ${staff.address.apartment}, ${staff.address.latitude}, ${staff.address.longitude}`
+                : "N/A"
             }
           />
-        </div>
-        <div className="md:col-span-2">
-          <StaffProfileMap latitude={latitude} longitude={longitude} />
         </div>
       </div>
     </main>

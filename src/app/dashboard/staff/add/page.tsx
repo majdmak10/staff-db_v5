@@ -93,7 +93,7 @@ const AddStaff = () => {
         action={handleSubmit}
         className="flex flex-col gap-4 w-full bg-white rounded-lg p-4"
       >
-        <h1 className="font-semibold">Add New Staff</h1>
+        <h1 className="font-bold">Add New Staff</h1>
 
         {errors.submit && (
           <div className="bg-red-100 text-red-700 p-3 rounded-md">
@@ -240,10 +240,10 @@ const AddStaff = () => {
             placeholder="Enter home phone number"
           />
           <InputField
-            label="Extension"
+            label="Office Extension"
             id="extension"
             name="extension"
-            placeholder="Enter extension"
+            placeholder="Enter office extension"
           />
           <InputField
             label="Radio Call"

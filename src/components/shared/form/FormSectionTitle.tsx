@@ -1,13 +1,16 @@
-// components/form/FormSectionTitle.tsx
-
 import React from "react";
+import clsx from "clsx"; // Optional: Helps merge class names
 
 interface FormSectionTitleProps {
   title: string;
+  className?: string; // Optional className prop for custom styling
 }
 
-const FormSectionTitle: React.FC<FormSectionTitleProps> = ({ title }) => (
-  <h2 className="text-gray-500 font-semibold">{title}</h2>
+const FormSectionTitle: React.FC<FormSectionTitleProps> = ({
+  title,
+  className,
+}) => (
+  <h2 className={clsx("text-gray-600 font-semibold", className)}>{title}</h2>
 );
 
 export default FormSectionTitle;

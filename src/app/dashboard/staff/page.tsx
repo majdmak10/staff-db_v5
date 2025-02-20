@@ -13,6 +13,7 @@ import {
   formatAddress,
 } from "@/utils/staffUtils";
 import DeleteButton from "@/components/shared/buttons/DeleteButton";
+import { convertToDMS } from "@/utils/convertToDMS";
 
 const StaffPage = async () => {
   const staff = await getStaff();
@@ -75,8 +76,12 @@ const StaffPage = async () => {
     insideDs: formatBoolean(member.insideDs),
     outsideDs: formatBoolean(member.outsideDs),
     address: formatAddress(member.address),
-    latitude: member.address?.latitude || "N/A",
-    longitude: member.address?.longitude || "N/A",
+    latitude: member.address?.latitude
+      ? convertToDMS(parseFloat(member.address.latitude), true)
+      : "N/A",
+    longitude: member.address?.longitude
+      ? convertToDMS(parseFloat(member.address.longitude), false)
+      : "N/A",
     actions: (
       <div className="flex gap-2 justify-start items-center">
         <Link href={`/dashboard/staff/${member.id}`}>

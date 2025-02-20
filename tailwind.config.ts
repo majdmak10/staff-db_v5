@@ -56,6 +56,7 @@ export default {
         mGreen: "#14a37f",
         mGreenLight: "#89d1bf",
         mRed: "#ff4569",
+        mPurple: "#512DA8",
         mText: "#344767",
         mMenuText: "#6b7280",
         mHover: "#d5e5fa",
