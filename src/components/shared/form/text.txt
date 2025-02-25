@@ -1,0 +1,73 @@
+"use client";
+
+import { useState, useEffect, useRef } from "react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
+import Image from "next/image";
+
+interface DateInputFieldProps {
+  label: string;
+  initialDate?: string; // Expected format: YYYY-MM-DD
+}
+
+const DateInputField: React.FC<DateInputFieldProps> = ({
+  label,
+  initialDate,
+}) => {
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const dateInputRef = useRef<DatePicker | null>(null); // ✅ Correct TypeScript fix
+
+  // Convert initialDate (YYYY-MM-DD) to a Date object
+  useEffect(() => {
+    if (initialDate) {
+      setSelectedDate(new Date(initialDate));
+    }
+  }, [initialDate]);
+
+  const handleDateChange = (date: Date | null) => {
+    setSelectedDate(date);
+  };
+
+  return (
+    <div className="relative">
+      <label className="block text-sm font-semibold text-gray-500 mb-2">
+        {label}
+      </label>
+
+      {/* Date Input Field with Calendar Icon */}
+      <div className="relative">
+        <DatePicker
+          selected={selectedDate}
+          onChange={handleDateChange}
+          dateFormat="dd/MM/yyyy"
+          placeholderText="DD/MM/YYYY"
+          className="w-full rounded-md ring-[1.5px] ring-gray-300 hover:ring-mBlue focus:ring-mBlue focus:outline-none text-gray-400 p-2 pr-10 transition-all duration-200 h-10"
+          showMonthDropdown
+          showYearDropdown
+          scrollableYearDropdown
+          yearDropdownItemNumber={100}
+          ref={dateInputRef} // ✅ Attach ref correctly
+        />
+
+        {/* Calendar Icon Inside Input */}
+        <Image
+          src="/profile_icons/calendar_gray.png"
+          alt="Calendar Icon"
+          width={20}
+          height={20}
+          className="absolute right-3 top-3 cursor-pointer"
+          onClick={() => dateInputRef.current?.setOpen(true)} // ✅ Open Datepicker on click
+        />
+      </div>
+
+      {/* Hidden input to store the correct format for form submission */}
+      <input
+        type="hidden"
+        name="dateOfBirth"
+        value={selectedDate ? selectedDate.toISOString().split("T")[0] : ""}
+      />
+    </div>
+  );
+};
+
+export default DateInputField;

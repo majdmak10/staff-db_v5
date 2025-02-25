@@ -40,7 +40,7 @@ const EditAdmin: React.FC<EditAdminProps> = async ({ params }) => {
             <Image
               src={
                 user.profilePicture ||
-                (user.sex === "male"
+                (user.sex === "Male"
                   ? "/avatars/noProfilePicture_m.png"
                   : "/avatars/noProfilePicture_f.png")
               }
@@ -49,12 +49,7 @@ const EditAdmin: React.FC<EditAdminProps> = async ({ params }) => {
               height={50}
               className="rounded-full w-[150px] h-[150px] object-fill"
             />
-            <UploadPicture
-              label="Profile Picture"
-              id="profilePicture"
-              name="profilePicture"
-              uploadIcon="/table_icons/cloud-c.png"
-            />
+            <UploadPicture />
           </div>
           <div className="col-span-4 space-y-4">
             <InputField
@@ -97,7 +92,7 @@ const EditAdmin: React.FC<EditAdminProps> = async ({ params }) => {
           >
             Save
           </button>
-          <CancelButton /> {/* Use the CancelButton component */}
+          <CancelButton />
         </div>
       </form>
     </main>

@@ -5,11 +5,16 @@ import Breadcrumbs from "@/components/layout/Breadcrumbs";
 import DeleteButton from "@/components/shared/buttons/DeleteButton";
 import Link from "next/link";
 
-const AdminProfile = async ({ params }: { params: { id: string } }) => {
-  const user = await getUserById(params.id);
+const AdminProfile = async ({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) => {
+  const { id } = await params;
+  const user = await getUserById(id);
 
   if (!user) {
-    return <div>User not found</div>;
+    return <div>Admin/User not found</div>;
   }
 
   return (
@@ -38,14 +43,14 @@ const AdminProfile = async ({ params }: { params: { id: string } }) => {
           <Image
             src={
               user.profilePicture ||
-              (user.sex === "male"
+              (user.sex === "Male"
                 ? "/avatars/noProfilePicture_m.png"
                 : "/avatars/noProfilePicture_f.png")
             }
             alt={`${user.fullName}'s Profile Picture`}
             width={200}
             height={200}
-            className="rounded-full border-2 border-[#eaeaea] object-fill"
+            className="rounded-full border-2 border-[#eaeaea] object-fill w-60 h-60"
           />
           <h1 className="text-xl font-semibold">{user.fullName}</h1>
           <p className="font-semibold">

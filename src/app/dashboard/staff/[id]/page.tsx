@@ -1,5 +1,3 @@
-import { getStaffById } from "@/lib/data";
-import { deleteStaff } from "@/lib/actions";
 import Breadcrumbs from "@/components/layout/Breadcrumbs";
 import DeleteButton from "@/components/shared/buttons/DeleteButton";
 import Image from "next/image";
@@ -7,10 +5,17 @@ import Link from "next/link";
 import FormSectionTitle from "@/components/shared/form/FormSectionTitle";
 import ProfileInfo from "@/components/shared/profile/ProfileInfo";
 import StaffProfileMap from "@/components/shared/profile/StaffProfileMap";
+import { getStaffById } from "@/lib/data";
+import { deleteStaff } from "@/lib/actions";
 import { convertToDMS } from "@/utils/convertToDMS";
 
-const StaffProfile = async ({ params }: { params: { id: string } }) => {
-  const staff = await getStaffById(params.id);
+const StaffProfile = async ({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) => {
+  const { id } = await params;
+  const staff = await getStaffById(id);
 
   if (!staff) {
     return <div>Staff not found</div>;
@@ -30,7 +35,10 @@ const StaffProfile = async ({ params }: { params: { id: string } }) => {
         items={[
           { label: "Dashboard", href: "/dashboard" },
           { label: "All Staff", href: "/dashboard/staff" },
-          { label: `${staff.fullName}`, href: `/dashboard/staff/${staff.id}` },
+          {
+            label: `${staff.fullName}`,
+            href: `/dashboard/staff/${staff.id}`,
+          },
         ]}
       />
       <div className="flex flex-col bg-white rounded-lg w-full p-4">

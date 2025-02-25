@@ -4,8 +4,23 @@ import React, { useCallback, useState } from "react";
 import { GoogleMap, Marker, useLoadScript } from "@react-google-maps/api";
 
 interface GoogleMapAddressProps {
-  onAddressSelect: (lat: string, lng: string) => void; // Now accepts decimal degree values
+  onAddressSelect: (lat: string, lng: string) => void; // DMS-formatted latitude/longitude
 }
+
+const convertToDMSWithDirection = (
+  decimal: number,
+  isLatitude: boolean
+): string => {
+  const degrees = Math.floor(Math.abs(decimal));
+  const minutesDecimal = (Math.abs(decimal) - degrees) * 60;
+  const minutes = Math.floor(minutesDecimal);
+  const seconds = ((minutesDecimal - minutes) * 60).toFixed(2);
+
+  const direction =
+    decimal >= 0 ? (isLatitude ? "N" : "E") : isLatitude ? "S" : "W";
+
+  return `${degrees}°${minutes}'${seconds}"${direction}`;
+};
 
 const GoogleMapAddress: React.FC<GoogleMapAddressProps> = ({
   onAddressSelect,
@@ -26,8 +41,11 @@ const GoogleMapAddress: React.FC<GoogleMapAddressProps> = ({
         const lng = event.latLng.lng();
         setSelectedPosition({ lat, lng });
 
-        // Pass **decimal degrees** instead of DMS
-        onAddressSelect(lat.toString(), lng.toString());
+        // Convert to DMS with direction and pass to the parent component
+        onAddressSelect(
+          convertToDMSWithDirection(lat, true), // Latitude
+          convertToDMSWithDirection(lng, false) // Longitude
+        );
       }
     },
     [onAddressSelect]

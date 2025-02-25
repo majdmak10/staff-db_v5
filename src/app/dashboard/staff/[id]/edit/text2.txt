@@ -8,7 +8,6 @@ import CancelButton from "@/components/shared/buttons/CancelButton";
 import MapEditor from "@/components/shared/form/MapEditorWrapper";
 import UploadPicture from "@/components/shared/form/UploadPicture";
 import Image from "next/image";
-import DateInputField from "@/components/shared/form/DateInputField";
 
 interface EditStaffProps {
   params: { id: string };
@@ -51,14 +50,7 @@ const EditStaff: React.FC<EditStaffProps> = async ({ params }) => {
             name="fullName"
             placeholder={staffMember.fullName}
           />
-          <DateInputField
-            label="Date of Birth"
-            initialDate={
-              staffMember.dateOfBirth
-                ? new Date(staffMember.dateOfBirth).toISOString().split("T")[0]
-                : undefined
-            }
-          />
+
           <SelectField
             label="Sex"
             id="sex"

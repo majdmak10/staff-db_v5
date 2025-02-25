@@ -1,82 +1,24 @@
-"use client";
-
-import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Breadcrumbs from "@/components/layout/Breadcrumbs";
-import FormSectionTitle from "@/components/shared/form/FormSectionTitle";
 import InputField from "@/components/shared/form/InputField";
 import SelectField from "@/components/shared/form/SelectField";
 import UploadPicture from "@/components/shared/form/UploadPicture";
-import { addStaff } from "@/lib/actions";
-import MapPicker from "@/components/shared/form/MapPicker";
-import { convertToDMS } from "@/utils/convertToDMS";
+import FormSectionTitle from "@/components/shared/form/FormSectionTitle";
+import Image from "next/image";
+import { getStaffById } from "@/lib/data";
+import { updateStaff } from "@/lib/actions";
+import CancelButton from "@/components/shared/buttons/CancelButton";
 
-const AddStaff = () => {
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [latitude, setLatitude] = useState("");
-  const [longitude, setLongitude] = useState("");
-  const router = useRouter();
+interface EditStaffProps {
+  params: { id: string };
+}
 
-  const validateForm = (formData: FormData) => {
-    const fullName = formData.get("fullName") as string;
-    const sex = formData.get("sex") as string;
+const EditStaff: React.FC<EditStaffProps> = async ({ params }) => {
+  const { id } = await params;
+  const staffMember = await getStaffById(id);
 
-    const newErrors: Record<string, string> = {};
-
-    // Full Name validation
-    if (!fullName || fullName.trim() === "") {
-      newErrors.fullName = "Full Name is required";
-    }
-
-    // Sex validation
-    if (!sex || sex === "") {
-      newErrors.sex = "Sex is required";
-    }
-
-    return newErrors;
-  };
-
-  const handleSubmit = async (formData: FormData) => {
-    const validationErrors = validateForm(formData);
-
-    if (Object.keys(validationErrors).length > 0) {
-      setErrors(validationErrors);
-      return;
-    }
-
-    // Append decimal values to formData
-    formData.append("latitude", latitude);
-    formData.append("longitude", longitude);
-
-    setErrors({});
-
-    try {
-      await addStaff(formData);
-    } catch (error) {
-      // Handle any submission errors
-      console.error("Submission error:", error);
-
-      // Narrow down the type of `error`
-      if (error instanceof Error) {
-        if (error.message === "UNHCR email already exists") {
-          setErrors({ unhcrEmail: "UNHCR email already exists" });
-        } else if (error.message === "Private email already exists") {
-          setErrors({ privateEmail: "Private email already exists" });
-        } else {
-          setErrors({ submit: "Failed to add staff. Please try again." });
-        }
-      } else {
-        // Handle cases where `error` is not an Error object
-        setErrors({
-          submit: "An unexpected error occurred. Please try again.",
-        });
-      }
-    }
-  };
-
-  const handleCancel = () => {
-    router.push("/dashboard/staff");
-  };
+  if (!staffMember) {
+    return <div>Staff member not found</div>;
+  }
 
   return (
     <main className="flex flex-col gap-3">
@@ -85,20 +27,18 @@ const AddStaff = () => {
         items={[
           { label: "Dashboard", href: "/dashboard" },
           { label: "All Staff", href: "/dashboard/staff" },
-          { label: "Add New Staff", href: "/dashboard/staff/add" },
+          {
+            label: "Edit Staff",
+            href: `/dashboard/staff/${staffMember.id}/edit`,
+          },
         ]}
       />
       <form
-        action={handleSubmit}
-        className="flex flex-col gap-4 w-full bg-white rounded-lg p-4"
+        action={updateStaff}
+        className="flex flex-col gap-4 bg-white rounded-lg p-4"
       >
-        <h1 className="font-semibold">Add New Staff</h1>
-
-        {errors.submit && (
-          <div className="bg-red-100 text-red-700 p-3 rounded-md">
-            {errors.submit}
-          </div>
-        )}
+        <h1 className="font-semibold">Edit Staff</h1>
+        <input type="hidden" name="id" value={staffMember.id} />
 
         {/* General Information */}
         <FormSectionTitle title="General Information" />
@@ -107,8 +47,8 @@ const AddStaff = () => {
             label="Full Name"
             id="fullName"
             name="fullName"
-            placeholder="Enter full name"
-            error={errors.fullName}
+            placeholder={staffMember.fullName}
+            // error={errors.fullName}
           />
           <InputField
             label="Date of Birth"
@@ -120,24 +60,24 @@ const AddStaff = () => {
             label="Sex"
             id="sex"
             name="sex"
-            placeholder="Select sex"
+            placeholder={staffMember.sex}
             options={[
               { value: "Female", label: "Female" },
               { value: "Male", label: "Male" },
             ]}
-            error={errors.sex}
+            // error={errors.sex}
           />
           <InputField
             label="Nationality"
             id="nationality"
             name="nationality"
-            placeholder="Enter nationality"
+            placeholder={staffMember.nationality}
           />
           <SelectField
             label="Employment Type"
             id="employmentType"
             name="employmentType"
-            placeholder="Select employment type"
+            placeholder={staffMember.employmentType}
             options={[
               { value: "International", label: "International" },
               { value: "National", label: "National" },
@@ -147,13 +87,13 @@ const AddStaff = () => {
             label="Position"
             id="position"
             name="position"
-            placeholder="Enter position"
+            placeholder={staffMember.position}
           />
           <SelectField
             label="Unit"
             id="unit"
             name="unit"
-            placeholder="Select unit"
+            placeholder={staffMember.unit}
             options={[
               { value: "Admin", label: "Admin" },
               { value: "Communication", label: "Communication" },
@@ -177,7 +117,7 @@ const AddStaff = () => {
             label="Blood Type"
             id="bloodType"
             name="bloodType"
-            placeholder="Select blood type"
+            placeholder={staffMember.bloodType}
             options={[
               { value: "A+", label: "A+" },
               { value: "B+", label: "B+" },
@@ -193,9 +133,21 @@ const AddStaff = () => {
             label="Dependents"
             id="dependents"
             name="dependents"
-            placeholder="Enter dependents"
+            placeholder={staffMember.dependents}
           />
-          <UploadPicture name="profilePicture" />
+          <UploadPicture />
+          <Image
+            src={
+              staffMember.profilePicture ||
+              (staffMember.sex === "Male"
+                ? "/avatars/noProfilePicture_m.png"
+                : "/avatars/noProfilePicture_f.png")
+            }
+            alt={`${staffMember.fullName}'s Profile Picture`}
+            width={50}
+            height={50}
+            className="rounded-full w-[80px] h-[80px] object-fill"
+          />
         </div>
 
         {/* Tailwind divider */}
@@ -208,47 +160,47 @@ const AddStaff = () => {
             label="UNHCR Email"
             id="unhcrEmail"
             name="unhcrEmail"
-            placeholder="Enter UNHCR email"
+            placeholder={staffMember.unhcrEmail}
             type="email"
-            error={errors.unhcrEmail}
+            // error={errors.unhcrEmail}
           />
           <InputField
             label="Private Email"
             id="privateEmail"
             name="privateEmail"
-            placeholder="Enter private email"
+            placeholder={staffMember.privateEmail}
             type="email"
-            error={errors.privateEmail}
+            // error={errors.privateEmail}
           />
           <InputField
             label="Mobile Syriatel"
             id="mobileSyriatel"
             name="mobileSyriatel"
-            placeholder="Enter Syriatel mobile number"
+            placeholder={staffMember.mobileSyriatel}
           />
           <InputField
             label="Mobile MTN"
             id="mobileMtn"
             name="mobileMtn"
-            placeholder="Enter MTN mobile number"
+            placeholder={staffMember.mobileMtn}
           />
           <InputField
             label="Home Phone"
             id="homePhone"
             name="homePhone"
-            placeholder="Enter home phone number"
+            placeholder={staffMember.homePhone}
           />
           <InputField
-            label="Extension"
+            label="Office Extension"
             id="extension"
             name="extension"
-            placeholder="Enter extension"
+            placeholder={staffMember.extension}
           />
           <InputField
             label="Radio Call"
             id="radio"
             name="radio"
-            placeholder="Enter radio call"
+            placeholder={staffMember.radio}
           />
         </div>
         <div>
@@ -260,19 +212,19 @@ const AddStaff = () => {
               label={""}
               id="emergencyContactName"
               name="emergencyContactName"
-              placeholder="Enter emergency contact name"
+              placeholder={staffMember.emergencyContact?.fullName}
             />
             <InputField
               label={""}
               id="emergencyContactRelationship"
               name="emergencyContactRelationship"
-              placeholder="Enter emergency contact relationship"
+              placeholder={staffMember.emergencyContact?.relationship}
             />
             <InputField
               label={""}
               name="emergencyContactMobile"
               id="emergencyContactMobile"
-              placeholder="Enter emergency contact mobile number"
+              placeholder={staffMember.emergencyContact?.mobile}
             />
           </div>
         </div>
@@ -286,7 +238,7 @@ const AddStaff = () => {
             label="Contract Type"
             id="contractType"
             name="contractType"
-            placeholder="Select an option"
+            placeholder={staffMember.contractType}
             options={[
               { value: "Fixed", label: "Fixed" },
               { value: "Temporary", label: "Temporary" },
@@ -308,13 +260,13 @@ const AddStaff = () => {
             label="National ID Number"
             id="nationalIdNumber"
             name="nationalIdNumber"
-            placeholder="Enter national ID number"
+            placeholder={staffMember.nationalIdNumber}
           />
           <InputField
             label="Passport Number"
             id="passportNumber"
             name="passportNumber"
-            placeholder="Enter passport number"
+            placeholder={staffMember.passportNumber}
           />
           <InputField
             label="Passport Expiry Date"
@@ -326,7 +278,7 @@ const AddStaff = () => {
             label="UNLP Number"
             id="unlpNumber"
             name="unlpNumber"
-            placeholder="Enter UNLP number"
+            placeholder={staffMember.unlpNumber}
           />
           <InputField
             label="UNLP Expiry Date"
@@ -346,7 +298,13 @@ const AddStaff = () => {
             label="Critical Staff"
             id="criticalStaff"
             name="criticalStaff"
-            placeholder="Select an option"
+            placeholder={
+              staffMember.criticalStaff === true
+                ? "Yes"
+                : staffMember.criticalStaff === false
+                ? "No"
+                : "Select an option" // Default placeholder
+            }
             options={[
               { value: "true", label: "Yes" },
               { value: "false", label: "No" },
@@ -356,7 +314,7 @@ const AddStaff = () => {
             label="Warden"
             id="warden"
             name="warden"
-            placeholder="Select an option"
+            placeholder={staffMember.warden}
             options={[
               { value: "Warden", label: "Warden" },
               { value: "Deputy", label: "Deputy" },
@@ -367,17 +325,24 @@ const AddStaff = () => {
             label="Floor Marshal"
             id="floorMarshal"
             name="floorMarshal"
-            placeholder="Select an option"
+            placeholder={staffMember.floorMarshal}
             options={[
-              { value: "true", label: "Yes" },
-              { value: "false", label: "No" },
+              { value: "Floor Marshal", label: "Floor Marshal" },
+              { value: "Deputy Floor Marshal", label: "Deputy Floor Marshal" },
+              { value: "None", label: "None" },
             ]}
           />
           <SelectField
             label="ETB"
             id="etb"
             name="etb"
-            placeholder="Select an option"
+            placeholder={
+              staffMember.etb === true
+                ? "Yes"
+                : staffMember.etb === false
+                ? "No"
+                : "Select an option" // Default placeholder
+            }
             options={[
               { value: "true", label: "Yes" },
               { value: "false", label: "No" },
@@ -387,7 +352,13 @@ const AddStaff = () => {
             label="IFAK"
             id="ifak"
             name="ifak"
-            placeholder="Select an option"
+            placeholder={
+              staffMember.ifak === true
+                ? "Yes"
+                : staffMember.ifak === false
+                ? "No"
+                : "Select an option" // Default placeholder
+            }
             options={[
               { value: "true", label: "Yes" },
               { value: "false", label: "No" },
@@ -397,7 +368,13 @@ const AddStaff = () => {
             label="Advanced Driving"
             id="advancedDriving"
             name="advancedDriving"
-            placeholder="Select an option"
+            placeholder={
+              staffMember.advancedDriving === true
+                ? "Yes"
+                : staffMember.advancedDriving === false
+                ? "No"
+                : "Select an option" // Default placeholder
+            }
             options={[
               { value: "true", label: "Yes" },
               { value: "false", label: "No" },
@@ -407,7 +384,13 @@ const AddStaff = () => {
             label="Inside DS"
             id="insideDs"
             name="insideDs"
-            placeholder="Select an option"
+            placeholder={
+              staffMember.insideDs === true
+                ? "Yes"
+                : staffMember.insideDs === false
+                ? "No"
+                : "Select an option" // Default placeholder
+            }
             options={[
               { value: "true", label: "Yes" },
               { value: "false", label: "No" },
@@ -417,7 +400,13 @@ const AddStaff = () => {
             label="Outside DS"
             id="outsideDs"
             name="outsideDs"
-            placeholder="Select an option"
+            placeholder={
+              staffMember.outsideDs === true
+                ? "Yes"
+                : staffMember.outsideDs === false
+                ? "No"
+                : "Select an option" // Default placeholder
+            }
             options={[
               { value: "true", label: "Yes" },
               { value: "false", label: "No" },
@@ -436,87 +425,63 @@ const AddStaff = () => {
               label="Neighborhood"
               id="neighborhood"
               name="addressNeighborhood"
-              placeholder="Enter neighborhood"
+              placeholder={staffMember.address?.neighborhood}
             />
             <InputField
               label="Street"
               id="street"
               name="addressStreet"
-              placeholder="Enter street"
+              placeholder={staffMember.address?.street}
             />
             <InputField
               label="Building"
               id="building"
               name="addressBuilding"
-              placeholder="Enter building"
+              placeholder={staffMember.address?.building}
             />
             <InputField
               label="Floor"
               id="floor"
               name="addressFloor"
-              placeholder="Enter floor"
+              placeholder={staffMember.address?.floor}
             />
             <InputField
               label="Apartment"
               id="apartment"
               name="addressApartment"
-              placeholder="Enter apartment"
+              placeholder={staffMember.address?.apartment}
             />
             <InputField
-              label="Latitude (DMS)"
-              id="latitudeDisplay"
-              name={""}
-              // Remove the "name" so it’s not part of the form submission
-              value={latitude ? convertToDMS(parseFloat(latitude), true) : ""}
-              readOnly
+              label="Latitude"
+              id="latitude"
+              name="latitude"
+              placeholder={staffMember.address?.latitude}
             />
             <InputField
-              label="Longitude (DMS)"
-              id="longitudeDisplay"
-              name={""}
-              // Remove the "name" so it’s not part of the form submission
-              value={
-                longitude ? convertToDMS(parseFloat(longitude), false) : ""
-              }
-              readOnly
+              label="Longitude"
+              id="longitude"
+              name="longitude"
+              placeholder={staffMember.address?.longitude}
             />
-
-            {/* Hidden inputs to submit the decimal values */}
-            <input type="hidden" name="latitude" value={latitude} />
-            <input type="hidden" name="longitude" value={longitude} />
           </div>
 
           {/* Google Map */}
-          <div className="w-full h-[300px] md:h-full md:col-span-2">
-            <MapPicker
-              latitude={latitude}
-              longitude={longitude}
-              onLocationChange={(lat, lng) => {
-                setLatitude(lat);
-                setLongitude(lng);
-              }}
-            />
-          </div>
+          {/* <div className="md:col-span-2">Google Maps</div> */}
         </div>
 
-        <div className="flex justify-center gap-4 mt-4">
+        {/* Submit Buttons Section */}
+        <div className="flex justify-center items-center gap-4 mt-4">
           <button
-            className="bg-mBlue text-sm text-white p-2 rounded-md w-16"
             type="submit"
+            className="bg-mBlue text-sm text-white p-2 rounded-md w-16"
           >
-            Add
+            Save
           </button>
-          <button
-            className="bg-mRed text-sm text-white p-2 rounded-md w-16"
-            type="button"
-            onClick={handleCancel}
-          >
-            Cancel
-          </button>
+          <CancelButton />
         </div>
       </form>
     </main>
   );
 };
 
-export default AddStaff;
+export default EditStaff;

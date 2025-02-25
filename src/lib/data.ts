@@ -15,11 +15,11 @@ export const getStaff = async () => {
 
 export const getStaffById = async (id: string) => {
   try {
-    const staffMember = await Staff.findById(id);
-    return staffMember;
+    const staff = await Staff.findById(id);
+    return staff;
   } catch (err) {
     console.log(err);
-    throw new Error("Failed to get staff member");
+    throw new Error("Failed to get staff");
   }
 };
 
