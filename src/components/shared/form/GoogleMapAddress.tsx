@@ -57,7 +57,7 @@ const GoogleMapAddress: React.FC<GoogleMapAddressProps> = ({
 
   return (
     <GoogleMap
-      mapContainerClassName="w-full h-[300px] md:h-full md:col-span-2 rounded-lg border border-gray-300"
+      // mapContainerClassName="w-full h-[300px] md:h-full md:col-span-2 rounded-lg border border-gray-300"
       zoom={10}
       center={{ lat: 36.2021, lng: 37.1343 }}
       onClick={onMapClick}

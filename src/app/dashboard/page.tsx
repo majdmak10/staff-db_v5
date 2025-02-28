@@ -1,13 +1,45 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import StaffCard from "@/components/dashboard/StaffCard";
-// import StaffPanel from "@/components/StaffPanel";
 import UsefulLinks from "@/components/dashboard/UsefulLinks";
+import { getStaffCounts } from "@/utils/getStaffActions";
+import StaffPanel from "@/components/dashboard/StaffPanel";
+import StaffInsidePanel from "@/components/dashboard/StaffInsidePanel";
+import StaffOutsidePanel from "@/components/dashboard/StaffOutsidePanel";
+
+// Define the type for our staff data
+type StaffCounts = {
+  totalStaff: number | null;
+  staffInside: number | null;
+  staffOutside: number | null;
+};
 
 const Dashboard = () => {
-  const staffInside = 10; // Replace with actual data
-  const staffOutside = 5; // Replace with actual data
-  const totalStaff = staffInside + staffOutside;
+  const [staffData, setStaffData] = useState<StaffCounts>({
+    totalStaff: null,
+    staffInside: null,
+    staffOutside: null,
+  });
+
+  useEffect(() => {
+    const fetchStaffData = async () => {
+      try {
+        const counts = await getStaffCounts();
+        setStaffData(counts);
+      } catch (error) {
+        console.error("Failed to fetch staff data:", error);
+        // Set to zeros in case of error
+        setStaffData({
+          totalStaff: 0,
+          staffInside: 0,
+          staffOutside: 0,
+        });
+      }
+    };
+
+    fetchStaffData();
+  }, []);
 
   return (
     <div className="flex gap-3 flex-col md:flex-row">
@@ -16,36 +48,39 @@ const Dashboard = () => {
         {/* STAFF CARDS */}
         <div className="flex flex-col gap-2 lg:flex-row lg:gap-3">
           <StaffCard
-            iconSrc="/cards_icons/staff_total.png" // Path to your image for total staff
+            iconSrc="/cards_icons/staff_total.png"
             altText="Total Staff Icon"
             title="Total Staff"
-            number={totalStaff}
+            number={staffData.totalStaff}
             link="/total-staff"
             textColor="text-uBlue"
           />
           <StaffCard
-            iconSrc="/cards_icons/staff_inside.png" // Path to your image for staff inside
+            iconSrc="/cards_icons/staff_inside.png"
             altText="Staff Inside Icon"
             title="Staff Inside Aleppo"
-            number={staffInside}
+            number={staffData.staffInside}
             link="/staff-inside"
             textColor="text-mGreen"
           />
           <StaffCard
-            iconSrc="/cards_icons/staff_outside.png" // Path to your image for staff outside
+            iconSrc="/cards_icons/staff_outside.png"
             altText="Staff Outside Icon"
             title="Staff Outside Aleppo"
-            number={staffOutside}
+            number={staffData.staffOutside}
             link="/staff-outside"
             textColor="text-mRed"
           />
         </div>
         <div>
-          {/* <StaffPanel imageSrc="/" name="Majd Makdessi" phone="0944613809" /> */}
-          Staff Panel
+          <StaffPanel />
         </div>
-        <div>Staff Inside Duty Station Panel</div>
-        <div>Staff Outside Duty Station Panel</div>
+        <div>
+          <StaffInsidePanel />
+        </div>
+        <div>
+          <StaffOutsidePanel />
+        </div>
       </div>
 
       {/* RIGHT */}

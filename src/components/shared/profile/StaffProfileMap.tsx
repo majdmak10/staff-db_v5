@@ -8,6 +8,13 @@ interface StaffProfileMapProps {
   longitude: number | null;
 }
 
+const containerStyle = {
+  width: "100%",
+  height: "100%",
+  border: "1px solid #D1D5DB",
+  borderRadius: "8px",
+};
+
 const StaffProfileMap: React.FC<StaffProfileMapProps> = ({
   latitude,
   longitude,
@@ -22,7 +29,7 @@ const StaffProfileMap: React.FC<StaffProfileMapProps> = ({
 
   return (
     <GoogleMap
-      mapContainerClassName="w-full h-[400px] rounded-lg border border-gray-300"
+      mapContainerStyle={containerStyle}
       zoom={15}
       center={{ lat: latitude, lng: longitude }}
     >

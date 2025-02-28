@@ -346,7 +346,7 @@ const StaffProfile = async ({
             }
           />
         </div>
-        <div className="md:col-span-2">
+        <div className="w-full md:col-span-2">
           <StaffProfileMap latitude={latitude} longitude={longitude} />
         </div>
       </div>

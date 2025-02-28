@@ -11,7 +11,9 @@ type MapPickerProps = {
 
 const containerStyle = {
   width: "100%",
-  height: "300px",
+  height: "100%",
+  border: "1px solid #D1D5DB",
+  borderRadius: "8px",
 };
 
 // Set default center to Aleppo, Syria

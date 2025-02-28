@@ -19,7 +19,7 @@ const StaffCard = ({
   textColor,
 }: StaffCardProps) => {
   return (
-    <div className="rounded-lg bg-white p-6 flex flex-1 items-center w-full lg:w-1/3">
+    <div className="rounded-lg bg-white p-6 flex flex-1 items-center w-full md:w-1/3">
       <div className="flex-shrink-0">
         <Image src={iconSrc} alt={altText} width={40} height={40} />
       </div>

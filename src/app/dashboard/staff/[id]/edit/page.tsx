@@ -52,6 +52,7 @@ const EditStaff: React.FC<EditStaffProps> = async ({ params }) => {
             placeholder={staffMember.fullName}
           />
           <DateInputField
+            name="dateOfBirth"
             label="Date of Birth"
             initialDate={
               staffMember.dateOfBirth
@@ -164,7 +165,6 @@ const EditStaff: React.FC<EditStaffProps> = async ({ params }) => {
             name="unhcrEmail"
             placeholder={staffMember.unhcrEmail}
             type="email"
-            // error={errors.unhcrEmail}
           />
           <InputField
             label="Private Email"
@@ -172,7 +172,267 @@ const EditStaff: React.FC<EditStaffProps> = async ({ params }) => {
             name="privateEmail"
             placeholder={staffMember.privateEmail}
             type="email"
-            // error={errors.privateEmail}
+          />
+          <InputField
+            label="Mobile Syriatel"
+            id="mobileSyriatel"
+            name="mobileSyriatel"
+            placeholder={staffMember.mobileSyriatel}
+          />
+          <InputField
+            label="Mobile MTN"
+            id="mobileMtn"
+            name="mobileMtn"
+            placeholder={staffMember.mobileMtn}
+          />
+          <InputField
+            label="Home Phone"
+            id="homePhone"
+            name="homePhone"
+            placeholder={staffMember.homePhone}
+          />
+          <InputField
+            label="Office Extension"
+            id="extension"
+            name="extension"
+            placeholder={staffMember.extension}
+          />
+          <InputField
+            label="Radio Call"
+            id="radio"
+            name="radio"
+            placeholder={staffMember.radio}
+          />
+        </div>
+        <div>
+          <label className="text-sm text-gray-500 font-semibold">
+            Emergency Contact
+          </label>
+          <div className="grid grid-cols-1 md:grid-cols-3 md:gap-x-10 gap-y-5">
+            <InputField
+              label={""}
+              id="emergencyContactName"
+              name="emergencyContactName"
+              placeholder={staffMember.emergencyContact?.fullName}
+            />
+            <InputField
+              label={""}
+              id="emergencyContactRelationship"
+              name="emergencyContactRelationship"
+              placeholder={staffMember.emergencyContact?.relationship}
+            />
+            <InputField
+              label={""}
+              name="emergencyContactMobile"
+              id="emergencyContactMobile"
+              placeholder={staffMember.emergencyContact?.mobile}
+            />
+          </div>
+        </div>
+
+        {/* Tailwind divider */}
+        <div className="divider my-6 h-[1px] bg-gray-200"></div>
+
+        {/* Official Documents Information */}
+        <FormSectionTitle title="Official Documents Information" />
+        <div className="grid grid-cols-1 md:grid-cols-3 md:gap-x-10 gap-y-5">
+          <SelectField
+            label="Contract Type"
+            id="contractType"
+            name="contractType"
+            placeholder={staffMember.contractType}
+            options={[
+              { value: "Fixed", label: "Fixed" },
+              { value: "Temporary", label: "Temporary" },
+            ]}
+          />
+          <DateInputField
+            name="contractStartDate"
+            label="Contract Start Date"
+            initialDate={
+              staffMember.contractStartDate
+                ? new Date(staffMember.contractStartDate)
+                    .toISOString()
+                    .split("T")[0]
+                : undefined
+            }
+          />
+          <DateInputField
+            name="contractEndDate"
+            label="Contract End Date"
+            initialDate={
+              staffMember.contractEndDate
+                ? new Date(staffMember.contractEndDate)
+                    .toISOString()
+                    .split("T")[0]
+                : undefined
+            }
+          />
+          <InputField
+            label="National ID Number"
+            id="nationalIdNumber"
+            name="nationalIdNumber"
+            placeholder={staffMember.nationalIdNumber}
+          />
+          <InputField
+            label="Passport Number"
+            id="passportNumber"
+            name="passportNumber"
+            placeholder={staffMember.passportNumber}
+          />
+          <DateInputField
+            name="passportExpiryDate"
+            label="Passport Expiry Date"
+            initialDate={
+              staffMember.passportExpiryDate
+                ? new Date(staffMember.passportExpiryDate)
+                    .toISOString()
+                    .split("T")[0]
+                : undefined
+            }
+          />
+          <InputField
+            label="UNLP Number"
+            id="unlpNumber"
+            name="unlpNumber"
+            placeholder={staffMember.unlpNumber}
+          />
+          <DateInputField
+            name="unlpExpiryDate"
+            label="UNLP Expiry Date"
+            initialDate={
+              staffMember.unlpExpiryDate
+                ? new Date(staffMember.unlpExpiryDate)
+                    .toISOString()
+                    .split("T")[0]
+                : undefined
+            }
+          />
+        </div>
+
+        {/* Tailwind divider */}
+        <div className="divider my-6 h-[1px] bg-gray-200"></div>
+
+        {/* Other Information */}
+        <FormSectionTitle title="Other Information" />
+        <div className="grid grid-cols-1 md:grid-cols-3 md:gap-x-10 gap-y-5">
+          <SelectField
+            label="Critical Staff"
+            id="criticalStaff"
+            name="criticalStaff"
+            placeholder={
+              staffMember.criticalStaff === true
+                ? "Yes"
+                : staffMember.criticalStaff === false
+                ? "No"
+                : "Select an option" // Default placeholder
+            }
+            options={[
+              { value: "true", label: "Yes" },
+              { value: "false", label: "No" },
+            ]}
+          />
+          <SelectField
+            label="Warden"
+            id="warden"
+            name="warden"
+            placeholder={staffMember.warden}
+            options={[
+              { value: "Warden", label: "Warden" },
+              { value: "Deputy", label: "Deputy" },
+              { value: "None", label: "None" },
+            ]}
+          />
+          <SelectField
+            label="Floor Marshal"
+            id="floorMarshal"
+            name="floorMarshal"
+            placeholder={staffMember.floorMarshal}
+            options={[
+              { value: "Floor Marshal", label: "Floor Marshal" },
+              { value: "Deputy Floor Marshal", label: "Deputy Floor Marshal" },
+              { value: "None", label: "None" },
+            ]}
+          />
+          <SelectField
+            label="ETB"
+            id="etb"
+            name="etb"
+            placeholder={
+              staffMember.etb === true
+                ? "Yes"
+                : staffMember.etb === false
+                ? "No"
+                : "Select an option" // Default placeholder
+            }
+            options={[
+              { value: "true", label: "Yes" },
+              { value: "false", label: "No" },
+            ]}
+          />
+          <SelectField
+            label="IFAK"
+            id="ifak"
+            name="ifak"
+            placeholder={
+              staffMember.ifak === true
+                ? "Yes"
+                : staffMember.ifak === false
+                ? "No"
+                : "Select an option" // Default placeholder
+            }
+            options={[
+              { value: "true", label: "Yes" },
+              { value: "false", label: "No" },
+            ]}
+          />
+          <SelectField
+            label="Advanced Driving"
+            id="advancedDriving"
+            name="advancedDriving"
+            placeholder={
+              staffMember.advancedDriving === true
+                ? "Yes"
+                : staffMember.advancedDriving === false
+                ? "No"
+                : "Select an option" // Default placeholder
+            }
+            options={[
+              { value: "true", label: "Yes" },
+              { value: "false", label: "No" },
+            ]}
+          />
+          <SelectField
+            label="Inside DS"
+            id="insideDs"
+            name="insideDs"
+            placeholder={
+              staffMember.insideDs === true
+                ? "Yes"
+                : staffMember.insideDs === false
+                ? "No"
+                : "Select an option" // Default placeholder
+            }
+            options={[
+              { value: "true", label: "Yes" },
+              { value: "false", label: "No" },
+            ]}
+          />
+          <SelectField
+            label="Outside DS"
+            id="outsideDs"
+            name="outsideDs"
+            placeholder={
+              staffMember.outsideDs === true
+                ? "Yes"
+                : staffMember.outsideDs === false
+                ? "No"
+                : "Select an option" // Default placeholder
+            }
+            options={[
+              { value: "true", label: "Yes" },
+              { value: "false", label: "No" },
+            ]}
           />
         </div>
 
@@ -181,13 +441,18 @@ const EditStaff: React.FC<EditStaffProps> = async ({ params }) => {
 
         {/* Address Information */}
         <FormSectionTitle title="Address Information" />
-        <div className="grid grid-cols-1 md:grid-cols-3 md:gap-x-10 gap-y-5">
-          <div className="flex flex-wrap justify-between gap-4">
-            <MapEditor
-              initialLatitude={staffMember.address?.latitude || "36.2021"}
-              initialLongitude={staffMember.address?.longitude || "37.1343"}
-            />
-          </div>
+        <div className="w-full md:col-span-2">
+          <MapEditor
+            initialLatitude={staffMember.address?.latitude || "36.2021"}
+            initialLongitude={staffMember.address?.longitude || "37.1343"}
+            initialAddress={{
+              neighborhood: staffMember.address?.neighborhood,
+              street: staffMember.address?.street,
+              building: staffMember.address?.building,
+              floor: staffMember.address?.floor,
+              apartment: staffMember.address?.apartment,
+            }}
+          />
         </div>
 
         {/* Submit Buttons Section */}

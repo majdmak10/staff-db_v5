@@ -1,20 +1,20 @@
-export interface IAddress {
-  neighborhood?: string;
-  street?: string;
-  building?: string;
-  floor?: string;
-  apartment?: string;
-  latitude?: number;
-  longitude?: number;
-}
-
 export interface IEmergencyContact {
   fullName?: string;
   relationship?: string;
   mobile?: string;
 }
 
-export interface StaffMember {
+export interface IAddress {
+  neighborhood?: string;
+  street?: string;
+  building?: string;
+  floor?: string;
+  apartment?: string;
+  latitude?: string;
+  longitude?: string;
+}
+
+export interface IStaff {
   _id: string;
   profilePicture?: string;
   fullName: string;

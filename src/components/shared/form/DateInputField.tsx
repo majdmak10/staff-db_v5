@@ -6,13 +6,17 @@ import "react-datepicker/dist/react-datepicker.css";
 import Image from "next/image";
 
 interface DateInputFieldProps {
-  label: string;
+  name: string; // Unique name for form submission
+  label: string; // Label for the input
   initialDate?: string; // Expected format: YYYY-MM-DD
+  placeholder?: string; // Custom placeholder (optional)
 }
 
 const DateInputField: React.FC<DateInputFieldProps> = ({
+  name,
   label,
   initialDate,
+  placeholder,
 }) => {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const dateInputRef = useRef<DatePicker | null>(null);
@@ -40,7 +44,7 @@ const DateInputField: React.FC<DateInputFieldProps> = ({
           selected={selectedDate}
           onChange={handleDateChange}
           dateFormat="dd/MM/yyyy"
-          placeholderText="DD/MM/YYYY"
+          placeholderText={placeholder || "DD/MM/YYYY"}
           className="w-full text-gray-400 focus:outline-none mr-8"
           showMonthDropdown
           showYearDropdown
@@ -136,7 +140,7 @@ const DateInputField: React.FC<DateInputFieldProps> = ({
       {/* Hidden input to store the correct format for form submission */}
       <input
         type="hidden"
-        name="dateOfBirth"
+        name={name}
         value={selectedDate ? selectedDate.toISOString().split("T")[0] : ""}
       />
 

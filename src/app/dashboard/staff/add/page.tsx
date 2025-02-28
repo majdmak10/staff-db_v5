@@ -487,7 +487,7 @@ const AddStaff = () => {
           </div>
 
           {/* Google Map */}
-          <div className="w-full h-[300px] md:h-full md:col-span-2">
+          <div className="w-full md:col-span-2">
             <MapPicker
               latitude={latitude}
               longitude={longitude}
